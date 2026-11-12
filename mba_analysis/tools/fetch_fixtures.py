@@ -22,7 +22,12 @@ HTML_FIXTURES = {
     "profile_narangerel_batbayar": f"{BASE}/en/players/narangerel-batbayar",
 }
 
-WIKI_FIXTURES = {}
+WIKI = "https://en.wikipedia.org/w/index.php?action=raw&title="
+WIKI_FIXTURES = {
+    "league": WIKI + "The_League_(Mongolia)",
+    "season_2023_24": WIKI + "2023%E2%80%9324_The_League_season",
+    "national_team": WIKI + "Mongolia_men%27s_national_basketball_team",
+}
 
 
 def main() -> None:
