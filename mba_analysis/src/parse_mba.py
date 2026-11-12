@@ -70,6 +70,74 @@ def parse_schedule(html: str, month: str) -> list[dict]:
     return rows
 
 
+STAT_COLS = ["GP", "MIN", "PPG", "RPG", "APG", "SPG", "BPG", "PF", "FG_pct", "TP_pct", "EFF"]
+POSITIONS = {"PG", "SG", "SF", "PF", "C"}
+
+
+def _float(s: str | None) -> float | None:
+    if s is None:
+        return None
+    s = s.strip()
+    return float(s) if re.fullmatch(r"-?\d+(?:\.\d+)?", s) else None
+
+
+def parse_player_stats(html: str) -> list[dict]:
+    table = _soup(html).find("main").find("table")
+    rows = []
+    for tr in table.find("tbody").find_all("tr"):
+        cells = [c.get_text(" ", strip=True) for c in tr.find_all(["td", "th"])]
+        link = tr.find("a", href=re.compile(r"^/en/players/"))
+        row = {
+            "rank": _int(cells[0]),
+            "player_name": cells[1],
+            "player_slug": _slug(link["href"] if link else None, "/en/players/"),
+            "team_name": cells[2],
+        }
+        for col, raw in zip(STAT_COLS, cells[3:]):
+            row[col] = _int(raw) if col == "GP" else _float(raw)
+        rows.append(row)
+    return rows
+
+
+def parse_player_profile(html: str, player_slug: str) -> dict:
+    main = _soup(html).find("main")
+    strings = list(main.stripped_strings)
+    meta = next((s for s in strings if re.search(r"\(\s*(PG|SG|SF|PF|C)\s*\)", s) and re.search(r"20\d\d-20\d\d", s)), "")
+    parts = [p.strip() for p in meta.split("·")]
+    pos = re.search(r"\((PG|SG|SF|PF|C)\)", meta)
+    height = re.search(r"(\d{3})\s*cm", meta)
+    birth = next((int(p) for p in parts if re.fullmatch(r"(19|20)\d\d", p)), None)
+    season = re.search(r"(20\d\d-20\d\d)", meta)
+    number = None
+    team_name = None
+    if "· #" in strings:
+        i = strings.index("· #")
+        number = _int(strings[i + 1])
+        team_name = strings[i - 1]
+    ft = None
+    table = main.find("table")
+    if table is not None:
+        header = [th.get_text(strip=True) for th in table.find("tr").find_all("th")]
+        ft_idx = header.index("FT%") if "FT%" in header else None
+        body = table.find_all("tr")[1:]
+        chosen = next((tr for tr in body if season and tr.get_text(" ", strip=True).startswith(season.group(1))), body[0] if body else None)
+        if chosen is not None and ft_idx is not None:
+            cells = [c.get_text(" ", strip=True) for c in chosen.find_all(["td", "th"])]
+            ft = _float(cells[ft_idx]) if ft_idx < len(cells) else None
+    return {
+        "player_slug": player_slug,
+        "team_name": team_name,
+        "number": number,
+        "position_raw": parts[0] if parts and pos else None,
+        "position": pos.group(1) if pos else None,
+        "height_cm": int(height.group(1)) if height else None,
+        "birth_year": birth,
+        "is_import": "Import player" in parts,
+        "season": season.group(1) if season else None,
+        "FT_pct": ft,
+    }
+
+
 def _quarters(table) -> tuple[list[int], list[int]]:
     trs = table.find_all("tr")
     labels = [c.get_text(strip=True) for c in trs[0].find_all(["th", "td"])][1:]
