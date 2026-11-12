@@ -70,3 +70,25 @@ def test_categories():
 
 def test_pythag_erdenet_2023_24():
     assert pythag(1878, 1693) == pytest.approx(0.8088, abs=1e-4)
+
+
+def test_add_player_rates():
+    from src.features import add_player_rates
+    ps = pd.DataFrame({"season": ["2025-2026"], "GP": [10], "MIN": [30.0], "PPG": [20.0], "RPG": [6.0],
+                       "APG": [3.0], "SPG": [1.5], "BPG": [0.6], "PTS_total": [200], "FGA": [150], "FTA": [50],
+                       "TPA": [60], "position": ["PG"], "birth_year": [1995]})
+    out = add_player_rates(ps).iloc[0]
+    assert out.MIN_total == 300
+    assert out.pts36 == pytest.approx(24.0) and out.reb36 == pytest.approx(7.2)
+    assert out.ts_pct == pytest.approx(200 / (2 * (150 + 22)))
+    assert out.tpa_rate == pytest.approx(0.4) and out.ftr == pytest.approx(1 / 3)
+    assert out.age == 30 and out.pos_group == "Guard" and out.scorer_tier == "Од"
+
+
+def test_add_player_rates_zero_fga_nan():
+    from src.features import add_player_rates
+    ps = pd.DataFrame({"season": ["2026-2027"], "GP": [1], "MIN": [0.0], "PPG": [0.0], "RPG": [0.0], "APG": [0.0],
+                       "SPG": [0.0], "BPG": [0.0], "PTS_total": [0], "FGA": [0], "FTA": [0], "TPA": [0],
+                       "position": ["C"], "birth_year": [2000]})
+    out = add_player_rates(ps).iloc[0]
+    assert np.isnan(out.ts_pct) and np.isnan(out.tpa_rate) and np.isnan(out.pts36)

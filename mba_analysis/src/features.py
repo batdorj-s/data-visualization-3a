@@ -71,3 +71,40 @@ def add_player_categories(df: pd.DataFrame, season_start_year: int | pd.Series) 
 def pythag(pf, pa, exponent: float = PYTHAG_EXP):
     pf_e, pa_e = np.power(pf, exponent, dtype=float), np.power(pa, exponent, dtype=float)
     return _div(pf_e, pf_e + pa_e)
+
+
+def add_player_rates(ps: pd.DataFrame) -> pd.DataFrame:
+    out = ps.copy()
+    out["MIN_total"] = out["MIN"] * out["GP"]
+    for src_col, dst in (("PPG", "pts36"), ("RPG", "reb36"), ("APG", "ast36"), ("SPG", "stl36"), ("BPG", "blk36")):
+        out[dst] = per36(out[src_col], out["MIN"])
+    out["ts_pct"] = ts_pct(out["PTS_total"], out["FGA"], out["FTA"])
+    out["tpa_rate"] = _div(out["TPA"], out["FGA"])
+    out["ftr"] = _div(out["FTA"], out["FGA"])
+    start_year = out["season"].astype(str).str[:4].astype(int)
+    return add_player_categories(out, start_year)
+
+
+def add_all_features(processed_dir) -> None:
+    from pathlib import Path
+
+    from src.elo import run_elo
+
+    d = Path(processed_dir)
+    ps = pd.read_csv(d / "players_season.csv")
+    meta = pd.read_csv(d / "team_meta.csv")
+    nat = pd.read_csv(d / "national_team.csv")
+    ps = add_player_rates(ps.drop(columns=[c for c in ("region", "is_national") if c in ps.columns]))
+    ps = ps.merge(meta[["team_key", "region"]], on="team_key", how="left")
+    ps["is_national"] = ps.player_id.isin(set(nat.matched_player_id.dropna()))
+    ps.to_csv(d / "players_season.csv", index=False)
+
+    tg = pd.read_csv(d / "team_games.csv")
+    base_cols = [c for c in tg.columns if c not in {"efg", "tov_pct", "orb_pct", "ftr", "poss", "ortg", "drtg", "net",
+                                                     "win", "opp_key", "opp_pts", "opp_dreb", "opp_poss"}]
+    four_factors(tg[base_cols]).to_csv(d / "team_games.csv", index=False)
+
+    g = pd.read_csv(d / "games.csv")
+    g = g.drop(columns=[c for c in g.columns if c.startswith("elo_")])
+    elo = run_elo(g.rename(columns={"home_team_key": "home_key", "away_team_key": "away_key"}))
+    g.merge(elo.drop(columns=["home_key", "away_key"]), on="game_id").to_csv(d / "games.csv", index=False)

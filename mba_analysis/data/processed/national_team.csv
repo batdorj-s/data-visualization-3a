@@ -1,0 +1,13 @@
+num,first,last,pos,birth_date,club,club_country,captain,matched_player_id
+2,Bolor-Erdene,Gantsolmon,"C,F",2003-11-17,Erdenet Miners,Mongolia,False,gantsolmon-bolor-erdene
+3,Enkhbayasgalan,Amarbayasgalan,F,1997-08-14,Erdenet Miners,Mongolia,False,amarbayasgalan-enkhbayasgalan
+4,Uuganbayar,Tumenbayar,G,1998-02-17,Bishrelt Metal,Mongolia,False,tumenbayar-uuganbayar
+5,Saruul-Erdene,Enkhbaatar,G,1999-01-18,SG Apes,Mongolia,False,enkhbaatar-saruul-erdene
+6,Bayasgalan,Delgerchuluun,G,1997-10-30,TSG GhostHawks,Taiwan,False,
+7,Azbayar,Altangerel,C,2005-03-28,Fukushima Firebonds,Japan,False,altangerel-azbayar
+8,Erdenetsogt,Ochirbat,G,1995-01-14,BCH Knights,Mongolia,True,ochirbat-erdenetsogt
+9,Orgil,Khishigbaatar,C,2003-05-17,Fukui Blowinds,Japan,False,
+10,Barsbold,Baatar-Erdene,G,2004-10-19,Khasin Khuleguud,Mongolia,False,baatar-erdene-barsbold
+22,Sugar-Ochir,Erdenetsetseg,G,1999-07-02,BCH Knights,Mongolia,False,erdenetsetseg-sugar-ochir
+25,Binderiya,Sandagdorj,G,2004-03-08,Khasin Khuleguud,Mongolia,False,sandagdorj-binderyaa
+55,Enkhiin-Od,Sharavjamts,G,2002-08-27,South Carolina Gamecocks,United States,False,
