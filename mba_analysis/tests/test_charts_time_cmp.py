@@ -92,3 +92,9 @@ def test_other_charts_pass_qa(tg, games, pg):
     check(C.fig_pareto(vals, imp.reindex(vals.index).map({True: "#D55E00", False: "#0072B2"}),
                        title="Т", subtitle="Д", xlabel="x", ylabel="y", n=len(vals), cum_ci=C.pareto_ci(
                            pg[pg.season == "2025-2026"], n_boot=50)))
+
+
+def test_fan_title_differs_from_plain(tg):
+    a = T.fig_cum_winpct(tg, ["sg_apes"], bands=False)._mba_meta["title"]
+    b = T.fig_cum_winpct(tg, ["sg_apes"], bands=True)._mba_meta["title"]
+    assert a != b and "±" in b

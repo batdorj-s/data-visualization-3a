@@ -76,3 +76,10 @@ def test_heatmap_centered(players):
     fig = D.fig_corr_heatmap(players)
     im = fig.axes[0].collections[0] if fig.axes[0].collections else fig.axes[0].images[0]
     assert im.norm.vmin == -1 and im.norm.vmax == 1
+
+
+def test_raincloud_title_uses_point_estimate(players):
+    imp = players[players.is_import.astype(bool)].PPG.median()
+    dom = players[~players.is_import.astype(bool)].PPG.median()
+    fig = D.fig_raincloud(players, np.full(100, 99.0))
+    assert f"{imp - dom:.1f}-оор" in fig._mba_meta["title"]

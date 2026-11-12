@@ -63,7 +63,13 @@ def fig_cum_winpct(team_games: pd.DataFrame, highlight: list[str], bands: bool =
     ax.set_ylabel("Хуримтлагдсан ялалтын хувь")
     final = tg.groupby("team_key").last()
     leader = final.winpct.idxmax()
-    return finish(fig, f"{names.get(leader, leader)} улирлыг {final.loc[leader, 'winpct']:.0%} ялалтаар тэргүүлж дуусгасан",
+    title = f"{names.get(leader, leader)} улирлыг {final.loc[leader, 'winpct']:.0%} ялалтаар тэргүүлж дуусгасан"
+    if bands:
+        f0 = final.loc[highlight[0]]
+        ci = wilson_ci(int(f0.wins), int(f0.games))
+        title = (f"{names.get(highlight[0], highlight[0])}-ийн ялалтын хувь улирлын эцэст ч "
+                 f"±{(ci.hi - ci.lo) / 2:.0%} тодорхой бус ({int(f0.games)} тоглолт)")
+    return finish(fig, title,
                   f"{season.replace('-20', '–')} энгийн улирал; саарал = бусад баг"
                   + (f"; зурвас = {names.get(highlight[0], highlight[0])}-ийн 50/80/95% итгэх интервал" if bands else ""),
                   source_mba(), n=int(tg.team_key.nunique()),

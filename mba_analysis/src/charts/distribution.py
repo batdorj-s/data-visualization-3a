@@ -168,7 +168,8 @@ def fig_raincloud(players: pd.DataFrame, boot_diff: np.ndarray):
     ax.set_xlabel(label("PPG"))
     ax.set_ylabel("Тоглогчийн төрөл")
     lo, hi = np.percentile(boot_diff, [2.5, 97.5])
-    est = float(np.median(boot_diff))
+    est = float(players.loc[players.is_import.astype(bool), "PPG"].median()
+                - players.loc[~players.is_import.astype(bool), "PPG"].median())
     ax2.hist(boot_diff, bins=40, color=NEUTRAL, edgecolor="white", linewidth=0.3)
     for v in (lo, hi):
         ax2.axvline(v, color="black", linestyle="--", linewidth=1)

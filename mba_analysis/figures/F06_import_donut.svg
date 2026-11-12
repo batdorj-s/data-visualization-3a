@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="453.543307pt" height="273.565804pt" viewBox="0 0 453.543307 273.565804" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-13T00:16:55.513709</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 273.565804 
+L 453.543307 273.565804 
+L 453.543307 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 266.019189 219.432952 
+C 278.727546 211.003107 288.388028 198.699076 293.561779 184.353452 
+C 298.735529 170.007827 299.152266 154.37004 294.749921 139.769218 
+C 290.347575 125.168397 281.35613 112.367304 269.114792 103.272565 
+C 256.873453 94.177826 242.021724 89.26456 226.771654 89.26456 
+L 226.771654 116.244951 
+C 236.226697 116.244951 245.434769 119.291176 253.024399 124.929914 
+C 260.614029 130.568652 266.188725 138.505329 268.918179 147.557839 
+C 271.647634 156.610348 271.389256 166.305776 268.181531 175.200063 
+C 264.973806 184.094351 258.984307 191.722849 251.105126 196.949353 
+z
+" style="fill: #d55e00; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 226.771654 89.26456 
+C 215.695327 89.26456 204.771152 91.856459 194.875418 96.832346 
+C 184.979684 101.808233 176.384259 109.031405 169.778631 117.92245 
+C 163.173002 126.813495 158.738648 137.128147 156.831274 148.039009 
+C 154.923899 158.949872 155.595905 170.157189 158.793386 180.761957 
+C 161.990868 191.366726 167.62598 201.077599 175.246698 209.115613 
+C 182.867416 217.153626 192.264374 223.29795 202.68379 227.055713 
+C 213.103205 230.813476 224.258823 232.08144 235.255788 230.757896 
+C 246.252752 229.434351 256.788942 225.555659 266.019189 219.432952 
+L 251.105126 196.949353 
+C 245.382373 200.745432 238.849935 203.150221 232.031817 203.970819 
+C 225.213699 204.791416 218.297216 204.005278 211.837178 201.675465 
+C 205.37714 199.345652 199.551026 195.536171 194.826181 190.552603 
+C 190.101336 185.569035 186.607566 179.548293 184.625128 172.973337 
+C 182.642689 166.398381 182.226046 159.449844 183.408618 152.685109 
+C 184.59119 145.920374 187.34049 139.52529 191.435979 134.012842 
+C 195.531469 128.500395 200.860633 124.022028 206.995988 120.936978 
+C 213.131343 117.851928 219.904331 116.244951 226.771654 116.244951 
+z
+" style="fill: #0072b2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'Arial'; fill: #d55e00" transform="translate(298.229929 133.225868)">Import</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'Arial'; fill: #d55e00" transform="translate(303.776804 144.109657)">41%</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'Arial'; fill: #0072b2" transform="translate(121.607909 181.5973)">Дотоод</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'Arial'; fill: #0072b2" transform="translate(129.75244 192.481089)">59%</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 9px; font-family: 'Arial'" transform="translate(217.765325 152.799279)">32%</text>
+    <text style="font-size: 9px; font-family: 'Arial'" transform="translate(211.553216 162.594689)">тоглогч</text>
+    <text style="font-size: 9px; font-family: 'Arial'" transform="translate(214.019779 172.3901)">Import</text>
+   </g>
+  </g>
+  <g id="text_4">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'Arial'; text-anchor: start" x="4.535433" y="12.121456" transform="rotate(-0 4.535433 12.121456)">Тоглогчдын 32% нь Import ч лигийн онооны 41%-ийг авдаг</text>
+  </g>
+  <g id="text_5">
+   <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #4d4d4d" x="4.535433" y="33.586815" transform="rotate(-0 4.535433 33.586815)">Бүх тоглолтын онооны хуваарь (95% CI 39%–42%) · 2025-26 ба 2026-27 · n = 252</text>
+  </g>
+  <g id="text_6">
+   <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start; fill: #6b6b6b" x="4.535433" y="269.356865" transform="rotate(-0 4.535433 269.356865)">Эх сурвалж: MBA статистикийн систем, 2026-11-12. CI: тоглолтоор 2000 bootstrap; n = тоглолтын тоо</text>
+  </g>
+ </g>
+</svg>
