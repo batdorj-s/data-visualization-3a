@@ -119,9 +119,8 @@ def fig_pairplot(players: pd.DataFrame, labels: pd.Series | None):
     df = df.dropna(subset=PAIR_COLS)
     if labels is not None:
         df["Бүлэг"] = labels.reindex(df.index).astype(str)
-        groups = sorted(df["Бүлэг"].dropna().unique())
-        colors = [PALETTE[c] for c in ("vermillion", "blue", "green", "orange", "purple", "sky")]
-        palette = dict(zip(groups, colors))
+        from src.charts.ml import cluster_colors
+        palette = cluster_colors(df["Бүлэг"].dropna())
         hue, subtitle = "Бүлэг", "Өнгө = K-Means архетип"
     else:
         df["Бүлэг"] = df.position
