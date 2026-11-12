@@ -1,0 +1,22 @@
+# Зохиогчийн эрхтэй хичээлийн материал (лекц, сурах бичиг) — нийтийн repo-д оруулахгүй
+/L*.pdf
+/BetterDataVis.pdf
+/Tominski*.pdf
+/project_01.docx
+/Claude-by-Anthropic-for-Word.docx
+
+# Локал тохиргоо, орчин
+.claude/settings.local.json
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+.env
+
+# MBA төсөл: түүхий HTML кэш (том, дахин үүсгэж болно). CSV-г commit хийнэ
+mba_analysis/data/raw/html/
+.streamlit/secrets.toml
+~$*.docx
+~$*.pptx
