@@ -20,3 +20,9 @@ mba_analysis/data/raw/html/
 .streamlit/secrets.toml
 ~$*.docx
 ~$*.pptx
+
+# MBA төсөл: тестийн fixture (татаж авна), venv
+mba_analysis/tests/fixtures/html/
+mba_analysis/tests/fixtures/wiki/
+mba_analysis/.venv/
+.superpowers/
