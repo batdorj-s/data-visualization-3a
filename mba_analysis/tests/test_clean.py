@@ -137,3 +137,15 @@ def test_link_national_team():
     out = link_national_team(nat, ps)
     assert out.matched_player_id.tolist()[0] == "sandagdorj-binderyaa"
     assert pd.isna(out.matched_player_id.tolist()[1])
+
+
+def test_fix_implausible_values():
+    from src.clean import fix_implausible_values
+    log = CleaningLog()
+    df = pd.DataFrame({"season": ["2026-2027"] * 4, "birth_year": [1900, 2025, 1995, None],
+                       "height_cm": [202, 150, 195, 190]})
+    out = fix_implausible_values(df, log)
+    assert pd.isna(out.birth_year[0]) and pd.isna(out.birth_year[1]) and out.birth_year[2] == 1995
+    assert pd.isna(out.height_cm[1]) and out.height_cm[0] == 202
+    assert log.to_frame().iloc[-1].step == "C12"
+    assert "3" in log.to_frame().iloc[-1].note

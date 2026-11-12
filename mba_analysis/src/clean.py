@@ -77,6 +77,25 @@ def fix_zero_attempt_pct(df: pd.DataFrame, log: CleaningLog | None = None) -> pd
     return out
 
 
+AGE_RANGE = (15, 45)
+HEIGHT_RANGE = (160, 230)
+
+
+def fix_implausible_values(df: pd.DataFrame, log: CleaningLog | None = None) -> pd.DataFrame:
+    """Боломжгүй утгыг (1900 гэх мэт placeholder төрсөн он, 150 см) NaN болгоно (C12)."""
+    out = df.copy()
+    start = out["season"].astype(str).str[:4].astype(int)
+    age = start - pd.to_numeric(out["birth_year"], errors="coerce")
+    bad_birth = age.notna() & ~age.between(*AGE_RANGE)
+    h = pd.to_numeric(out["height_cm"], errors="coerce")
+    bad_height = h.notna() & ~h.between(*HEIGHT_RANGE)
+    out.loc[bad_birth, "birth_year"] = np.nan
+    out.loc[bad_height, "height_cm"] = np.nan
+    _log(log, "C12", f"Алдаатай утгыг засав: нас {AGE_RANGE}-аас гадуур → төрсөн он NaN, өндөр {HEIGHT_RANGE} см-ээс гадуур → NaN",
+         len(df), len(out), f"төрсөн он: {int(bad_birth.sum())}, өндөр: {int(bad_height.sum())}; нийт {int(bad_birth.sum() + bad_height.sum())}")
+    return out
+
+
 def drop_dnp(df: pd.DataFrame, log: CleaningLog | None = None) -> pd.DataFrame:
     out = df[~df["dnp"].astype(bool)].copy()
     _log(log, "C4", "Тоглоогүй (DNP) мөрийг хасав", len(df), len(out))
@@ -272,6 +291,7 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     ps = ps.merge(prof[["player_slug", "position", "height_cm", "birth_year", "is_import", "FT_pct"]],
                   on="player_slug", how="left")
     ps["is_import"] = ps.is_import.fillna(False).astype(bool)
+    ps = fix_implausible_values(ps, log)
     ps = fix_zero_attempt_pct(ps, log)
     ps = flag_eligible(ps, 5, log)
     missing = report_missing(ps, ["position", "height_cm", "birth_year", "FT_pct", "TP_pct", "FGA"])

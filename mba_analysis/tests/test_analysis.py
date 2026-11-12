@@ -58,3 +58,27 @@ def test_h4_perfect():
     x = np.arange(30, dtype=float)
     r = eval_h4(pd.DataFrame({"height_cm": x, "RPG": 2 * x}))
     assert r.estimate == pytest.approx(1.0)
+
+
+def test_run_analysis_writes_reports(tmp_path):
+    from src.analysis import run_analysis
+    proc, rep = tmp_path / "processed", tmp_path / "reports"
+    proc.mkdir()
+    rng = np.random.default_rng(0)
+    n = 40
+    pd.DataFrame({
+        "PPG": rng.uniform(0, 25, n), "RPG": rng.uniform(0, 10, n), "APG": rng.uniform(0, 6, n),
+        "MIN": rng.uniform(5, 35, n), "ts_pct": rng.uniform(0.3, 0.7, n), "height_cm": rng.uniform(175, 210, n),
+        "age": rng.integers(19, 35, n), "eligible": [True] * n, "is_import": [True] * 10 + [False] * 30,
+        "position": rng.choice(["PG", "SG", "SF", "PF", "C"], n), "pos_group": "Guard", "team": "A",
+        "region": "Улаанбаатар", "scorer_tier": "Дунд",
+    }).to_csv(proc / "players_season.csv", index=False)
+    pd.DataFrame({"home_pts": [80, 70, 90], "away_pts": [70, 80, 85], "phase": ["regular"] * 3,
+                  "quarters_home": ["20|20|20|20"] * 3, "quarters_away": ["20|20|20|10"] * 3}).to_csv(
+        proc / "games.csv", index=False)
+    run_analysis(proc, rep)
+    for name in ["descriptive_numeric", "descriptive_categorical", "descriptive_games", "hypotheses"]:
+        assert (rep / f"{name}.csv").exists()
+    hyp = pd.read_csv(rep / "hypotheses.csv")
+    assert {"H1", "H2", "H4"} <= set(hyp.hid)
+    assert list(hyp.columns) == list(HypothesisResult._fields)

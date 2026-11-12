@@ -98,3 +98,36 @@ def eval_h4(players: pd.DataFrame) -> HypothesisResult:
     ci = fisher_ci(float(r), len(d))
     return HypothesisResult("H4", "Өндөр тоглогчид илүү их самбар авдаг (Pearson r)", float(r), ci.lo, ci.hi,
                             0.0, float(p), int(len(d)), f"Pearson r; Spearman ρ = {rho:.2f}; CI: Fisher z")
+
+
+def extra_hypotheses(processed_dir) -> list[HypothesisResult]:
+    """H3, H5 нь models-оос хамаардаг (Task 16). Шаардлагатай файл байхгүй бол хоосон."""
+    return []
+
+
+def run_analysis(processed_dir, reports_dir) -> None:
+    from pathlib import Path
+
+    processed_dir, reports_dir = Path(processed_dir), Path(reports_dir)
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    ps = pd.read_csv(processed_dir / "players_season.csv")
+    elig = ps[ps.eligible.astype(bool)]
+    num = pd.concat([describe_numeric(elig, NUMERIC_COLS).assign(group="Бүгд"),
+                     describe_numeric(elig.assign(status=elig.is_import.map({True: "Import", False: "Дотоод"})),
+                                      NUMERIC_COLS, by="status").query("group != 'Бүгд'")], ignore_index=True)
+    num.to_csv(reports_dir / "descriptive_numeric.csv", index=False)
+    describe_categorical(elig, CATEGORICAL_COLS).to_csv(reports_dir / "descriptive_categorical.csv", index=False)
+    games = pd.read_csv(processed_dir / "games.csv")
+    describe_games(games).to_csv(reports_dir / "descriptive_games.csv", index=False)
+    results = [eval_h1(elig), eval_h2(games[games.phase == "regular"]), eval_h4(elig)]
+    results += extra_hypotheses(processed_dir)
+    pd.DataFrame(results, columns=HypothesisResult._fields).sort_values("hid").to_csv(
+        reports_dir / "hypotheses.csv", index=False)
+
+
+if __name__ == "__main__":
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    run_analysis(root / "data" / "processed", root / "reports")
+    print(pd.read_csv(root / "reports" / "hypotheses.csv").to_string(index=False))

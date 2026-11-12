@@ -1,0 +1,32 @@
+variable,value,count,pct,is_mode
+position,PG,70,25.64,True
+position,SG,69,25.27,False
+position,C,53,19.41,False
+position,SF,46,16.85,False
+position,PF,35,12.82,False
+pos_group,Guard,139,50.92,True
+pos_group,Forward,81,29.67,False
+pos_group,Center,53,19.41,False
+team,Khan Falcons,32,11.72,True
+team,Selenge Bodons,29,10.62,False
+team,BCH Knights,28,10.26,False
+team,Erdenet Miners,26,9.52,False
+team,Darkhan United,26,9.52,False
+team,SG Apes,26,9.52,False
+team,SUA TLG Tushig Bagana,16,5.86,False
+team,Bishrelt Metal,15,5.49,False
+team,BurenScore Mongolians,13,4.76,False
+team,Zavkhan Brothers,13,4.76,False
+team,XAC Broncos,13,4.76,False
+team,South Gobi Broncos,13,4.76,False
+team,Western Warriors,12,4.4,False
+team,Sono Brothers,11,4.03,False
+is_import,False,207,75.82,True
+is_import,True,66,24.18,False
+region,Орон нутаг,139,50.92,True
+region,Улаанбаатар,95,34.8,False
+region,Тодорхойгүй,39,14.29,False
+scorer_tier,Бага,125,45.79,True
+scorer_tier,Дунд,82,30.04,False
+scorer_tier,Өндөр,53,19.41,False
+scorer_tier,Од,13,4.76,False
