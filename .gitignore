@@ -27,3 +27,4 @@ mba_analysis/tests/fixtures/wiki/
 mba_analysis/.venv/
 .superpowers/
 mba_analysis/figures/_preview/
+node_modules/
