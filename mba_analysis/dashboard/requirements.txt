@@ -1,0 +1,6 @@
+streamlit>=1.57
+pandas>=2.3
+numpy>=2.3
+plotly>=6.3
+pyarrow>=21.0
+scipy>=1.16

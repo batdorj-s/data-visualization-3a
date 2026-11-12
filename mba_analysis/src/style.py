@@ -11,15 +11,7 @@ from matplotlib import font_manager  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 WIDTH_IN = 16 / 2.54
 
-PALETTE = {
-    "orange": "#E69F00", "sky": "#56B4E9", "green": "#009E73", "yellow": "#F0E442",
-    "blue": "#0072B2", "vermillion": "#D55E00", "purple": "#CC79A7", "black": "#000000",
-}
-IMPORT_COLORS = {True: "#D55E00", False: "#0072B2"}
-IMPORT_LABELS = {True: "Import", False: "Дотоод"}
-POS_COLORS = {"PG": "#E69F00", "SG": "#56B4E9", "SF": "#009E73", "PF": "#CC79A7", "C": "#0072B2"}
-NEUTRAL = "#9E9E9E"
-LIGHT = "#D9D9D9"
+from src.palette import IMPORT_COLORS, IMPORT_LABELS, LIGHT, NEUTRAL, PALETTE, POS_COLORS  # noqa: E402,F401
 
 
 def apply_style() -> str:

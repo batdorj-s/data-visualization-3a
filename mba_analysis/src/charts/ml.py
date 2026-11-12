@@ -11,16 +11,12 @@ from src.models import ARCHETYPE_FEATURES, _metrics
 from src.style import NEUTRAL, PALETTE, apply_style, finish, source_mba
 from src.uncertainty import wilson_ci
 
-CLUSTER_COLORS = [PALETTE["vermillion"], PALETTE["blue"], PALETTE["green"], PALETTE["orange"], PALETTE["purple"]]
+from src.palette import CLUSTER_COLORS, cluster_colors  # noqa: E402,F401
 MODEL_NAMES = {"logreg": "Logistic Regression", "rf": "Random Forest", "baseline_elo": "Baseline: Elo өндөр нь ялна",
                "baseline_winpct": "Baseline: ялалтын хувь өндөр нь ялна"}
 MODEL_COLORS = {"logreg": PALETTE["blue"], "rf": PALETTE["green"], "baseline_elo": NEUTRAL, "baseline_winpct": "#6B6B6B"}
 ML_SOURCE = "Эх сурвалж: MBA статистикийн систем; загвар: reports/metrics.json"
 
-
-def cluster_colors(names) -> dict:
-    """Архетипийн нэр → өнгө; бүх график (PCA, radar, pair plot, dashboard) ижил mapping хэрэглэнэ."""
-    return dict(zip(sorted(set(names)), CLUSTER_COLORS))
 
 
 def fig_elbow_silhouette(inertia_by_k: dict, silhouette_by_k: dict, k: int):

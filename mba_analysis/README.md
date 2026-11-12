@@ -23,6 +23,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Dashboard
+
+Локал дээр ажиллуулах (repo-гийн үндсэн хавтаснаас):
+
+```bash
+mba_analysis/.venv/bin/streamlit run mba_analysis/dashboard/app.py
+```
+
+**Streamlit Community Cloud-д байршуулах** (хэрэглэгч өөрөө хийнэ):
+1. https://share.streamlit.io руу GitHub-аараа нэвтэрнэ.
+2. "Create app" → Repository: `batdorj-s/data-visualization-3a`, Branch: `main`,
+   Main file path: `mba_analysis/dashboard/app.py`.
+3. Python 3.13 сонгоод "Deploy" дарна. Санууд нь `mba_analysis/dashboard/requirements.txt`-аас суулгагдана.
+4. Гарсан URL-ийг тайлан, слайдад оруулна.
+
+Dashboard нь зөвхөн `dashboard/data/*.parquet`-ийг уншдаг. Датаг шинэчлэх бол
+`python -m src.build_dashboard_data` ажиллуулна. Хугацааны хэмжилт: `python tools/time_dashboard.py`
+→ `reports/dashboard_timing.csv`.
+
 ## Өгөгдлийн эх сурвалж
 
 1. MBA статистикийн систем — https://mongolia.basketball/en/stats

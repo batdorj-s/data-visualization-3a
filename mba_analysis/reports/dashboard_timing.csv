@@ -1,0 +1,5 @@
+metric,value,target
+first_load_ms,664.17,< 3000
+filter_update_median_ms,31.32,< 300
+filter_update_p90_ms,32.58,-
+win_probability_ms,0.03,< 100
