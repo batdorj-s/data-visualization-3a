@@ -1,4 +1,5 @@
 import re
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -55,11 +56,18 @@ def source_mba() -> str:
 
 
 def finish(fig, title: str, subtitle: str, source: str, n: int, uncertainty_note: str | None = None):
+    width_in = fig.get_size_inches()[0]
+    sub_lines = textwrap.wrap(f"{subtitle} · n = {n}", width=int(17 * width_in))
+    cap_lines = textwrap.wrap(source if not uncertainty_note else f"{source}. {uncertainty_note}",
+                              width=int(20 * width_in))
+    height_in = fig.get_size_inches()[1]
+    line = 0.16 / height_in
     fig.suptitle(title, x=0.01, y=0.985, ha="left", va="top", fontsize=11, fontweight="bold")
-    fig.text(0.01, 0.925, f"{subtitle} · n = {n}", ha="left", va="top", fontsize=8.5, color="#4D4D4D")
-    caption = source if not uncertainty_note else f"{source}. {uncertainty_note}"
-    fig.text(0.01, 0.01, caption, ha="left", va="bottom", fontsize=7, color="#6B6B6B", wrap=True)
-    fig.tight_layout(rect=(0, 0.05, 1, 0.89))
+    fig.text(0.01, 1 - 0.38 / height_in, "\n".join(sub_lines), ha="left", va="top", fontsize=8.5, color="#4D4D4D")
+    fig.text(0.01, 0.01, "\n".join(cap_lines), ha="left", va="bottom", fontsize=7, color="#6B6B6B")
+    top = 1 - (0.42 / height_in + len(sub_lines) * line)
+    bottom = 0.02 + len(cap_lines) * 0.13 / height_in
+    fig.tight_layout(rect=(0, bottom, 1, top))
     fig._mba_meta = {"title": title, "subtitle": subtitle, "source": source, "n": n,
                      "uncertainty_note": uncertainty_note}
     return fig

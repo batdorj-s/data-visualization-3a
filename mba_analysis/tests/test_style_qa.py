@@ -78,3 +78,14 @@ def test_save_figure_png_svg(tmp_path):
     assert png.exists() and svg.exists()
     width = Image.open(png).size[0]
     assert abs(width - 1890) <= 5
+
+
+def test_long_subtitle_wraps():
+    apply_style()
+    fig, ax = plt.subplots(figsize=(6.3, 4))
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    finish(fig, "Гарчиг", "маш урт дэд гарчиг " * 15, source_mba(), n=1)
+    subtitle = next(t for t in fig.texts if "маш урт" in t.get_text())
+    assert "\n" in subtitle.get_text()
+    assert all(len(line) <= 120 for line in subtitle.get_text().split("\n"))
