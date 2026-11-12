@@ -100,9 +100,32 @@ def eval_h4(players: pd.DataFrame) -> HypothesisResult:
                             0.0, float(p), int(len(d)), f"Pearson r; Spearman ρ = {rho:.2f}; CI: Fisher z")
 
 
-def extra_hypotheses(processed_dir) -> list[HypothesisResult]:
-    """H3, H5 нь models-оос хамаардаг (Task 16). Шаардлагатай файл байхгүй бол хоосон."""
-    return []
+def extra_hypotheses(reports_dir) -> list[HypothesisResult]:
+    """H3, H5-ийг models.run_models-ийн гаралтаас уншина. Файл байхгүй бол хоосон."""
+    import json
+    from pathlib import Path
+
+    reports_dir = Path(reports_dir)
+    out = []
+    expl_path = reports_dir / "explanatory.csv"
+    if expl_path.exists():
+        e = pd.read_csv(expl_path)
+        e["abs"] = e.coef.abs()
+        rank = int(e.sort_values("abs", ascending=False).feature.tolist().index("efg")) + 1
+        row = e.set_index("feature").loc["efg"]
+        out.append(HypothesisResult(
+            "H3", "Four Factors дотроос eFG% нь ялалтыг хамгийн хүчтэй тодорхойлдог (стандартчилсан коэффициент)",
+            float(row.coef), float(row.lo), float(row.hi), 0.0, float("nan"), 0,
+            f"Стандартчилсан logistic regression; |коэф|-ийн эрэмбэ {rank}/{len(e)}; CI: тоглолтоор bootstrap"))
+    metrics_path = reports_dir / "metrics.json"
+    if metrics_path.exists():
+        py = json.loads(metrics_path.read_text(encoding="utf-8")).get("pythagorean")
+        if py:
+            out.append(HypothesisResult(
+                "H5", "Авсан/алдсан оноо ялалтын хувийг сайн тайлбарладаг (Pythagorean R²)",
+                float(py["r2"]), float(py["r2_ci"]["lo"]), float(py["r2_ci"]["hi"]), 0.0, float("nan"), int(py["n"]),
+                f"Pythagorean expectation, тааруулсан экспонент {py['exponent']:.2f}; CI: баг-улирлаар bootstrap"))
+    return out
 
 
 def run_analysis(processed_dir, reports_dir) -> None:
@@ -120,7 +143,7 @@ def run_analysis(processed_dir, reports_dir) -> None:
     games = pd.read_csv(processed_dir / "games.csv")
     describe_games(games).to_csv(reports_dir / "descriptive_games.csv", index=False)
     results = [eval_h1(elig), eval_h2(games[games.phase == "regular"]), eval_h4(elig)]
-    results += extra_hypotheses(processed_dir)
+    results += extra_hypotheses(reports_dir)
     pd.DataFrame(results, columns=HypothesisResult._fields).sort_values("hid").to_csv(
         reports_dir / "hypotheses.csv", index=False)
 

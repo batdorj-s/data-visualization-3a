@@ -44,14 +44,15 @@ def _kmeans(k: int, seed: int) -> KMeans:
     return KMeans(n_clusters=k, n_init=10, random_state=seed)
 
 
-def fit_archetypes(X: np.ndarray, k_range=range(2, 9), seed: int = SEED, k: int | None = None,
+def fit_archetypes(X: np.ndarray, k_range=range(2, 9), seed: int = SEED, k: int | None = None, min_k: int = 2,
                    scaler: StandardScaler | None = None) -> ArchetypeResult:
     inertia, sil = {}, {}
     for kk in k_range:
         m = _kmeans(kk, seed).fit(X)
         inertia[kk] = float(m.inertia_)
         sil[kk] = float(silhouette_score(X, m.labels_))
-    chosen = k if k is not None else max(sil, key=sil.get)
+    eligible = {kk: v for kk, v in sil.items() if kk >= min_k} or sil
+    chosen = k if k is not None else max(eligible, key=eligible.get)
     model = _kmeans(chosen, seed).fit(X)
     cols = ARCHETYPE_FEATURES if X.shape[1] == len(ARCHETYPE_FEATURES) else [f"f{i}" for i in range(X.shape[1])]
     return ArchetypeResult(chosen, model.labels_, inertia, sil, pd.DataFrame(model.cluster_centers_, columns=cols),
@@ -265,17 +266,27 @@ def fit_pythagorean(standings: pd.DataFrame, n_boot: int = 1000, seed: int = SEE
     yv = np.log(st.W.to_numpy(float) / st.L.to_numpy(float))
     exp = float((x * yv).sum() / (x * x).sum())
     rng = np.random.default_rng(seed)
-    boots = []
+    actual = (st.W / (st.W + st.L)).to_numpy(float)
+    pf, pa = st.PF.to_numpy(float), st.PA.to_numpy(float)
+
+    def r2_of(e, idx):
+        a, p = actual[idx], pythag(pf[idx], pa[idx], e)
+        sst = ((a - a.mean()) ** 2).sum()
+        return 1 - ((a - p) ** 2).sum() / sst if sst > 0 else np.nan
+
+    boots, r2_boots = [], []
     for _ in range(n_boot):
         i = rng.integers(0, len(x), len(x))
-        boots.append((x[i] * yv[i]).sum() / (x[i] * x[i]).sum())
-    actual = st.W / (st.W + st.L)
-    pred = pythag(st.PF, st.PA, exp)
-    pred_ref = pythag(st.PF, st.PA, 13.91)
-    r2 = 1 - ((actual - pred) ** 2).sum() / ((actual - actual.mean()) ** 2).sum()
+        e = (x[i] * yv[i]).sum() / (x[i] * x[i]).sum()
+        boots.append(e)
+        r2_boots.append(r2_of(e, i))
+    all_idx = np.arange(len(x))
+    r2 = r2_of(exp, all_idx)
+    pred, pred_ref = pythag(pf, pa, exp), pythag(pf, pa, 13.91)
     return {"exponent": exp, "exponent_ci": CI(exp, float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))),
-            "r2": float(r2), "mae": float((actual - pred).abs().mean()),
-            "mae_13_91": float((actual - pred_ref).abs().mean()), "n": int(len(st))}
+            "r2": float(r2), "r2_ci": CI(float(r2), float(np.nanpercentile(r2_boots, 2.5)), float(np.nanpercentile(r2_boots, 97.5))),
+            "mae": float(np.abs(actual - pred).mean()), "mae_13_91": float(np.abs(actual - pred_ref).mean()),
+            "n": int(len(st))}
 
 
 def cluster_composition(players: pd.DataFrame, labels: np.ndarray, names: dict[int, str]) -> pd.DataFrame:
@@ -283,3 +294,89 @@ def cluster_composition(players: pd.DataFrame, labels: np.ndarray, names: dict[i
     out = df.groupby("cluster_name").agg(n=("is_import", "size"), pct_import=("is_import", lambda s: 100 * s.mean()))
     pos = pd.crosstab(df.cluster_name, df.position).reindex(columns=POSITIONS, fill_value=0)
     return out.join(pos).fillna(0).astype({p: int for p in POSITIONS}).reset_index()
+
+
+def _ci_dict(ci) -> dict:
+    return {"est": ci.est, "lo": ci.lo, "hi": ci.hi}
+
+
+def run_models(processed_dir, reports_dir, models_dir, n_boot: int = 1000, stability_boot: int = 100,
+               seed: int = SEED) -> dict:
+    import json
+    from pathlib import Path
+
+    import joblib
+
+    processed_dir, reports_dir, models_dir = Path(processed_dir), Path(reports_dir), Path(models_dir)
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    models_dir.mkdir(parents=True, exist_ok=True)
+    metrics: dict = {}
+
+    # 7.1 K-Means
+    ps = pd.read_csv(processed_dir / "players_season.csv")
+    ps = ps[ps.eligible.astype(bool)]
+    df, X = archetype_matrix(ps, min_minutes=150)
+    res = fit_archetypes(X, seed=seed, min_k=3, scaler=df.attrs["scaler"])
+    ari, coassign = cluster_stability(X, res.k, n_boot=stability_boot, seed=seed)
+    names = name_clusters(res.centroids_z)
+    centroids = pd.DataFrame(res.scaler.inverse_transform(res.centroids_z), columns=ARCHETYPE_FEATURES)
+    centroids.insert(0, "cluster_name", [names[i] for i in range(res.k)])
+    centroids.to_csv(reports_dir / "cluster_centroids.csv", index=False)
+    res.centroids_z.assign(cluster_name=[names[i] for i in range(res.k)]).to_csv(
+        reports_dir / "cluster_centroids_z.csv", index=False)
+    cluster_composition(df, res.labels, names).to_csv(reports_dir / "cluster_composition.csv", index=False)
+    pd.DataFrame({"player_id": df.player_id, "season": df.season, "cluster": res.labels,
+                  "cluster_name": [names[int(l)] for l in res.labels], "coassign": coassign,
+                  "pc1": res.pca_xy[:, 0], "pc2": res.pca_xy[:, 1]}).to_csv(reports_dir / "clusters.csv", index=False)
+    metrics["kmeans"] = {"k": res.k, "n": int(len(df)), "silhouette_by_k": res.silhouette_by_k,
+                         "inertia_by_k": res.inertia_by_k, "silhouette": res.silhouette_by_k[res.k],
+                         "bootstrap_ari": ari, "stable": bool(ari >= 0.6), "names": names}
+    joblib.dump(res.model, models_dir / "kmeans.joblib")
+    joblib.dump(res.scaler, models_dir / "scaler.joblib")
+
+    # 7.2 Ялалтын таамаглал
+    games = pd.read_csv(processed_dir / "games.csv").rename(columns={"home_team_key": "home_key",
+                                                                     "away_team_key": "away_key"})
+    tg = pd.read_csv(processed_dir / "team_games.csv")
+    gm = build_game_matrix(games, tg, seed=seed)
+    gm.to_csv(reports_dir / "game_matrix.csv", index=False)
+    models = make_models(seed)
+    cv, preds = walk_forward_cv(gm, models, n_folds=5, return_predictions=True)
+    cv.to_csv(reports_dir / "cv_metrics.csv", index=False)
+    preds.to_csv(reports_dir / "cv_predictions.csv", index=False)
+    summary = cv.groupby("model")[["accuracy", "auc", "brier"]].agg(["mean", "std"])
+    metrics["win_cv"] = {m: {f"{k}_{s}": float(summary.loc[m, (k, s)]) for k in ("accuracy", "auc", "brier")
+                             for s in ("mean", "std")} for m in summary.index}
+    metrics["win_bootstrap"] = {m: {k: _ci_dict(v) for k, v in bootstrap_metrics(p.y, p.p, n_boot, seed).items()}
+                                for m, p in preds.groupby("model")}
+    hold = season_holdout(gm, models)
+    hold.to_csv(reports_dir / "season_holdout.csv", index=False)
+    metrics["win_holdout"] = hold.to_dict(orient="records")
+    metrics["win_matrix"] = {"n_games": int(len(gm)), "features": WIN_FEATURES}
+    final_X = gm[WIN_FEATURES].fillna(0).to_numpy()
+    for name, m in models.items():
+        joblib.dump(m.fit(final_X, gm.y), models_dir / f"{name}.joblib")
+
+    # 7.3 Тайлбар загвар
+    expl = fit_explanatory(tg, n_boot=n_boot, seed=seed)
+    expl.to_csv(reports_dir / "explanatory.csv", index=False)
+    metrics["explanatory"] = expl.to_dict(orient="records")
+
+    # 7.4 Pythagorean
+    st = pd.read_csv(processed_dir / "standings_hist.csv")
+    py = fit_pythagorean(st, n_boot=n_boot, seed=seed)
+    metrics["pythagorean"] = {k: (_ci_dict(v) if hasattr(v, "_fields") else v) for k, v in py.items()}
+
+    (reports_dir / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2, default=float),
+                                              encoding="utf-8")
+    return metrics
+
+
+if __name__ == "__main__":
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    m = run_models(root / "data" / "processed", root / "reports", root / "dashboard" / "models")
+    print("k =", m["kmeans"]["k"], "silhouette =", round(m["kmeans"]["silhouette"], 3), "ARI =", round(m["kmeans"]["bootstrap_ari"], 3))
+    for name, v in m["win_cv"].items():
+        print(name, {k: round(x, 3) for k, x in v.items()})

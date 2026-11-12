@@ -91,3 +91,10 @@ def test_cluster_composition():
     assert out.loc["B", "C"] == 2
     pos_cols = ["PG", "SG", "SF", "PF", "C"]
     assert (out[pos_cols].sum(axis=1) == out["n"]).all()
+
+
+def test_min_k_respected_but_all_k_scored():
+    X, _ = make_blobs(n_samples=120, centers=2, n_features=4, cluster_std=0.5, random_state=1)
+    res = fit_archetypes(X, seed=42, min_k=3)
+    assert res.k >= 3
+    assert 2 in res.silhouette_by_k

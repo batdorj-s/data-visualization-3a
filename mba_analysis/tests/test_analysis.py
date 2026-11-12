@@ -82,3 +82,22 @@ def test_run_analysis_writes_reports(tmp_path):
     hyp = pd.read_csv(rep / "hypotheses.csv")
     assert {"H1", "H2", "H4"} <= set(hyp.hid)
     assert list(hyp.columns) == list(HypothesisResult._fields)
+
+
+def test_extra_hypotheses_h3_h5(tmp_path):
+    import json
+    from src.analysis import extra_hypotheses
+    pd.DataFrame({"feature": ["efg", "tov_pct", "orb_pct", "ftr"], "coef": [3.8, -1.9, 1.6, 1.0],
+                  "lo": [3.5, -2.3, 1.2, 0.7], "hi": [4.2, -1.6, 1.9, 1.4], "perm_importance": [0.4, 0.09, 0.07, 0.03],
+                  "perm_lo": [0.33, 0.06, 0.05, 0.02], "perm_hi": [0.46, 0.12, 0.09, 0.05]}).to_csv(
+        tmp_path / "explanatory.csv", index=False)
+    (tmp_path / "metrics.json").write_text(json.dumps({"pythagorean": {
+        "exponent": 10.8, "r2": 0.886, "r2_ci": {"est": 0.886, "lo": 0.79, "hi": 0.94}, "n": 33}}), encoding="utf-8")
+    res = {r.hid: r for r in extra_hypotheses(tmp_path)}
+    assert res["H3"].estimate == 3.8 and res["H3"].ci_lo == 3.5 and "1/4" in res["H3"].method
+    assert res["H5"].estimate == 0.886 and res["H5"].n == 33 and res["H5"].ci_hi == 0.94
+
+
+def test_extra_hypotheses_missing_files(tmp_path):
+    from src.analysis import extra_hypotheses
+    assert extra_hypotheses(tmp_path) == []

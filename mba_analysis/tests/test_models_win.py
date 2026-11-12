@@ -129,6 +129,7 @@ def test_pythag_recovers_exponent():
     assert res["exponent"] == pytest.approx(14, abs=0.5)
     assert res["exponent_ci"].lo <= res["exponent"] <= res["exponent_ci"].hi
     assert res["r2"] > 0.95 and res["mae"] < res["mae_13_91"] + 1e-9
+    assert res["r2_ci"].lo <= res["r2"] <= res["r2_ci"].hi
 
 
 def test_explanatory_signs():
@@ -136,3 +137,26 @@ def test_explanatory_signs():
     out = fit_explanatory(tg, n_boot=200).set_index("feature")
     assert out.loc["efg", "coef"] > 0 and out.loc["efg", "lo"] > 0
     assert set(out.columns) >= {"coef", "lo", "hi", "perm_importance", "perm_lo", "perm_hi"}
+
+
+def test_run_models_smoke(tmp_path):
+    import json
+    from src.models import run_models
+    proc, rep, mod = tmp_path / "p", tmp_path / "r", tmp_path / "m"
+    proc.mkdir()
+    games, tg = synthetic_league(n_games=120, seed=2)
+    games.rename(columns={"home_key": "home_team_key", "away_key": "away_team_key"}).to_csv(proc / "games.csv", index=False)
+    tg.to_csv(proc / "team_games.csv", index=False)
+    rng = np.random.default_rng(0)
+    n = 60
+    ps = pd.DataFrame({f: rng.normal(size=n) for f in ["pts36", "reb36", "ast36", "stl36", "blk36", "tpa_rate", "ftr", "ts_pct"]})
+    ps = ps.assign(MIN_total=300, eligible=True, player_id=[f"p{i}" for i in range(n)], season="2025-2026",
+                   is_import=rng.random(n) < 0.3, position=rng.choice(["PG", "SG", "SF", "PF", "C"], n))
+    ps.to_csv(proc / "players_season.csv", index=False)
+    pd.DataFrame({"PF": [2000, 1900, 2100], "PA": [1900, 2000, 1950], "W": [15, 9, 16], "L": [9, 15, 8]}).to_csv(
+        proc / "standings_hist.csv", index=False)
+    run_models(proc, rep, mod, n_boot=50, stability_boot=10)
+    metrics = json.loads((rep / "metrics.json").read_text(encoding="utf-8"))
+    assert {"kmeans", "win_cv", "win_bootstrap", "pythagorean", "explanatory"} <= set(metrics)
+    assert (rep / "clusters.csv").exists() and (rep / "explanatory.csv").exists()
+    assert (mod / "logreg.joblib").exists() and (mod / "kmeans.joblib").exists()
