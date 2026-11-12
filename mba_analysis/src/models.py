@@ -96,6 +96,188 @@ def name_clusters(centroids_z: pd.DataFrame) -> dict[int, str]:
     return names
 
 
+WIN_FEATURES = ["elo_diff", "winpct_to_date_diff", "net_rating_last5_diff", "efg_last5_diff", "tov_pct_last5_diff"]
+FF_FEATURES = ["efg", "tov_pct", "orb_pct", "ftr"]
+
+
+def _pregame_team_stats(team_games: pd.DataFrame) -> pd.DataFrame:
+    """Баг бүрийн тоглолт бүрийн өмнөх (тухайн өдрөөс ӨМНӨХ) статистик."""
+    tg = team_games.assign(dt_=pd.to_datetime(team_games["date"])).sort_values(["dt_", "game_id"], kind="stable")
+    rows = []
+    for (_, _), grp in tg.groupby(["team_key", "season"], sort=False, observed=True):
+        hist = []
+        for r in grp.itertuples(index=False):
+            prior = [h for h in hist if h[0] < r.dt_]
+            last5 = prior[-5:]
+            rows.append({
+                "game_id": r.game_id, "team_key": r.team_key, "n_prior": len(prior),
+                "winpct": np.mean([h[1] for h in prior]) if prior else np.nan,
+                "net5": np.mean([h[2] for h in last5]) if last5 else np.nan,
+                "efg5": np.nanmean([h[3] for h in last5]) if last5 else np.nan,
+                "tov5": np.nanmean([h[4] for h in last5]) if last5 else np.nan,
+            })
+            hist.append((r.dt_, float(bool(r.win)), r.net, r.efg, r.tov_pct))
+    return pd.DataFrame(rows)
+
+
+def build_game_matrix(games: pd.DataFrame, team_games: pd.DataFrame, seed: int = SEED,
+                      min_prior_games: int = 3) -> pd.DataFrame:
+    tg = team_games if "date" in team_games.columns else team_games.merge(games[["game_id", "date"]], on="game_id")
+    pre = _pregame_team_stats(tg).set_index(["game_id", "team_key"])
+    g = games.assign(dt_=pd.to_datetime(games["date"])).sort_values(["dt_", "game_id"], kind="stable").reset_index(drop=True)
+    flip = np.random.default_rng(seed).random(len(g)) < 0.5
+    rows = []
+    for f, r in zip(flip, g.itertuples(index=False)):
+        a, b = (r.away_key, r.home_key) if f else (r.home_key, r.away_key)
+        ea, eb = (r.elo_pre_away, r.elo_pre_home) if f else (r.elo_pre_home, r.elo_pre_away)
+        pa, pb = pre.loc[(r.game_id, a)], pre.loc[(r.game_id, b)]
+        if min(pa.n_prior, pb.n_prior) < min_prior_games:
+            continue
+        a_pts, b_pts = (r.away_pts, r.home_pts) if f else (r.home_pts, r.away_pts)
+        rows.append({
+            "game_id": r.game_id, "date": r.date, "season": r.season, "team_a": a, "team_b": b,
+            "y": int(a_pts > b_pts), "elo_diff": ea - eb, "winpct_to_date_diff": pa.winpct - pb.winpct,
+            "net_rating_last5_diff": pa.net5 - pb.net5, "efg_last5_diff": pa.efg5 - pb.efg5,
+            "tov_pct_last5_diff": pa.tov5 - pb.tov5,
+        })
+    return pd.DataFrame(rows, columns=["game_id", "date", "season", "team_a", "team_b", "y", *WIN_FEATURES])
+
+
+def baseline_predict(df: pd.DataFrame, kind: str) -> np.ndarray:
+    col = {"elo": "elo_diff", "winpct": "winpct_to_date_diff"}[kind]
+    return np.sign(df[col].fillna(0).to_numpy(float)) * 0.5 + 0.5
+
+
+def make_models(seed: int = SEED) -> dict:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
+
+    return {
+        "logreg": Pipeline([("scale", StandardScaler()), ("clf", LogisticRegression(C=1.0))]),
+        "rf": RandomForestClassifier(n_estimators=300, max_depth=4, random_state=seed),
+    }
+
+
+def _metrics(y: np.ndarray, p: np.ndarray) -> dict:
+    from sklearn.metrics import brier_score_loss, roc_auc_score
+
+    y, p = np.asarray(y), np.asarray(p, float)
+    auc = roc_auc_score(y, p) if len(np.unique(y)) == 2 else np.nan
+    return {"accuracy": float(((p >= 0.5).astype(int) == y).mean()), "auc": float(auc),
+            "brier": float(brier_score_loss(y, p))}
+
+
+def _predict_all(train: pd.DataFrame, test: pd.DataFrame, models: dict) -> dict[str, np.ndarray]:
+    from sklearn.base import clone
+
+    X_tr, X_te = train[WIN_FEATURES].fillna(0).to_numpy(), test[WIN_FEATURES].fillna(0).to_numpy()
+    out = {name: clone(m).fit(X_tr, train.y).predict_proba(X_te)[:, 1] for name, m in models.items()}
+    out["baseline_elo"] = baseline_predict(test, "elo")
+    out["baseline_winpct"] = baseline_predict(test, "winpct")
+    return out
+
+
+def walk_forward_cv(df: pd.DataFrame, models: dict, n_folds: int = 5, return_predictions: bool = False):
+    d = df.assign(dt_=pd.to_datetime(df["date"])).sort_values(["dt_", "game_id"]).reset_index(drop=True)
+    chunks = np.array_split(np.sort(d.dt_.unique()), n_folds + 1)
+    metrics, preds = [], []
+    for i in range(n_folds):
+        train = d[d.dt_ <= chunks[i][-1]]
+        test = d[d.dt_.isin(chunks[i + 1])]
+        for name, p in _predict_all(train, test, models).items():
+            metrics.append({"fold": i + 1, "model": name, "n_train": len(train), "n_test": len(test),
+                            "train_end": train.dt_.max().date().isoformat(),
+                            "test_start": test.dt_.min().date().isoformat(), **_metrics(test.y, p)})
+            preds.append(pd.DataFrame({"game_id": test.game_id.values, "fold": i + 1, "model": name,
+                                       "y": test.y.values, "p": p}))
+    res = pd.DataFrame(metrics)
+    return (res, pd.concat(preds, ignore_index=True)) if return_predictions else res
+
+
+def bootstrap_metrics(y, p, n_boot: int = 1000, seed: int = SEED) -> dict:
+    from src.uncertainty import CI
+
+    y, p = np.asarray(y), np.asarray(p, float)
+    point = _metrics(y, p)
+    rng = np.random.default_rng(seed)
+    samples = {k: [] for k in point}
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(y), len(y))
+        for k, v in _metrics(y[idx], p[idx]).items():
+            samples[k].append(v)
+    return {k: CI(point[k], float(np.nanpercentile(samples[k], 2.5)), float(np.nanpercentile(samples[k], 97.5)))
+            for k in point}
+
+
+def season_holdout(df: pd.DataFrame, models: dict, train_season: str = "2025-2026",
+                   test_season: str = "2026-2027") -> pd.DataFrame:
+    train, test = df[df.season == train_season], df[df.season == test_season]
+    if train.empty or test.empty:
+        return pd.DataFrame()
+    return pd.DataFrame([{"model": name, "n_train": len(train), "n_test": len(test), **_metrics(test.y, p)}
+                         for name, p in _predict_all(train, test, models).items()])
+
+
+def explanatory_matrix(team_games: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
+    home = team_games[team_games.side == "home"].set_index("game_id")
+    away = team_games[team_games.side == "away"].set_index("game_id")
+    ids = home.index.intersection(away.index).sort_values()
+    flip = np.random.default_rng(seed).random(len(ids)) < 0.5
+    a = np.where(flip[:, None], away.loc[ids, FF_FEATURES], home.loc[ids, FF_FEATURES]).astype(float)
+    b = np.where(flip[:, None], home.loc[ids, FF_FEATURES], away.loc[ids, FF_FEATURES]).astype(float)
+    y = np.where(flip, away.loc[ids, "win"], home.loc[ids, "win"]).astype(int)
+    out = pd.DataFrame(a - b, columns=FF_FEATURES, index=ids)
+    out["y"] = y
+    return out.dropna().reset_index()
+
+
+def fit_explanatory(team_games: pd.DataFrame, n_boot: int = 1000, seed: int = SEED) -> pd.DataFrame:
+    from sklearn.inspection import permutation_importance
+    from sklearn.linear_model import LogisticRegression
+
+    m = explanatory_matrix(team_games, seed)
+    X = StandardScaler().fit_transform(m[FF_FEATURES])
+    y = m.y.to_numpy()
+    clf = LogisticRegression(C=1.0).fit(X, y)
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(y), len(y))
+        if len(np.unique(y[idx])) == 2:
+            boots.append(LogisticRegression(C=1.0).fit(X[idx], y[idx]).coef_[0])
+    boots = np.array(boots)
+    perm = permutation_importance(clf, X, y, n_repeats=30, random_state=seed, scoring="roc_auc").importances
+    return pd.DataFrame({
+        "feature": FF_FEATURES, "coef": clf.coef_[0],
+        "lo": np.percentile(boots, 2.5, axis=0), "hi": np.percentile(boots, 97.5, axis=0),
+        "perm_importance": perm.mean(axis=1),
+        "perm_lo": np.percentile(perm, 2.5, axis=1), "perm_hi": np.percentile(perm, 97.5, axis=1),
+    })
+
+
+def fit_pythagorean(standings: pd.DataFrame, n_boot: int = 1000, seed: int = SEED) -> dict:
+    from src.features import pythag
+    from src.uncertainty import CI
+
+    st = standings[(standings.W > 0) & (standings.L > 0)].reset_index(drop=True)
+    x = np.log(st.PF.to_numpy(float) / st.PA.to_numpy(float))
+    yv = np.log(st.W.to_numpy(float) / st.L.to_numpy(float))
+    exp = float((x * yv).sum() / (x * x).sum())
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        i = rng.integers(0, len(x), len(x))
+        boots.append((x[i] * yv[i]).sum() / (x[i] * x[i]).sum())
+    actual = st.W / (st.W + st.L)
+    pred = pythag(st.PF, st.PA, exp)
+    pred_ref = pythag(st.PF, st.PA, 13.91)
+    r2 = 1 - ((actual - pred) ** 2).sum() / ((actual - actual.mean()) ** 2).sum()
+    return {"exponent": exp, "exponent_ci": CI(exp, float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))),
+            "r2": float(r2), "mae": float((actual - pred).abs().mean()),
+            "mae_13_91": float((actual - pred_ref).abs().mean()), "n": int(len(st))}
+
+
 def cluster_composition(players: pd.DataFrame, labels: np.ndarray, names: dict[int, str]) -> pd.DataFrame:
     df = players.assign(cluster_name=[names[int(l)] for l in labels])
     out = df.groupby("cluster_name").agg(n=("is_import", "size"), pct_import=("is_import", lambda s: 100 * s.mean()))
