@@ -2,6 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from src.report_data import DRAFT_LABEL, build_report_data
@@ -75,3 +76,15 @@ def test_import_share_matches_figure_f06(data):
     pg = inputs["pg"]
     expected = pg.loc[pg.is_import, "PTS"].sum() / pg.PTS.sum()
     assert data["kpi"]["import_share"] == pytest.approx(expected)
+
+
+def test_report_narrative_numbers_come_from_data(data):
+    import re
+    text = json.dumps(data, ensure_ascii=False)
+    snap = re.search(r"Татсан огноо: (\d{4}-\d{2}-\d{2})", (ROOT / "data" / "raw" / "SNAPSHOT.md").read_text(encoding="utf-8")).group(1)
+    assert snap in text
+    log = pd.read_csv(ROOT / "reports" / "cleaning_log.csv").set_index("step")
+    assert "79 зөрүү" not in text
+    timing = pd.read_csv(ROOT / "reports" / "dashboard_timing.csv").set_index("metric").value
+    assert f"{timing['filter_update_median_ms']:.0f} мс" in text
+    assert "~32%" not in text and "80/20" not in text

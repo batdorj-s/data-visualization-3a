@@ -170,7 +170,10 @@ def fig_calibration(y: np.ndarray, p: np.ndarray, n_bins: int = 5):
     ax.set_ylim(0, 1)
     ax.set_xlabel("Таамагласан ялах магадлал")
     ax.set_ylabel("Бодит ялалтын хувь")
-    return finish(fig, "Магадлалын тохируулга: таамаглал бодит хувьтай ойролцоо",
+    off = sum(not (y_ - lo_ <= x_ <= y_ + hi_) for x_, y_, lo_, hi_ in zip(xs, ys, los, his))
+    title = ("Магадлалын тохируулга: бүх бүлэгт таамаглал бодит хувьтай нийцнэ" if off == 0
+             else f"Магадлалын тохируулга: {off}/{len(xs)} бүлэгт таамаглал бодит хувиас баттай зөрсөн")
+    return finish(fig, title,
                   f"Logistic Regression, {n_bins} квантил бүлэг", ML_SOURCE, n=int(len(df)),
                   uncertainty_note="Шугам: бүлэг бүрийн Wilson 95% CI")
 

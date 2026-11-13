@@ -95,3 +95,13 @@ def test_fan_title_differs_from_plain(tg):
     a = T.fig_cum_winpct(tg, ["sg_apes"], bands=False)._mba_meta["title"]
     b = T.fig_cum_winpct(tg, ["sg_apes"], bands=True)._mba_meta["title"]
     assert a != b and "±" in b
+
+
+def test_cum_winpct_title_reports_ties():
+    rows = []
+    for gid, (a, b, aw) in enumerate([("x", "y", True), ("y", "z", True), ("x", "z", True), ("y", "x", True)], 1):
+        for team, opp, win in ((a, b, aw), (b, a, not aw)):
+            rows.append(dict(game_id=gid, season="2025-2026", phase="regular", date=f"2025-10-{gid:02d}",
+                             team_key=team, team=team.upper(), win=win))
+    title = T.fig_cum_winpct(pd.DataFrame(rows), ["x"], bands=False)._mba_meta["title"]
+    assert "X" in title and "Y" in title and "тэнц" in title

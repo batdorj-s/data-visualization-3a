@@ -92,10 +92,12 @@ def test_extra_hypotheses_h3_h5(tmp_path):
                   "perm_lo": [0.33, 0.06, 0.05, 0.02], "perm_hi": [0.46, 0.12, 0.09, 0.05]}).to_csv(
         tmp_path / "explanatory.csv", index=False)
     (tmp_path / "metrics.json").write_text(json.dumps({"pythagorean": {
-        "exponent": 10.8, "r2": 0.886, "r2_ci": {"est": 0.886, "lo": 0.79, "hi": 0.94}, "n": 33}}), encoding="utf-8")
+        "exponent": 10.8, "r2": 0.886, "r2_ci": {"est": 0.886, "lo": 0.79, "hi": 0.94}, "n": 33},
+        "explanatory_dominance": {"est": 1.9, "lo": 1.3, "hi": 2.5, "n_games": 252}}), encoding="utf-8")
     res = {r.hid: r for r in extra_hypotheses(tmp_path)}
-    assert res["H3"].estimate == 3.8 and res["H3"].ci_lo == 3.5 and "1/4" in res["H3"].method
-    assert res["H5"].estimate == 0.886 and res["H5"].n == 33 and res["H5"].ci_hi == 0.94
+    assert (res["H3"].estimate, res["H3"].ci_lo, res["H3"].null_value, res["H3"].n) == (1.9, 1.3, 0.0, 252)
+    assert "1/4" in res["H3"].method
+    assert res["H5"].estimate == 0.886 and res["H5"].n == 33 and res["H5"].null_value == 0.5
 
 
 def test_extra_hypotheses_missing_files(tmp_path):

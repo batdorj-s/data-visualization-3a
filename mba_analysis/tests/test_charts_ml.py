@@ -80,3 +80,10 @@ def test_cluster_colors_consistent_across_charts():
     for line in radar.axes[0].get_lines():
         if line.get_label() in colors:
             assert matplotlib.colors.to_hex(line.get_color()) == matplotlib.colors.to_hex(colors[line.get_label()])
+
+
+def test_calibration_title_detects_miscalibration():
+    import numpy as np
+    y = np.zeros(200, dtype=int)
+    p = np.linspace(0.6, 0.95, 200)
+    assert "ойролцоо" not in M.fig_calibration(y, p)._mba_meta["title"]

@@ -160,3 +160,11 @@ def test_run_models_smoke(tmp_path):
     assert {"kmeans", "win_cv", "win_bootstrap", "pythagorean", "explanatory"} <= set(metrics)
     assert (rep / "clusters.csv").exists() and (rep / "explanatory.csv").exists()
     assert (mod / "logreg.joblib").exists() and (mod / "kmeans.joblib").exists()
+
+
+def test_explanatory_reports_efg_dominance():
+    _, tg = synthetic_league(n_games=200, seed=11)
+    out = fit_explanatory(tg, n_boot=200)
+    dom = out.attrs["efg_dominance"]
+    assert dom["lo"] <= dom["est"] <= dom["hi"]
+    assert dom["n_games"] == 200

@@ -113,17 +113,22 @@ def extra_hypotheses(reports_dir) -> list[HypothesisResult]:
         e["abs"] = e.coef.abs()
         rank = int(e.sort_values("abs", ascending=False).feature.tolist().index("efg")) + 1
         row = e.set_index("feature").loc["efg"]
-        out.append(HypothesisResult(
-            "H3", "Four Factors дотроос eFG% нь ялалтыг хамгийн хүчтэй тодорхойлдог (стандартчилсан коэффициент)",
-            float(row.coef), float(row.lo), float(row.hi), 0.0, float("nan"), 0,
-            f"Стандартчилсан logistic regression; |коэф|-ийн эрэмбэ {rank}/{len(e)}; CI: тоглолтоор bootstrap"))
+        dom = None
+        if (reports_dir / "metrics.json").exists():
+            dom = json.loads((reports_dir / "metrics.json").read_text(encoding="utf-8")).get("explanatory_dominance")
+        if dom:
+            out.append(HypothesisResult(
+                "H3", "Four Factors дотроос eFG% нь ялалтыг хамгийн хүчтэй тодорхойлдог (|β_eFG| − бусдын хамгийн их |β|)",
+                float(dom["est"]), float(dom["lo"]), float(dom["hi"]), 0.0, float("nan"), int(dom["n_games"]),
+                f"Стандартчилсан logistic regression, β_eFG = {row.coef:.2f}; |коэф|-ийн эрэмбэ {rank}/{len(e)}; "
+                "CI: тоглолтоор bootstrap"))
     metrics_path = reports_dir / "metrics.json"
     if metrics_path.exists():
         py = json.loads(metrics_path.read_text(encoding="utf-8")).get("pythagorean")
         if py:
             out.append(HypothesisResult(
-                "H5", "Авсан/алдсан оноо ялалтын хувийг сайн тайлбарладаг (Pythagorean R²)",
-                float(py["r2"]), float(py["r2_ci"]["lo"]), float(py["r2_ci"]["hi"]), 0.0, float("nan"), int(py["n"]),
+                "H5", "Авсан/алдсан оноо ялалтын хувийн хагасаас илүүг тайлбарладаг (Pythagorean R² > 0.5)",
+                float(py["r2"]), float(py["r2_ci"]["lo"]), float(py["r2_ci"]["hi"]), 0.5, float("nan"), int(py["n"]),
                 f"Pythagorean expectation, тааруулсан экспонент {py['exponent']:.2f}; CI: баг-улирлаар bootstrap"))
     return out
 

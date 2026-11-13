@@ -248,13 +248,23 @@ def fit_explanatory(team_games: pd.DataFrame, n_boot: int = 1000, seed: int = SE
         if len(np.unique(y[idx])) == 2:
             boots.append(LogisticRegression(C=1.0).fit(X[idx], y[idx]).coef_[0])
     boots = np.array(boots)
+    efg = FF_FEATURES.index("efg")
+
+    def dominance(c):
+        others = np.delete(np.abs(c), efg, axis=-1)
+        return np.abs(c[..., efg]) - others.max(axis=-1)
+
+    dom = dominance(boots)
     perm = permutation_importance(clf, X, y, n_repeats=30, random_state=seed, scoring="roc_auc").importances
-    return pd.DataFrame({
+    out = pd.DataFrame({
         "feature": FF_FEATURES, "coef": clf.coef_[0],
         "lo": np.percentile(boots, 2.5, axis=0), "hi": np.percentile(boots, 97.5, axis=0),
         "perm_importance": perm.mean(axis=1),
         "perm_lo": np.percentile(perm, 2.5, axis=1), "perm_hi": np.percentile(perm, 97.5, axis=1),
     })
+    out.attrs["efg_dominance"] = {"est": float(dominance(clf.coef_[0])), "lo": float(np.percentile(dom, 2.5)),
+                                  "hi": float(np.percentile(dom, 97.5)), "n_games": int(len(y))}
+    return out
 
 
 def fit_pythagorean(standings: pd.DataFrame, n_boot: int = 1000, seed: int = SEED) -> dict:
@@ -361,6 +371,7 @@ def run_models(processed_dir, reports_dir, models_dir, n_boot: int = 1000, stabi
     expl = fit_explanatory(tg, n_boot=n_boot, seed=seed)
     expl.to_csv(reports_dir / "explanatory.csv", index=False)
     metrics["explanatory"] = expl.to_dict(orient="records")
+    metrics["explanatory_dominance"] = expl.attrs["efg_dominance"]
 
     # 7.4 Pythagorean
     st = pd.read_csv(processed_dir / "standings_hist.csv")

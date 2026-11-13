@@ -3,6 +3,7 @@
 Ноорог блок бүр DRAFT_LABEL-тай: эцсийн тайлбарыг оюутан өөрийн үгээр бичнэ (даалгаврын шаардлага).
 """
 import json
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -65,6 +66,29 @@ def build_report_data(root: Path) -> dict:
     kpi = {"games": int(len(games)), "player_seasons": int(len(ps)), "eligible": int(len(elig)),
            "player_games": int(len(pg)), "unique_players": int(ps.player_id.nunique()), "import_share": float(share)}
 
+    snap = re.search(r"Татсан огноо: (\d{4}-\d{2}-\d{2})", (root / "data" / "raw" / "SNAPSHOT.md").read_text(encoding="utf-8"))
+    snap_date = snap.group(1) if snap else "тодорхойгүй"
+    notes = log.drop_duplicates("step").set_index("step").note.fillna("")
+    c1_note = str(notes.get("C1", ""))
+    matches = pd.read_csv(R / "name_matches.csv")
+    relinks = int((matches.left_id != matches.right_id).sum())
+    timing_path = R / "dashboard_timing.csv"
+    filter_ms = (pd.read_csv(timing_path).set_index("metric").value.get("filter_update_median_ms")
+                 if timing_path.exists() else None)
+    player_import_share = float(ps.drop_duplicates("player_id").is_import.mean())
+    beats_elo = boot["logreg"]["accuracy"]["lo"] > boot["baseline_elo"]["accuracy"]["hi"]
+    model_verdict = ("Загвар Elo baseline-ийг итгэх интервалын хэмжээнд баттай давсан." if beats_elo else
+                     "Загвар Elo baseline-ийг итгэх интервалын хэмжээнд баттай давж чадаагүй — энэ нь өөрөө дүгнэлт.")
+    h2_contains_null = h.loc["H2", "ci_lo"] <= 0.5 <= h.loc["H2", "ci_hi"]
+    h2_text = (f"Талбайн давуу тал нотлогдоогүй (гэрийн багийн ялалт {h.loc['H2', 'estimate']:.1%}, CI 50%-ийг агуулна)."
+               if h2_contains_null else f"Гэрийн багийн ялалт {h.loc['H2', 'estimate']:.1%} — 50%-аас баттай ялгаатай.")
+    c10_note = str(notes.get("C10", ""))
+    from src.charts.comparison import pareto_table
+    reg = pg[(pg.phase == "regular") & (pg.season == "2025-2026")]
+    pt = pareto_table(reg.groupby("player_id").PTS.sum())
+    k80 = int((pt.cum_share.to_numpy() < 0.8).sum()) + 1
+    pareto_text = f"Топ {k80 / len(pt):.0%} тоглогч онооны 80%-ийг авдаг"
+
     def T(name):
         return chart_titles.get(name, name)
 
@@ -109,14 +133,14 @@ def build_report_data(root: Path) -> dict:
             _table("Хүснэгт 2. Өгөгдлийн эх сурвалж", sources),
             _para(f"Нийт {kpi['games']} тоглолт, {kpi['player_games']:,} тоглогч-тоглолтын мөр, "
                   f"{kpi['player_seasons']} тоглогч-улирал ({kpi['unique_players']} өвөрмөц тоглогч) цуглуулав. "
-                  "Сайт цаг тутам шинэчлэгддэг тул 2026-11-12-ны snapshot-ийг ашигласан."),
+                  f"Сайт цаг тутам шинэчлэгддэг тул {snap_date}-ны snapshot-ийг ашигласан."),
             _draft("Өгөгдлийг хэрхэн цуглуулсан, ямар ёс зүйн зарчим баримталсныг (robots.txt, хүсэлтийн завсар) тайлбарлана."),
         ]},
         {"title": "3. Өгөгдлийн цэвэрлэгээ ба боловсруулалт", "blocks": [
             _table("Хүснэгт 3. Цэвэрлэгээний алхмууд (reports/cleaning_log.csv-ээс)", clog),
             _fig(root, "U09_data_quality", f"Зураг 1. {T('U09_data_quality')}"),
-            _draft("Хамгийн сонирхолтой олдвор: MBA-ийн улирлын хүснэгт зөвхөн энгийн улирлыг тооцдог нь C10 шалгалтаар "
-                   "илэрсэн (бүх тоглолтоор 79 зөрүү → энгийн улирлаар 8). 1900 гэх мэт placeholder төрсөн оныг засав."),
+            _draft(f"Хамгийн сонирхолтой олдвор (C10): {c10_note}. Мөн 1900 гэх мэт placeholder төрсөн оныг засав (C12), "
+                   f"оноо зөрчилтэй тоглолтыг илрүүлэв (C13)."),
         ]},
         {"title": "4. Танилцуулах статистик", "blocks": [
             _table("Хүснэгт 4. Тоон хувьсагчдын статистик (GP ≥ 5)", desc),
@@ -148,13 +172,13 @@ def build_report_data(root: Path) -> dict:
             _fig(root, "F14b_pca_clusters", f"Зураг 11. {T('F14b_pca_clusters')}"),
             _table("Хүснэгт 6. Ялалтын загваруудын үнэлгээ", met_tbl),
             _fig(root, "U06a_model_accuracy", f"Зураг 12. {T('U06a_model_accuracy')}"),
-            _draft("Загвар Elo baseline-ийг итгэх интервалын хэмжээнд давж чадаагүй — энэ нь өөрөө дүгнэлт. "
+            _draft(f"{model_verdict} "
                    f"Тайлбар загварт eFG%-ийн коэффициент {h.loc['H3', 'estimate']:.2f} хамгийн том."),
         ]},
         {"title": "7. Шинжилгээ ба дүгнэлт", "blocks": [
             _fig(root, "U05_hypotheses", f"Зураг 13. {T('U05_hypotheses')}"),
             _h2("7.1 Үндсэн хандлага"),
-            _draft(f"Import тоглогч бүх тоглогчийн ~32% боловч онооны {share:.0%}-ийг авдаг; медиан онооны зөрүү "
+            _draft(f"Import тоглогч бүх тоглогчийн {player_import_share:.0%} боловч онооны {share:.0%}-ийг авдаг; медиан онооны зөрүү "
                    f"{h.loc['H1', 'estimate']:.1f} [{h.loc['H1', 'ci_lo']:.1f}–{h.loc['H1', 'ci_hi']:.1f}]."),
             _h2("7.2 Хамаарал"),
             _draft(f"Өндөр ↔ самбар r = {h.loc['H4', 'estimate']:.2f}; Pythagorean R² = {h.loc['H5', 'estimate']:.2f} "
@@ -162,7 +186,7 @@ def build_report_data(root: Path) -> dict:
             _h2("7.3 Онцгой утга"),
             _draft("Funnel дээр 95% хилээс гадуурх тоглогчдын ихэнх нь цөөн шидэлттэй — жинхэнэ онцгой ба азыг ялгах."),
             _h2("7.4 Шалтгаан ба үр дагавар"),
-            _draft(f"Талбайн давуу тал нотлогдоогүй (гэрийн багийн ялалт {h.loc['H2', 'estimate']:.1%}, CI 50%-ийг агуулна). "
+            _draft(f"{h2_text} "
                    "Хамаарал шалтгааныг нотлохгүй: Import тоглогч илүү их минут тоглодог."),
             _h2("7.5 Практик санал"),
             _draft("Шидэлтийн сонголт (eFG%), дотоодын тоглогчийн хөгжил, цөөн тоглогчоос хамаарах эрсдэл."),
@@ -171,17 +195,17 @@ def build_report_data(root: Path) -> dict:
             _fig(root, "report/blueprint/architecture", "Зураг 14. MBA Scout системийн архитектур", 13.0),
             _bullets(["Скаутын хайлт: архетипээр төстэй тоглогч, статистик бүр итгэх интервалтай",
                       "Тоглолтын өмнөх тайлан: ялах магадлал (20 цэг), Four Factors, Elo явц",
-                      "Интерактив dashboard: 6 хуудас, харилцааны 7 зорилго, шүүлтүүрийн хариу ~31 мс"]),
+                      f"Интерактив dashboard: 6 хуудас, харилцааны 7 зорилго, шүүлтүүрийн хариу {filter_ms:.0f} мс"]),
             _draft("Санал бүрийг шинжилгээний аль үр дүн дэмжиж байгааг өөрийн үгээр холбож бичнэ."),
         ]},
         {"title": "9. Хязгаарлалт", "blocks": [
             _bullets(["2026-27 улирал дуусаагүй; 2023-24 зөвхөн багийн түвшинд, 2024-25 оны дата байхгүй",
-                      "Улирал хоорондын тоглогчийг нэрээр тааруулсан (25 холбоо); зарим Import шошго, гэр хот батлагдаагүй",
+                      f"Улирал хоорондын тоглогчийг нэрээр тааруулсан ({relinks} холбоо); зарим Import шошго, гэр хот батлагдаагүй",
                       "Ялалтын загварын тест жижиг (~210 тоглолт) тул итгэх интервал өргөн",
                       "Ажиглалтын өгөгдөл тул шалтгаан-үр дагаврын дүгнэлт хийх боломжгүй"]),
         ]},
         {"title": "10. Эх сурвалж", "blocks": [
-            _bullets(["Mongolian Basketball Association. Statistics Centre. https://mongolia.basketball/en/stats (2026-11-12)",
+            _bullets([f"Mongolian Basketball Association. Statistics Centre. https://mongolia.basketball/en/stats ({snap_date})",
                       "Wikipedia. The League (Mongolia); 2023–24 The League season; Mongolia men's national basketball team",
                       "geoBoundaries. Mongolia ADM1 (ODbL 1.0)",
                       "Schwabish, J. (2021). Better Data Visualizations. Columbia University Press",
@@ -201,14 +225,14 @@ def build_report_data(root: Path) -> dict:
          "bullets": ["5 таамаглал, итгэх интервалтай шалгасан", "2025-26 бүтэн улирал + 2026-27 (явцын)"],
          "notes": "Ноорог: 5 таамаглалыг товч дурдана."},
         {"layout": "image", "title": "Цэвэрлэгээ: датанд бодит алдаа байсан", "image": "figures/U09_data_quality.png",
-         "bullets": ["16 багийн нэрийн хувилбар → 14 баг", "MBA-ийн хүснэгт зөвхөн энгийн улирлыг тооцдог (C10)",
+         "bullets": [f"Багийн нэр: {c1_note}", "MBA-ийн хүснэгт зөвхөн энгийн улирлыг тооцдог (C10)",
                      "1900 гэх мэт placeholder төрсөн он засав (C12)"],
          "notes": "Ноорог: цэвэрлэгээний 12 алхмаас хамгийн чухал 3-ыг тайлбарлана."},
         {"layout": "image", "title": "Онооны тархалт: Import ба дотоод", "image": "figures/F01_ppg_hist.png",
          "bullets": [f"Import тоглогчид онооны {share:.0%}-ийг авдаг", "Тархалт баруун тийш хазгай"],
          "notes": "Ноорог: гистограмаас юу харагдаж байгааг тайлбарлана."},
         {"layout": "image", "title": "Pareto: онооны төвлөрөл", "image": "figures/P1_league_pareto.png",
-         "bullets": ["80/20 зарчим лигт ойролцоогоор хэрэгждэг", "Саарал зурвас = 95% CI"],
+         "bullets": [pareto_text, "Саарал зурвас = 95% CI"],
          "notes": "Ноорог: Pareto chart-ийг хэрхэн уншихыг тайлбарлана."},
         {"layout": "image", "title": "Funnel: оновч уу, аз уу?", "image": "figures/U01_ts_funnel.png",
          "bullets": ["Цөөн шидэлттэй үед хил өргөн", "Онцгой мэт харагдах нь заримдаа аз"],

@@ -48,8 +48,10 @@ def win_calculator():
     c2.metric(f"{t2} Elo", f"{elo[t2]:.0f}")
     c3.metric(f"{t1} ялах магадлал", f"{p:.0%}", help=f"95% интервал {lo:.0%}–{hi:.0%}" if f.show_ci else None)
     if f.show_ci:
-        st.caption(f"95% интервал {lo:.0%}–{hi:.0%} (β-ийн 500 bootstrap); загварын accuracy ≈ 60%, "
-                   "энгийн Elo baseline-аас баттай илүү биш.")
+        mm = load("model_metrics").set_index("model")
+        acc, elo_acc = mm.loc["logreg", "accuracy_mean"], mm.loc["baseline_elo", "accuracy_mean"]
+        st.caption(f"95% интервал {lo:.0%}–{hi:.0%} (β-ийн 500 bootstrap). Walk-forward CV: Logistic Regression "
+                   f"accuracy {acc:.0%}, энгийн Elo baseline {elo_acc:.0%}.")
     st.plotly_chart(px_quantile_dots(p, 20, t1, t2), width="stretch")
 
 

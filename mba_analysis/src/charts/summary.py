@@ -6,7 +6,7 @@ from src.style import NEUTRAL, PALETTE, apply_style, finish, source_mba
 
 VERDICT_COLORS = {"Дэмжигдсэн": PALETTE["green"], "Дэмжигдээгүй": PALETTE["vermillion"], "Тодорхойгүй": NEUTRAL}
 UNITS = {"H1": "PPG-ийн медиан зөрүү (Import − дотоод)", "H2": "Гэрийн багийн ялалтын хувь",
-         "H3": "eFG%-ийн стандартчилсан коэффициент", "H4": "Pearson r (өндөр ↔ самбар)", "H5": "R² (Pythagorean)"}
+         "H3": "|β_eFG| − бусад хүчин зүйлийн хамгийн их |β|", "H4": "Pearson r (өндөр ↔ самбар)", "H5": "R² (Pythagorean), босго 0.5"}
 COL_LABELS = {"position": "Байрлал", "height_cm": "Өндөр", "birth_year": "Төрсөн он", "FT_pct": "FT%",
               "TP_pct": "3P%", "FGA": "FGA"}
 
@@ -42,8 +42,9 @@ def fig_hypothesis_summary(hyp: pd.DataFrame):
         ax.text(1.01, 0.5, v, transform=ax.transAxes, color=color, fontweight="bold", fontsize=8, va="center")
         ax._qa_no_ylabel = True
     n_yes = verdicts.count("Дэмжигдсэн")
-    return finish(fig, f"5 таамаглалын {n_yes} нь дэмжигдсэн, талбайн давуу тал нотлогдоогүй"
-                  if "Дэмжигдсэн" in verdicts else "Таамаглалын хураангуй",
+    others = [h for h, v in zip(hyp.hid, verdicts) if v != "Дэмжигдсэн"]
+    title = f"{len(hyp)} таамаглалын {n_yes} нь дэмжигдсэн" + (f"; {', '.join(others)} нотлогдоогүй" if others else "")
+    return finish(fig, title,
                   "Цэг = тооцоолсон утга, зурвас = 95% итгэх интервал, тасархай = нөлөөгүй үеийн утга",
                   "Эх сурвалж: MBA (2025–27), Wikipedia; тооцоо: reports/hypotheses.csv", n=int(len(hyp)),
                   uncertainty_note="CI: bootstrap (H1, H3, H5), Wilson (H2), Fisher z (H4)")

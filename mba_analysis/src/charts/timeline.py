@@ -62,8 +62,10 @@ def fig_cum_winpct(team_games: pd.DataFrame, highlight: list[str], bands: bool =
     ax.set_xlabel("Огноо")
     ax.set_ylabel("Хуримтлагдсан ялалтын хувь")
     final = tg.groupby("team_key").last()
-    leader = final.winpct.idxmax()
-    title = f"{names.get(leader, leader)} улирлыг {final.loc[leader, 'winpct']:.0%} ялалтаар тэргүүлж дуусгасан"
+    top = final.winpct.max()
+    leaders = [names.get(k, k) for k in final.index[np.isclose(final.winpct, top)]]
+    title = (f"{' ба '.join(leaders)} улирлыг {top:.0%} ялалтаар тэнцүү тэргүүлж дуусгасан" if len(leaders) > 1
+             else f"{leaders[0]} улирлыг {top:.0%} ялалтаар тэргүүлж дуусгасан")
     if bands:
         f0 = final.loc[highlight[0]]
         ci = wilson_ci(int(f0.wins), int(f0.games))

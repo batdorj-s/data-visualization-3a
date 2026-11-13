@@ -41,3 +41,17 @@ def test_data_quality_qa():
                            pd.read_csv(REP / "ppg_validation.csv"))
     assert len(fig.axes) == 3
     check(fig)
+
+
+def _hyp(h2_supported: bool):
+    rows = [dict(hid=f"H{i}", statement=f"s{i}", estimate=0.3, ci_lo=0.1, ci_hi=0.5, null_value=0.0) for i in range(1, 6)]
+    if not h2_supported:
+        rows[1].update(estimate=0.46, ci_lo=0.40, ci_hi=0.53, null_value=0.5)
+    return pd.DataFrame(rows)
+
+
+def test_hypothesis_title_is_computed():
+    all_yes = fig_hypothesis_summary(_hyp(True))._mba_meta["title"]
+    assert all_yes.startswith("5 таамаглалын 5") and "нотлогдоогүй" not in all_yes
+    one_no = fig_hypothesis_summary(_hyp(False))._mba_meta["title"]
+    assert one_no.startswith("5 таамаглалын 4") and "H2" in one_no
