@@ -207,16 +207,16 @@ L 434.099738 83.591677
     </g>
    </g>
    <g id="patch_3">
-    <path d="M 63.12865 149.675146 
-L 105.858304 149.675146 
+    <path d="M 63.12865 149.20634 
+L 105.858304 149.20634 
 L 105.858304 122.518323 
 L 63.12865 122.518323 
-L 63.12865 149.675146 
+L 63.12865 149.20634 
 z
 " clip-path="url(#p5e305dfa23)" style="fill: #e69f00; opacity: 0.75; stroke: #000000; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_21">
-    <path d="M 84.493477 149.675146 
+    <path d="M 84.493477 149.20634 
 L 84.493477 184.154391 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
    </g>
@@ -289,21 +289,21 @@ L 172.866171 93.4152
     </g>
    </g>
    <g id="patch_5">
-    <path d="M 218.50921 143.486654 
-L 261.238864 143.486654 
-L 261.238864 115.728618 
-L 218.50921 115.728618 
-L 218.50921 143.486654 
+    <path d="M 218.50921 146.245582 
+L 261.238864 146.245582 
+L 261.238864 116.121188 
+L 218.50921 116.121188 
+L 218.50921 146.245582 
 z
 " clip-path="url(#p5e305dfa23)" style="fill: #009e73; opacity: 0.75; stroke: #000000; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_31">
-    <path d="M 239.874037 143.486654 
+    <path d="M 239.874037 146.245582 
 L 239.874037 182.531543 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
    </g>
    <g id="line2d_32">
-    <path d="M 239.874037 115.728618 
+    <path d="M 239.874037 116.121188 
 L 239.874037 93.793365 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
    </g>
@@ -320,24 +320,25 @@ L 250.556451 93.793365
    <g id="line2d_35">
     <g clip-path="url(#p5e305dfa23)">
      <use xlink:href="#m8aabdace67" x="239.874037" y="193.132472" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+     <use xlink:href="#m8aabdace67" x="239.874037" y="193.859877" style="fill: #9e9e9e; stroke: #9e9e9e"/>
     </g>
    </g>
    <g id="patch_6">
-    <path d="M 296.19949 155.163854 
-L 338.929144 155.163854 
-L 338.929144 131.413596 
-L 296.19949 131.413596 
-L 296.19949 155.163854 
+    <path d="M 296.19949 154.04952 
+L 338.929144 154.04952 
+L 338.929144 126.32476 
+L 296.19949 126.32476 
+L 296.19949 154.04952 
 z
 " clip-path="url(#p5e305dfa23)" style="fill: #cc79a7; opacity: 0.75; stroke: #000000; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_36">
-    <path d="M 317.564317 155.163854 
+    <path d="M 317.564317 154.04952 
 L 317.564317 169.325067 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
    </g>
    <g id="line2d_37">
-    <path d="M 317.564317 131.413596 
+    <path d="M 317.564317 126.32476 
 L 317.564317 106.910793 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
    </g>
@@ -392,8 +393,8 @@ L 405.937011 86.156023
     </g>
    </g>
    <g id="line2d_46">
-    <path d="M 63.12865 137.529737 
-L 105.858304 137.529737 
+    <path d="M 63.12865 136.120964 
+L 105.858304 136.120964 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000"/>
    </g>
    <g id="line2d_47">
@@ -402,13 +403,13 @@ L 183.548584 136.886262
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000"/>
    </g>
    <g id="line2d_48">
-    <path d="M 218.50921 129.002226 
-L 261.238864 129.002226 
+    <path d="M 218.50921 129.993027 
+L 261.238864 129.993027 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000"/>
    </g>
    <g id="line2d_49">
-    <path d="M 296.19949 144.170603 
-L 338.929144 144.170603 
+    <path d="M 296.19949 142.57053 
+L 338.929144 142.57053 
 " clip-path="url(#p5e305dfa23)" style="fill: none; stroke: #000000"/>
    </g>
    <g id="line2d_50">
@@ -442,14 +443,14 @@ L 434.099738 221.152543
     <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start" x="323.564317" y="198.59321" transform="rotate(-0 323.564317 198.59321)">Erdenetsogt</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start" x="401.254597" y="78.316041" transform="rotate(-0 401.254597 78.316041)">Jonathan</text>
+    <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start" x="245.874037" y="193.859877" transform="rotate(-0 245.874037 193.859877)">Balt</text>
    </g>
   </g>
   <g id="text_19">
    <text style="font-weight: 700; font-size: 11px; font-family: 'Arial'; text-anchor: start" x="4.535433" y="12.160987" transform="rotate(-0 4.535433 12.160987)">C байрлалын тоглогчдын шидэлтийн оновч (TS%) хамгийн өндөр</text>
   </g>
   <g id="text_20">
-   <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #4d4d4d" x="4.535433" y="33.586815" transform="rotate(-0 4.535433 33.586815)">Шидэлтийн оролдлого ≥ 30; цэг = 1.5·IQR-аас гадуурх тоглогч · 2025-26 ба 2026-27 (явцын), GP ≥ 5 · n = 224</text>
+   <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #4d4d4d" x="4.535433" y="33.586815" transform="rotate(-0 4.535433 33.586815)">Шидэлтийн оролдлого ≥ 30; цэг = 1.5·IQR-аас гадуурх тоглогч · 2025-26 ба 2026-27 (явцын), GP ≥ 5 · n = 225</text>
   </g>
   <g id="text_21">
    <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start; fill: #6b6b6b" x="4.535433" y="269.356865" transform="rotate(-0 4.535433 269.356865)">Эх сурвалж: MBA статистикийн систем, 2026-11-12</text>

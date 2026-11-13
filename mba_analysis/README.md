@@ -32,15 +32,15 @@ pip install -r requirements.txt
 .venv/bin/python -m src.scrape --offline   # MBA (кэшгүй бол --offline-ийг хасаж татна, ~15 мин)
 .venv/bin/python -m src.wiki               # Wikipedia / FIBA
 .venv/bin/python -m src.clean              # C1–C12 + шинэ хувьсагч, Elo
+.venv/bin/python -m src.models             # K-Means, ялалтын загвар (H3/H5-д хэрэгтэй тул analysis-аас өмнө)
 .venv/bin/python -m src.analysis           # статистик, H1–H5
-.venv/bin/python -m src.models             # K-Means, ялалтын загвар
 .venv/bin/python -m src.make_figures       # 29 график + chart_qa
 .venv/bin/python -m src.blueprint          # шийдлийн зураг төсөл
 .venv/bin/python -m src.build_dashboard_data
 .venv/bin/python -m src.report_data
 (cd tools/report && npm install && node build_docx.js ../../report/report_data.json ../../report/MBA_tailan.docx \
   && node build_pptx.js ../../report/report_data.json ../../report/MBA_taniltsuulga.pptx)
-.venv/bin/python -m pytest                 # 162 тест
+.venv/bin/python -m pytest                 # 184 тест
 ```
 
 ## Dashboard
