@@ -16,6 +16,7 @@ from src.charts import comparison as C  # noqa: E402
 from src.charts import distribution as D  # noqa: E402
 from src.charts import geo_network as G  # noqa: E402
 from src.charts import ml as M  # noqa: E402
+from src.charts import shots as SH  # noqa: E402
 from src.charts import relation as R  # noqa: E402
 from src.charts import summary as S  # noqa: E402
 from src.charts import timeline as T  # noqa: E402
@@ -63,7 +64,28 @@ def load_inputs(processed_dir: Path, reports_dir: Path, n_boot: int = 2000) -> d
         "expl": pd.read_csv(r / "explanatory.csv"), "labels": labels, "boot_diff": boot_diff,
         "highlight": [final.index[0], final.index[1], final.index[-1]],
         "geo": ROOT / "data" / "raw" / "geo" / "mng_adm1.geojson", "n_boot": n_boot,
+        **_pbp_inputs(p, r, pg),
     }
+
+
+def _pbp_inputs(p: Path, r: Path, pg: pd.DataFrame) -> dict:
+    """Шидэлт, play-by-play-ийн оролт (файл байхгүй бол хоосон — хуучин snapshot-той нийцтэй)."""
+    if not (p / "shots.csv").exists():
+        return {}
+    games = pd.read_csv(p / "games.csv")
+    assists = pd.read_csv(p / "assists.csv").merge(games[["game_id", "season", "phase"]], on="game_id")
+    metrics = json.loads((r / "metrics.json").read_text(encoding="utf-8"))
+    return {"shots": pd.read_csv(p / "shots.csv"), "pbp": pd.read_csv(p / "pbp.csv.gz"), "assists": assists,
+            "inplay_minute": pd.read_csv(r / "inplay_minute.csv"), "inplay_params": metrics["inplay"]["params"],
+            "player_names": dict(zip(pg.player_id, pg.name.str.title())),
+            "player_import": pg.groupby("player_id").is_import.max().to_dict(),
+            "team_names": dict(zip(pg.team_key, pg.team))}
+
+
+def _assist_network(i: dict):
+    a = i["assists"][(i["assists"].season == MAIN_SEASON) & (i["assists"].phase == "regular")]
+    team = a.team_key.value_counts().idxmax()
+    return SH.fig_assist_network(a, team, i["team_names"].get(team, team), i["player_names"], i["player_import"])
 
 
 def _league_pareto(i: dict):
@@ -127,6 +149,11 @@ FIGURE_SPECS: list[tuple[str, Callable[[dict], Any]]] = [
     ("U06a_model_accuracy", _metric_dist),
     ("U06b_calibration", lambda i: _logreg(i, M.fig_calibration)),
     ("U09_data_quality", lambda i: S.fig_data_quality(i["missing"], i["matches"], i["ppg_val"])),
+    ("F15_shot_map", lambda i: SH.fig_shot_map(i["shots"], n_boot=min(i["n_boot"], 1000))),
+    ("F16_shot_profile", lambda i: SH.fig_shot_profile(i["shots"])),
+    ("F17_assist_network", _assist_network),
+    ("F18_game_flow", lambda i: SH.fig_game_flow(i["pbp"], i["games"], i["inplay_params"])),
+    ("U10_inplay_accuracy", lambda i: SH.fig_inplay_accuracy(i["inplay_minute"])),
 ]
 
 

@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import date, datetime
 
@@ -229,3 +230,43 @@ def parse_game(html: str, game_id: int) -> dict:
         "team_totals": team_totals,
         "players": players,
     }
+
+
+_FLIGHT = re.compile(r'self\.__next_f\.push\(\[1,"(.*?)"\]\)</script>', re.S)
+
+
+def _flight_text(html: str) -> str:
+    """Next.js-ийн RSC урсгалыг (self.__next_f.push) нэг текст болгоно — шидэлт, play-by-play энд JSON-оор байдаг."""
+    return "".join(json.loads(f'"{c}"') for c in _FLIGHT.findall(html))
+
+
+def _json_at(text: str, marker: str, skip: int = 0):
+    """`marker` олдсон байрлалаас `skip` тэмдэгтийн дараа эхлэх JSON утгыг уншина."""
+    i = text.find(marker)
+    if i < 0:
+        return None
+    return json.JSONDecoder().raw_decode(text[i + skip:])[0]
+
+
+def parse_game_events(html: str, game_id: int) -> dict:
+    """Тоглолтын хуудасны нуугдмал JSON-оос шидэлтийн байршил ба play-by-play-г уншина.
+
+    Шидэлт: x 0–637, y 0–350 пиксел (бүтэн талбай 28 × 15 м, 22.75 px/м; сайтын ShotChart-ийн хувиргалт).
+    Play-by-play: үйл явдал бүрийн цаг, төрөл, тоглогч, тухайн үеийн оноо.
+    """
+    text = _flight_text(html)
+    shots_obj = _json_at(text, '{"shots":[')
+    events = _json_at(text, '"events":[', skip=len('"events":')) or []
+    shots = [{"game_id": game_id, "seq": s["seq"], "side": s["side"], "shot_player_id": s.get("playerId"),
+              "player": s.get("player"), "number": s.get("number"), "period": s["period"], "made": bool(s["made"]),
+              "three": bool(s["three"]), "x": s["x"], "y": s["y"]}
+             for s in (shots_obj or {}).get("shots", [])]
+    pbp = []
+    for e in events:
+        p = e.get("player") if isinstance(e.get("player"), dict) else {}
+        made = e.get("made")
+        pbp.append({"game_id": game_id, "seq": e["seq"], "period": e["period"], "clock": e.get("clock"),
+                    "side": e.get("side"), "player_slug": p.get("slug"), "player": p.get("name"),
+                    "number": p.get("number"), "type": e.get("type"), "made": made if isinstance(made, bool) else None,
+                    "points": e.get("points") or 0, "home": e.get("home"), "away": e.get("away"), "text": e.get("text")})
+    return {"shots": shots, "events": pbp}

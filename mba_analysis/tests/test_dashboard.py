@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 DASH = Path(__file__).resolve().parents[1] / "dashboard"
 APP = str(DASH / "app.py")
 PAGES = ["views/overview.py", "views/players.py", "views/teams.py", "views/ml.py", "views/quality.py",
-         "views/about.py", "views/glossary.py"]
+         "views/about.py", "views/glossary.py", "views/shots.py"]
 EMPTY_MSG = "Сонгосон шүүлтүүрт тохирох өгөгдөл алга"
 
 
@@ -98,3 +98,10 @@ def test_glossary_search_filters_terms():
 def test_theme_config_copies_match():
     root = DASH.parents[1]
     assert (root / ".streamlit" / "config.toml").read_text() == (DASH.parent / ".streamlit" / "config.toml").read_text()
+
+
+def test_shots_page_follows_highlight_team():
+    at = run("views/shots.py", highlight_team="BCH Knights")
+    assert not at.exception, [e.value for e in at.exception]
+    team = next(s for s in at.selectbox if s.label == "Баг")
+    assert team.value == "BCH Knights"

@@ -110,3 +110,25 @@ def test_parse_schedule_live_game_is_not_final():
     assert rows[901]["status"] == "Final"
     live = [r for r in parse_schedule(LIVE_CARD, "2026-11") if r["status"] != "Final"]
     assert len(live) == 1 and live[0]["game_id"] is None and live[0]["home_pts"] is None
+
+
+def test_parse_game_events_141(html):
+    from src.parse_mba import parse_game_events
+    ev = parse_game_events(html("game_141"), 141)
+    shots, pbp = ev["shots"], ev["events"]
+    assert len(shots) == 138
+    s = shots[0]
+    assert set(s) >= {"game_id", "seq", "side", "player", "number", "period", "made", "three", "x", "y"}
+    assert s["game_id"] == 141 and s["side"] in ("home", "away") and 0 <= s["x"] <= 637 and 0 <= s["y"] <= 350
+    assert len(pbp) > 300
+    last_score = [e for e in pbp if e["home"] is not None][-1]
+    assert (last_score["home"], last_score["away"]) == (77, 69)  # гарчгийн эцсийн оноо
+    made = [e for e in pbp if e["type"] in ("2pt", "3pt", "ft") and e["made"] is True]
+    assert sum(e["points"] for e in made if e["side"] == "home") == 77
+    sub = next(e for e in pbp if e["type"] == "sub")
+    assert sub["player_slug"] and sub["clock"] == "10:00"
+
+
+def test_parse_game_events_missing_block_returns_empty():
+    from src.parse_mba import parse_game_events
+    assert parse_game_events("<html><head><title>x</title></head><body></body></html>", 1) == {"shots": [], "events": []}

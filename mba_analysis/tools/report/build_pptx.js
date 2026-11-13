@@ -81,7 +81,7 @@ function bullets(items) {
   return items.map((t, i) => ({ text: t, options: { bullet: { indent: 14 }, breakLine: i < items.length - 1, paraSpaceAfter: 8 } }));
 }
 
-const SECTIONS = { 0: "Танилцуулга", 2: "Өгөгдөл", 3: "Дүрслэл", 8: "Машин суралцал", 10: "Шийдэл ба дүгнэлт" };
+const SECTIONS = { 0: "Танилцуулга", 2: "Өгөгдөл", 3: "Дүрслэл", 9: "Машин сургалт", 11: "Шийдэл ба дүгнэлт" };
 let section = null;
 
 data.slides.forEach((s, i) => {

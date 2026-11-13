@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.fetch import CacheMiss, Fetcher
-from src.parse_mba import parse_game, parse_player_profile, parse_player_stats, parse_schedule
+from src.parse_mba import parse_game, parse_game_events, parse_player_profile, parse_player_stats, parse_schedule
 
 BASE = "https://mongolia.basketball"
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,8 +34,11 @@ def profile_url(slug: str) -> str:
     return f"{BASE}/en/players/{slug}"
 
 
+GZIP = {"method": "gzip", "mtime": 0}  # mtime=0: дахин ажиллуулахад файл байт бүрээрээ ижил
+
+
 def _write(df: pd.DataFrame, path: Path) -> int:
-    df.to_csv(path, index=False, encoding="utf-8")
+    df.to_csv(path, index=False, encoding="utf-8", compression=GZIP if str(path).endswith(".gz") else None)
     return len(df)
 
 
@@ -56,11 +59,12 @@ def scrape_all(raw_dir: Path, fetcher: Fetcher) -> dict[str, int]:
 
     finals = (sched_df[sched_df["status"] == "Final"].drop_duplicates("game_id")
               if len(sched_df) else sched_df)
-    games, team_games, player_games = [], [], []
+    games, team_games, player_games, shots, events = [], [], [], [], []
     for i, card in enumerate(finals.to_dict("records"), 1):
         gid = int(card["game_id"])
         try:
-            g = parse_game(fetcher.get(game_url(gid)), gid)
+            page = fetcher.get(game_url(gid))
+            g = parse_game(page, gid)
         except CacheMiss:
             counts["missing_games"] += 1
             continue
@@ -78,11 +82,16 @@ def scrape_all(raw_dir: Path, fetcher: Fetcher) -> dict[str, int]:
             team_games.append({"game_id": gid, "season": card["season"], "team_name": names[t["side"]], **t})
         for p in g["players"]:
             player_games.append({"game_id": gid, "season": card["season"], "team_name": names[p["side"]], **p})
+        ev = parse_game_events(page, gid)
+        shots += ev["shots"]
+        events += ev["events"]
         if i % 25 == 0:
             print(f"  тоглолт {i}/{len(finals)}", flush=True)
     counts["games_raw"] = _write(pd.DataFrame(games), raw_dir / "games_raw.csv")
     counts["team_games_raw"] = _write(pd.DataFrame(team_games), raw_dir / "team_games_raw.csv")
     counts["player_games_raw"] = _write(pd.DataFrame(player_games), raw_dir / "player_games_raw.csv")
+    counts["shots_raw"] = _write(pd.DataFrame(shots), raw_dir / "shots_raw.csv")
+    counts["pbp_raw"] = _write(pd.DataFrame(events), raw_dir / "pbp_raw.csv.gz")
 
     stats = []
     counts["missing_stats"] = 0

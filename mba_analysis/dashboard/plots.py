@@ -231,3 +231,127 @@ def px_map(meta: pd.DataFrame, standings: pd.DataFrame, geojson_path: Path, seas
     unknown = len(st) - len(known)
     title = "Багийн хот ба ялалтын хувь" + (f" ({unknown} багийн хот тодорхойгүй)" if unknown else "")
     return _layout(fig, title, height=400)
+
+
+# ---------- Шидэлт ба тоглолтын явц ----------
+def _arc(cx, cy, r, a0, a1, n=60):
+    t = np.radians(np.linspace(a0, a1, n))
+    return cx + r * np.cos(t), cy + r * np.sin(t)
+
+
+def court_traces(color: str = "#94A3B8") -> list[go.Scatter]:
+    """FIBA-ийн хагас талбай: хэвтээ = өргөн 0–15 м, босоо = суурь шугамаас зай, сагс (7.5; 1.575)."""
+    ang = np.degrees(np.arcsin(6.6 / 6.75))
+    yc = 1.575 + 6.75 * np.cos(np.radians(ang))
+    parts = [
+        ([0, 15, 15, 0, 0], [0, 0, 10.5, 10.5, 0]),
+        ([5.05, 5.05, 9.95, 9.95], [0, 5.8, 5.8, 0]),
+        _arc(7.5, 1.575, 0.225, 0, 360), _arc(7.5, 1.575, 1.25, 0, 180), _arc(7.5, 5.8, 1.8, 0, 180),
+        ([0.9, 0.9], [0, yc]), ([14.1, 14.1], [0, yc]), _arc(7.5, 1.575, 6.75, 90 - ang, 90 + ang),
+        ([6.6, 8.4], [1.2, 1.2]),
+    ]
+    return [go.Scatter(x=list(x), y=list(y), mode="lines", line=dict(color=color, width=1.2), hoverinfo="skip",
+                       showlegend=False) for x, y in parts]
+
+
+def shot_cells(shots: pd.DataFrame, size: float = 1.0, min_n: int = 5) -> pd.DataFrame:
+    s = shots[shots.location_ok]
+    cx = (s.court_y // size) * size + size / 2
+    cy = (s.court_x // size) * size + size / 2
+    c = s.assign(cx=cx, cy=cy).groupby(["cx", "cy"]).agg(n=("pts", "size"), pps=("pts", "mean"),
+                                                        fg=("made", "mean")).reset_index()
+    return c[(c.n >= min_n) & (c.cy <= 10.5)]
+
+
+def px_shot_map(shots: pd.DataFrame, league_pps: float, title: str) -> go.Figure:
+    c = shot_cells(shots, min_n=max(3, len(shots) // 800))
+    fig = go.Figure(court_traces())
+    if len(c):
+        fig.add_trace(go.Scatter(
+            x=c.cx, y=c.cy, mode="markers", showlegend=False,
+            marker=dict(symbol="square", size=(8 + 30 * np.sqrt(c.n / c.n.max())).tolist(), color=c.pps,
+                        colorscale="RdBu_r", cmid=league_pps, cmin=0.4, cmax=1.8, line=dict(width=0),
+                        colorbar=dict(title=dict(text="Оноо /<br>шидэлт", side="top"), thickness=12, len=0.7)),
+            customdata=np.c_[c.n, c.fg],
+            hovertemplate="%{customdata[0]} шидэлт<br>Оносон %{customdata[1]:.0%}<br>Шидэлт бүрт %{marker.color:.2f} "
+                          "оноо<extra></extra>"))
+    fig.update_xaxes(visible=False, range=[-0.3, 15.3])
+    fig.update_yaxes(visible=False, range=[-0.3, 10.8], scaleanchor="x", scaleratio=1)
+    return _layout(fig, title, height=470)
+
+
+def px_zone_bars(zones: pd.DataFrame, league_pps: float) -> go.Figure:
+    z = zones.sort_values("pps")
+    fig = go.Figure(go.Bar(x=z.pps, y=z.zone, orientation="h",
+                           marker_color=[B_COLOR if v >= league_pps else A_COLOR for v in z.pps],
+                           customdata=np.c_[z.n, z.share], text=[f"{v:.2f}" for v in z.pps], textposition="outside",
+                           hovertemplate="%{y}: шидэлт бүрт %{x:.2f} оноо<br>%{customdata[0]} шидэлт "
+                                         "(%{customdata[1]:.0%})<extra></extra>"))
+    fig.add_vline(x=league_pps, line_dash="dash", line_color=NEUTRAL,
+                  annotation_text=f"Лигийн дундаж {league_pps:.2f}", annotation_position="top")
+    fig.update_xaxes(title="Шидэлт бүрт ногдох оноо", range=[0, max(1.6, z.pps.max() + 0.25)])
+    return _layout(fig, "Бүс бүрийн үр ашиг", height=330, showlegend=False)
+
+
+def px_assist_network(edges: pd.DataFrame, involvement: pd.Series, is_import: dict, title: str) -> go.Figure:
+    nodes = list(involvement.sort_values(ascending=False).index)
+    ang = np.linspace(0, 2 * np.pi, len(nodes), endpoint=False)
+    pos = {n: (np.cos(a), np.sin(a)) for n, a in zip(nodes, ang)}
+    fig = go.Figure()
+    mx = max(edges.n.max(), 1) if len(edges) else 1
+    for r in edges.itertuples():
+        (x0, y0), (x1, y1) = pos[r.passer], pos[r.scorer]
+        fig.add_trace(go.Scatter(x=[x0, x1], y=[y0, y1], mode="lines", showlegend=False, hoverinfo="text",
+                                 text=f"{r.passer} → {r.scorer}: {r.n} удаа",
+                                 line=dict(color=f"rgba(100,116,139,{0.25 + 0.6 * r.n / mx})", width=1 + 7 * r.n / mx)))
+        fig.add_annotation(x=x1, y=y1, ax=x0, ay=y0, xref="x", yref="y", axref="x", ayref="y", showarrow=True,
+                           arrowhead=2, arrowsize=1, arrowwidth=1, arrowcolor="rgba(100,116,139,0.6)", text="",
+                           standoff=12)
+    fig.add_trace(go.Scatter(
+        x=[pos[n][0] for n in nodes], y=[pos[n][1] for n in nodes], mode="markers+text", showlegend=False,
+        text=nodes, textposition=["top center" if pos[n][1] >= 0 else "bottom center" for n in nodes],
+        marker=dict(size=(12 + 30 * np.sqrt(involvement[nodes] / involvement.max())).tolist(),
+                    color=[IMPORT_COLORS[bool(is_import.get(n, False))] for n in nodes], line=dict(color="white", width=1)),
+        customdata=involvement[nodes].to_numpy(), hovertemplate="%{text}: %{customdata} дамжуулалтад оролцсон<extra></extra>"))
+    fig.update_xaxes(visible=False, range=[-1.45, 1.45])
+    fig.update_yaxes(visible=False, range=[-1.35, 1.35], scaleanchor="x")
+    return _layout(fig, title, height=520)
+
+
+def px_game_flow(flow: pd.DataFrame, wp: np.ndarray, home: str, away: str, show_ci_line: bool = True) -> go.Figure:
+    t = flow.elapsed / 60
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.55, 0.45], vertical_spacing=0.08)
+    pos, neg = flow.margin.clip(lower=0), flow.margin.clip(upper=0)
+    fig.add_trace(go.Scatter(x=t, y=pos, line=dict(shape="hv", width=0), fill="tozeroy", fillcolor="rgba(213,94,0,0.75)",
+                             name=f"{home} тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=neg, line=dict(shape="hv", width=0), fill="tozeroy", fillcolor="rgba(0,114,178,0.75)",
+                             name=f"{away} тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=flow.margin, mode="lines", line=dict(shape="hv", color="rgba(0,0,0,0)"),
+                             showlegend=False, customdata=np.c_[flow.home, flow.away],
+                             hovertemplate="%{x:.1f} мин: %{customdata[0]}–%{customdata[1]}<extra></extra>"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=wp, mode="lines", line=dict(shape="hv", color="black", width=2),
+                             name=f"{home} ялах магадлал", hovertemplate="%{x:.1f} мин: %{y:.0%}<extra></extra>"),
+                  row=2, col=1)
+    fig.add_hline(y=0.5, line_dash="dot", line_color=NEUTRAL, row=2, col=1)
+    for q in (10, 20, 30):
+        fig.add_vline(x=q, line_color="#E2E8F0")
+    fig.update_yaxes(title="Онооны зөрүү", row=1, col=1)
+    fig.update_yaxes(title="Ялах магадлал", tickformat=".0%", range=[0, 1], row=2, col=1)
+    fig.update_xaxes(title="Тоглолтын минут", row=2, col=1)
+    return _layout(fig, f"{home} – {away}: тоглолтын явц", height=520)
+
+
+def px_inplay_accuracy(minute: pd.DataFrame, show_ci: bool) -> go.Figure:
+    fig = go.Figure()
+    for key, color, name, dash in (("model", A_COLOR, "Загвар", "solid"), ("leader", NEUTRAL, "Одоо тэргүүлж буй нь ялна", "dash")):
+        if show_ci:
+            fig.add_trace(go.Scatter(x=np.r_[minute.minute, minute.minute[::-1]],
+                                     y=np.r_[minute[f"hi_{key}"], minute[f"lo_{key}"][::-1]], fill="toself",
+                                     fillcolor="rgba(0,114,178,0.15)" if key == "model" else "rgba(158,158,158,0.18)",
+                                     line=dict(width=0), name=f"{name}: 95% хүрээ", hoverinfo="skip"))
+        fig.add_trace(go.Scatter(x=minute.minute, y=minute[f"acc_{key}"], mode="lines", name=name,
+                                 line=dict(color=color, width=3 if key == "model" else 2, dash=dash),
+                                 hovertemplate="%{x}-р минут: %{y:.0%}<extra>" + name + "</extra>"))
+    fig.update_yaxes(title="Ялагчийг зөв таамагласан хувь", tickformat=".0%", range=[0.4, 1])
+    fig.update_xaxes(title="Тоглолтын минут")
+    return _layout(fig, "Тоглолт урагшлах тусам ялагчийг хэр зөв таамаглах вэ", height=400)

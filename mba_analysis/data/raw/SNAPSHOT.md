@@ -17,6 +17,8 @@
 | games_raw | 252 |
 | team_games_raw | 504 |
 | player_games_raw | 7130 |
+| shots_raw | 33347 |
+| pbp_raw | 139595 |
 | missing_stats | 0 |
 | players_season_raw | 318 |
 | players_profile_raw | 260 |

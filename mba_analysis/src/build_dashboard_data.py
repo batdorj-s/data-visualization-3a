@@ -70,6 +70,39 @@ def _team_games(tg: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(parts, ignore_index=True)
 
 
+def _pbp_tables(p: Path, r: Path, games: pd.DataFrame, pg: pd.DataFrame, metrics: dict) -> dict[str, pd.DataFrame]:
+    """Шидэлт, дамжуулалт, тоглолтын явцын хүснэгтүүд (файл байхгүй бол хоосон)."""
+    if not (p / "shots.csv").exists() or "inplay" not in metrics:
+        return {}
+    from src.charts.shots import lead_changes
+
+    names = pg.drop_duplicates("player_id").set_index("player_id").name.str.title()
+    teams = dict(zip(pg.team_key, pg.team))
+    gi = games[["game_id", "season", "phase", "date"]]
+    shots = pd.read_csv(p / "shots.csv").merge(gi, on="game_id")
+    shots = shots.assign(player_name=shots.player_id.map(names), team=shots.team_key.map(teams),
+                         pts=shots.made.astype(int) * (2 + shots.three.astype(int)))[
+        ["game_id", "season", "phase", "team", "player_id", "player_name", "is_import", "made", "three", "court_x",
+         "court_y", "dist", "zone", "location_ok", "pts"]]
+    assists = pd.read_csv(p / "assists.csv").merge(gi, on="game_id")
+    assists = assists.assign(team=assists.team_key.map(teams), passer=assists.passer_id.map(names),
+                             scorer=assists.scorer_id.map(names))
+    pbp = pd.read_csv(p / "pbp.csv.gz")
+    # Онооны зөрүү өөрчлөгдсөн мөч ба үеийн заагуудыг л хадгална (графикт хангалттай, файл жижиг)
+    pbp = pbp.sort_values(["game_id", "seq"])
+    changed = pbp.groupby("game_id").margin.diff().fillna(1).ne(0) | pbp.type.isin(["start", "end"])
+    flow = pbp.loc[changed, ["game_id", "elapsed", "period", "home", "away", "margin"]]
+    lc = pbp.groupby("game_id").apply(lead_changes, include_groups=False).rename("lead_changes")
+    game_list = games[["game_id", "season", "phase", "date", "home_team", "away_team", "home_pts", "away_pts",
+                       "elo_pre_home", "elo_pre_away"]].merge(lc, left_on="game_id", right_index=True)
+    params = metrics["inplay"]["params"]
+    return {
+        "shots": shots, "assists": assists, "game_flow": flow, "game_list": game_list,
+        "inplay_minute": pd.read_csv(r / "inplay_minute.csv"),
+        "inplay_params": pd.DataFrame([{"intercept": params["intercept"], **params["coef"]}]),
+    }
+
+
 def build(processed_dir: Path, reports_dir: Path, out_dir: Path, n_boot: int = 2000) -> dict[str, int]:
     from src.charts.comparison import pareto_ci, pareto_table
 
@@ -123,6 +156,7 @@ def build(processed_dir: Path, reports_dir: Path, out_dir: Path, n_boot: int = 2
         "cleaning_log": pd.read_csv(r / "cleaning_log.csv"),
         "model_metrics": pd.DataFrame(metrics["win_cv"]).T.reset_index(names="model"),
     }
+    tables.update(_pbp_tables(p, r, games, pg, metrics))
     counts = {}
     for name, df in tables.items():
         df.to_parquet(out / f"{name}.parquet", index=False)

@@ -64,7 +64,13 @@ def build_report_data(root: Path) -> dict:
     boot = m["win_bootstrap"]
     km = m["kmeans"]
     py = m["pythagorean"]
-    kpi = {"games": int(len(games)), "player_seasons": int(len(ps)), "eligible": int(len(elig)),
+    shots_df = pd.read_csv(P / "shots.csv")
+    ip = m["inplay"]
+    shot_bad = float((~shots_df.location_ok).mean())
+    ast_note = log.set_index("step").note.get("C16", "")
+    ast_share = float(re.search(r"(\d+)%", str(ast_note)).group(1)) / 100 if re.search(r"(\d+)%", str(ast_note)) else 0.0
+    kpi = {"shots": int(len(shots_df)), "pbp_events": int(len(pd.read_csv(P / "pbp.csv.gz", usecols=["seq"]))),
+           "games": int(len(games)), "player_seasons": int(len(ps)), "eligible": int(len(elig)),
            "player_games": int(len(pg)), "unique_players": int(ps.player_id.nunique()), "import_share": float(share)}
 
     snap = re.search(r"Татсан огноо: (\d{4}-\d{2}-\d{2})", (root / "data" / "raw" / "SNAPSHOT.md").read_text(encoding="utf-8"))
@@ -147,6 +153,10 @@ def build_report_data(root: Path) -> dict:
             _para(f"Нийт {kpi['games']} тоглолт, тоглогч бүрийн {kpi['player_games']:,} тоглолтын бичлэг, "
                   f"{kpi['player_seasons']} тоглогч-улирал ({kpi['unique_players']} өөр тоглогч) цуглуулав. "
                   f"Сайт байнга шинэчлэгддэг тул бүх тооцоо {snap_date}-нд татсан хувилбар дээр хийгдсэн."),
+            _para(f"Үүнээс гадна тоглолтын хуудас бүрт нуугдсан хоёр датаг задлав: {kpi['shots']:,} шидэлтийн байршил "
+                  f"(талбайн аль цэгээс шидсэн, оносон эсэх) ба {kpi['pbp_events']:,} үйл явдлын тоглолтын явцын бичлэг "
+                  "(шидэлт, солилт, дамжуулалт г.м. цаг, онооны хамт). Шидэлтийн тоо хайрцаг онооны нийт шидэлттэй яг "
+                  "тэнцүү гарсан нь задлалт зөв болохыг баталсан."),
             _draft("Өгөгдлийг хэрхэн цуглуулсан, ямар ёс зүйн зарчим баримталсныг (robots.txt, хүсэлтийн завсар) тайлбарлана."),
         ]},
         {"title": "3. Өгөгдлийн цэвэрлэгээ ба боловсруулалт", "blocks": [
@@ -170,13 +180,16 @@ def build_report_data(root: Path) -> dict:
             _fig(root, "F01_ppg_hist", f"Зураг 2. Гистограм — {T('F01_ppg_hist')}"),
             _fig(root, "F02_ts_box_pos", f"Зураг 3. Хайрцган график (box plot) — {T('F02_ts_box_pos')}"),
             _fig(root, "F03_height_reb", f"Зураг 4. Цэгэн график (scatter) — {T('F03_height_reb')}"),
-            _fig(root, "F04_cum_winpct", f"Зураг 5. Шугаман график — {T('F04_cum_winpct')}"),
             _fig(root, "F05_four_factors", f"Зураг 6. Баганан график — {T("F05_four_factors")}", 11.5),
             _fig(root, "F06_import_donut", f"Зураг 7. Цагираган график — {T("F06_import_donut")}", 10.0),
             _h2("Парето (Pareto) ба тодорхой бус байдлын график"),
             _fig(root, "P1_league_pareto", f"Зураг 8. Парето (Pareto) график — {T('P1_league_pareto')}"),
             _fig(root, "U01_ts_funnel", f"Зураг 9. Юүлүүр (funnel) график — {T('U01_ts_funnel')}"),
             _fig(root, "U03_fan_winpct", f"Зураг 10. Сэнсэн (fan) график — {T('U03_fan_winpct')}"),
+            _h2("Шидэлтийн байршил, дамжуулалт, тоглолтын явц"),
+            _fig(root, "F15_shot_map", f"Зураг 0. Орон зайн (hexbin) график — {T('F15_shot_map')}", 11.0),
+            _fig(root, "F17_assist_network", f"Зураг 0. Сүлжээний граф — {T('F17_assist_network')}", 10.0),
+            _fig(root, "F18_game_flow", f"Зураг 0. Шугаман (цаг хугацааны) график — {T('F18_game_flow')}", 11.0),
             _draft("График бүрээс юу харагдаж байгааг 1–2 өгүүлбэрээр өөрийн үгээр тайлбарлана. Бусад график "
                    "(дулааны зураг, violin, хос харьцуулалт, газрын зураг, шилжилтийн сүлжээ г.м.) "
                    "notebooks/04_visualization-д бий."),
@@ -190,7 +203,15 @@ def build_report_data(root: Path) -> dict:
             _fig(root, "F14b_pca_clusters", f"Зураг 11. {T('F14b_pca_clusters')}"),
             _table("Хүснэгт 6. Ялагч таамаглах аргуудын үнэлгээ", met_tbl),
             _fig(root, "U06a_model_accuracy", f"Зураг 12. {T('U06a_model_accuracy')}"),
-            _draft(f"{model_verdict} "
+            _para(f"Гуравдугаар загвар нь тоглолтын явцын бичлэгээр тоглолтын ДУНД ялах магадлалыг тооцно: тоглолт бүрийг "
+                  f"минут тутам зогсоож ({ip['n_states']:,} мөч), тухайн үеийн онооны зөрүү, үлдсэн хугацаа, тоглолтын "
+                  "өмнөх хүчний оноогоор гэрийн баг ялах магадлалыг тооцов. Нэг тоглолтын мөчүүд сургалт, тест хоёрт зэрэг "
+                  "орохгүйгээр 5 хэсэгт хувааж шалгасан."),
+            _fig(root, "U10_inplay_accuracy", f"Зураг 0. {T('U10_inplay_accuracy')}", 10.0),
+            _draft(f"Тоглолтын дундах загвар хагас дуусахад {ip['acc_minute']['20']:.0%}, 35-р минутад "
+                   f"{ip['acc_minute']['35']:.0%} зөв таамагласан нь «одоо тэргүүлж буй нь ялна» дүрэмтэй ойролцоо "
+                   f"({ip['acc_leader']:.0%} дунджаар); давуу тал нь магадлалаар хэр итгэлтэйг хэлж өгдөгт. "
+                   f"{model_verdict} "
                    f"Ялалтыг тайлбарлах загварт шидэлтийн оновч бусад хүчин зүйлээс {h.loc['H3', 'estimate']:.1f} "
                    f"нэгжээр илүү нөлөөтэй гарсан."),
         ]},
@@ -218,7 +239,7 @@ def build_report_data(root: Path) -> dict:
             _fig(root, "report/blueprint/architecture", "Зураг 14. MBA Scout системийн архитектур", 13.0),
             _bullets(["Скаутын хайлт: хэв маягаар төстэй тоглогч олох, тоо бүр магадлалтай хүрээтэй",
                       "Тоглолтын өмнөх тайлан: ялах магадлал («20 тоглолтоос хэд»), ялалтын 4 хүчин зүйл, хүчний онооны явц",
-                      f"Интерактив dashboard: 7 хуудас (нэр томьёоны толь орсон), харилцааны 7 зорилго, шүүлтүүрийн хариу "
+                      f"Интерактив dashboard: 8 хуудас (шидэлтийн газрын зураг, нэр томьёоны толь орсон), харилцааны 7 зорилго, шүүлтүүрийн хариу "
                       f"{filter_ms:.0f} мс"]),
             _draft("Санал бүрийг шинжилгээний аль үр дүн дэмжиж байгааг өөрийн үгээр холбож бичнэ."),
         ]},
@@ -227,6 +248,8 @@ def build_report_data(root: Path) -> dict:
                       f"Улирал хоорондын тоглогчийг нэрээр нь тааруулсан ({relinks} холбоо); зарим тоглогчийн гадаад "
                       "эсэх, багийн хот эх сурвалжаар батлагдаагүй",
                       "Ялагч таамаглах загварыг шалгах тоглолт цөөн (~210) тул магадлалтай хүрээ өргөн",
+                      f"Шидэлтийн {shot_bad:.0%} нь байршил ба 2/3 онооны шошго зөрсөн тул байршлын шинжилгээнээс "
+                      f"хассан; дамжуулалтын {ast_share:.0%}-ийг л шидэлттэй нь холбож чадсан",
                       "Туршилт бус, ажигласан дата тул «шалтгаан нь юу вэ» гэдгийг баталж чадахгүй"]),
         ]},
         {"title": "10. Эх сурвалж ба нэр томьёо", "blocks": [
@@ -267,6 +290,10 @@ def build_report_data(root: Path) -> dict:
         {"layout": "image", "title": "Ялалтын хувь: хэр итгэлтэй вэ?", "image": "figures/U03_fan_winpct.png",
          "bullets": ["Улирлын эхэнд хүрээ өргөн, сүүлд нарийн", "Сүүдэр = 50 / 80 / 95% магадлалтай хүрээ"],
          "notes": "Ноорог: улирлын явцад тодорхой бус байдал хэрхэн буурдгийг тайлбарлана."},
+        {"layout": "image", "title": "Хаанаас шидэх нь үр ашигтай вэ?", "image": "figures/F15_shot_map.png",
+         "bullets": [f"{shots_df.shape[0]:,} шидэлтийн байршлыг задалсан", T("F15_shot_map").split(",")[0],
+                     T("F15_shot_map").split(", ", 1)[-1].capitalize()],
+         "notes": "Ноорог: шидэлтийн газрын зургийг хэрхэн уншихыг тайлбарлана."},
         {"layout": "image", "title": "Таамаглалын дүн", "image": "figures/U05_hypotheses.png",
          "bullets": [f"{r.hid}: {VERDICT_PLAIN[r.verdict]}" for r in hyp.itertuples()][:3],
          "notes": "Ноорог: таамаглал бүрийн дүгнэлтийг өөрийн үгээр."},
@@ -276,10 +303,10 @@ def build_report_data(root: Path) -> dict:
          "notes": "Ноорог: хэв маяг бүрийг тайлбарлана."},
         {"layout": "image", "title": "ML 2: ялагчийг таамаглах", "image": "figures/U06a_model_accuracy.png",
          "bullets": [f"ML загвар {cv['logreg']['accuracy_mean']:.0%}, энгийн дүрэм {cv['baseline_elo']['accuracy_mean']:.0%} зөв",
-                     "Зөвхөн тоглолтын өмнөх датаг ашигласан"],
+                     f"Тоглолтын дунд: 35-р минутад {ip['acc_minute']['35']:.0%} зөв"],
          "notes": "Ноорог: яагаад ML загвар энгийн дүрмийг давж чадаагүйг тайлбарлана."},
         {"layout": "image", "title": "Шийдэл: MBA Scout ба интерактив dashboard", "image": "report/blueprint/architecture.png",
-         "bullets": ["Dashboard: 7 хуудас, энгийн хэлтэй, нэр томьёоны тольтой", "Харилцааны 7 зорилгыг бүгдийг хэрэгжүүлсэн"],
+         "bullets": ["Dashboard: 8 хуудас, энгийн хэлтэй, нэр томьёоны тольтой", "Харилцааны 7 зорилгыг бүгдийг хэрэгжүүлсэн"],
          "notes": "Ноорог: dashboard-ийг шууд үзүүлж тайлбарлана."},
         {"layout": "closing", "title": "Дүгнэлт ба санал",
          "bullets": ["Гадаад тоглогч оноонд давамгай; дотоодын тоглогчийн хөгжилд анхаарах",
@@ -287,6 +314,12 @@ def build_report_data(root: Path) -> dict:
                      "Магадлалтай хүрээг харуулах нь буруу дүгнэлтээс сэргийлнэ"],
          "notes": "Ноорог: гол 3 дүгнэлт, асуултад бэлтгэнэ."},
     ]
+    fig_no = 0
+    for sec in sections:  # зургийн дугаарыг дарааллаар нь автоматаар өгнө
+        for blk in sec["blocks"]:
+            if blk["type"] == "figure":
+                fig_no += 1
+                blk["caption"] = re.sub(r"^Зураг \d+\.", f"Зураг {fig_no}.", blk["caption"])
     hyp_records = hyp.astype(object).where(hyp.notna(), None).to_dict(orient="records")
     return {"kpi": kpi, "hypotheses": hyp_records, "sections": sections, "slides": slides,
             "draft_label": DRAFT_LABEL}

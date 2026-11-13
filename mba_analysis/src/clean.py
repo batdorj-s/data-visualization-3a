@@ -371,7 +371,24 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     if missing_meta:
         raise UnmappedTeamError(f"team_meta.csv-д байхгүй team_key: {missing_meta}")
 
+    # шидэлт ба play-by-play (тоглолтын хуудасны нуугдмал JSON)
+    from src.pbp import clean_pbp, clean_shots, link_assists
+
+    shots, sst = clean_shots(pd.read_csv(raw_dir / "shots_raw.csv"), pg)
+    log.add("C14", "Шидэлтийг тоглогчтой (тоглолт, тал, дугаар) холбож, байршлыг метр, бүс болгов", sst["shots"], sst["shots"],
+            f"холбогдоогүй {sst['unlinked']}; 2/3 оноо нь байршилтайгаа зөрсөн {sst['bad_location']} "
+            f"({sst['bad_location'] / sst['shots']:.1%}) — байршлын шинжилгээнээс хассан")
+    pbp, pst = clean_pbp(pd.read_csv(raw_dir / "pbp_raw.csv.gz"), pg, g)
+    log.add("C15", "Play-by-play: цагийг секунд, онооны зөрүү, тоглогч, багтай болгов", pst["events"], pst["events"],
+            f"тоглогчтой холбогдоогүй үйл явдал {pst['unlinked_players']}")
+    assists, ast = link_assists(pbp)
+    log.add("C16", "Оновчтой дамжуулалтыг ±2 үйл явдлын доторх оносон шидэлттэй холбов", ast["assists"], ast["linked"],
+            f"{ast['share']:.0%} холбогдов; үлдсэн нь шидэлтээс хол бичигдсэн")
+
     g.to_csv(out_dir / "games.csv", index=False)
+    shots.to_csv(out_dir / "shots.csv", index=False)
+    pbp.to_csv(out_dir / "pbp.csv.gz", index=False, compression={"method": "gzip", "mtime": 0})
+    assists.to_csv(out_dir / "assists.csv", index=False)
     tg.to_csv(out_dir / "team_games.csv", index=False)
     pg.to_csv(out_dir / "player_games.csv", index=False)
     ps.to_csv(out_dir / "players_season.csv", index=False)

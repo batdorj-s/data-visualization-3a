@@ -378,6 +378,16 @@ def run_models(processed_dir, reports_dir, models_dir, n_boot: int = 1000, stabi
     py = fit_pythagorean(st, n_boot=n_boot, seed=seed)
     metrics["pythagorean"] = {k: (_ci_dict(v) if hasattr(v, "_fields") else v) for k, v in py.items()}
 
+    # 7.5 Тоглолтын дундах ялах магадлал (play-by-play)
+    pbp_path = processed_dir / "pbp.csv.gz"
+    if pbp_path.exists():
+        from src.inplay import run_inplay
+
+        ip_cv, ip_minute, ip = run_inplay(pd.read_csv(pbp_path), pd.read_csv(processed_dir / "games.csv"), n_boot=n_boot)
+        ip_cv.to_csv(reports_dir / "inplay_cv.csv", index=False)
+        ip_minute.to_csv(reports_dir / "inplay_minute.csv", index=False)
+        metrics["inplay"] = ip
+
     (reports_dir / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2, default=float),
                                               encoding="utf-8")
     return metrics

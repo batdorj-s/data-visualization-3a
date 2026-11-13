@@ -40,3 +40,19 @@ def test_clusters_carry_team_key():
     cl = pd.read_csv(R / "clusters.csv")
     assert "team_key" in cl.columns
     assert not cl.duplicated(["player_id", "season", "team_key"]).any()
+
+
+def test_shots_match_box_score_attempts():
+    shots = pd.read_csv(P / "shots.csv")
+    pg = pd.read_csv(P / "player_games.csv")
+    assert len(shots) == int(pg.FGA.sum())  # шидэлт бүр хайрцаг онооны FGA-д тоологдсон
+    assert shots.player_id.notna().mean() > 0.99
+
+
+def test_pbp_final_score_matches_quarters_not_title_mismatches():
+    e = pd.read_csv(P / "pbp.csv.gz")
+    g = pd.read_csv(P / "games.csv").set_index("game_id")
+    last = e.sort_values(["game_id", "seq"]).groupby("game_id")[["home", "away"]].last()
+    bad = set(last.index[(last.home != g.home_pts.reindex(last.index)) | (last.away != g.away_pts.reindex(last.index))])
+    flagged = pd.read_csv(R / "score_mismatches.csv")
+    assert bad == set(flagged.loc[flagged.title_vs_quarters, "game_id"])  # зөрүү нь зөвхөн C13-ийн тоглолтууд
