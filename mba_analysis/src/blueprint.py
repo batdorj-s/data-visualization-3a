@@ -40,8 +40,8 @@ def _save(fig, out_dir: Path, name: str) -> Path:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     png = out_dir / f"{name}.png"
-    fig.savefig(png, dpi=300)
-    fig.savefig(out_dir / f"{name}.svg")
+    fig.savefig(png, dpi=300, metadata={"Software": None})
+    fig.savefig(out_dir / f"{name}.svg", metadata={"Date": None})
     plt.close(fig)
     return png
 

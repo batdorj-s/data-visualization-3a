@@ -68,3 +68,11 @@ def test_scrape_only_final_games(tmp_path, monkeypatch):
     requested = {u for u in f.urls if "/en/games/" in u}
     assert requested == expected
     assert any(r["status"] == "Scheduled" for r in sched)
+
+
+def test_offline_rerun_keeps_snapshot_date(tmp_path, offline_jan):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "SNAPSHOT.md").write_text("# Өгөгдлийн snapshot\n\n- Татсан огноо: 2026-11-12T23:58\n", encoding="utf-8")
+    scrape.scrape_all(raw, offline_jan)
+    assert "Татсан огноо: 2026-11-12T23:58" in (raw / "SNAPSHOT.md").read_text(encoding="utf-8")

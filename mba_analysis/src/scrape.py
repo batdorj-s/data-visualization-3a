@@ -1,4 +1,5 @@
 import argparse
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -105,10 +106,15 @@ def scrape_all(raw_dir: Path, fetcher: Fetcher) -> dict[str, int]:
             print(f"  профайл {i}/{len(slugs)}", flush=True)
     counts["players_profile_raw"] = _write(pd.DataFrame(profiles), raw_dir / "players_profile_raw.csv")
 
+    fetched_at = datetime.now().isoformat(timespec="minutes")
+    snap = raw_dir / "SNAPSHOT.md"
+    if fetcher.offline and snap.exists():
+        prev = re.search(r"Татсан огноо: (\S+)", snap.read_text(encoding="utf-8"))
+        fetched_at = prev.group(1) if prev else fetched_at
     lines = [
         "# Өгөгдлийн snapshot",
         "",
-        f"- Татсан огноо: {datetime.now().isoformat(timespec='minutes')}",
+        f"- Татсан огноо: {fetched_at}",
         f"- Эх сурвалж: {BASE} (MBA статистикийн систем)",
         "- 2026-2027 улирал энэ огнооны байдлаар дуусаагүй (явцын).",
         "",

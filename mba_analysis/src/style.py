@@ -34,6 +34,7 @@ def apply_style() -> str:
         "savefig.dpi": 300,
         "figure.dpi": 100,
         "svg.fonttype": "none",
+        "svg.hashsalt": "mba-analysis",
     })
     return font
 
@@ -71,6 +72,6 @@ def save_figure(fig, out_dir: Path, name: str) -> tuple[Path, Path]:
     w, h = fig.get_size_inches()
     fig.set_size_inches(WIDTH_IN, h * WIDTH_IN / w)
     png, svg = out_dir / f"{name}.png", out_dir / f"{name}.svg"
-    fig.savefig(png, dpi=300)
-    fig.savefig(svg)
+    fig.savefig(png, dpi=300, metadata={"Software": None})
+    fig.savefig(svg, metadata={"Date": None})
     return png, svg

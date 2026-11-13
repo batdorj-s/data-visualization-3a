@@ -89,3 +89,9 @@ def test_long_subtitle_wraps():
     subtitle = next(t for t in fig.texts if "маш урт" in t.get_text())
     assert "\n" in subtitle.get_text()
     assert all(len(line) <= 120 for line in subtitle.get_text().split("\n"))
+
+
+def test_svg_output_is_deterministic(tmp_path):
+    a = save_figure(good_fig(), tmp_path / "a", "F00")[1].read_bytes()
+    b = save_figure(good_fig(), tmp_path / "b", "F00")[1].read_bytes()
+    assert a == b
