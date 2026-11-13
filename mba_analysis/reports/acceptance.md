@@ -1,14 +1,14 @@
 # Хүлээн авах шалгуур (spec §15) — шалгалтын үр дүн
 
-Шалгасан огноо: 2026-11-13 · Branch: `feat/mba-analysis` · Тест: `.venv/bin/python -m pytest` → **162 passed**
+Шалгасан огноо: 2026-11-13 · Branch: `feat/mba-analysis` · Тест: `.venv/bin/python -m pytest` → **184 passed** (эцсийн review-ийн засваруудын дараа)
 
 | # | Шалгуур | Дүн | Нотолгоо |
 |---|---|---|---|
 | 1 | `python -m src.scrape` кэштэй үед сүлжээгүйгээр давтан ажиллаж §3-ийн бүх CSV-г үүсгэнэ | ✅ | `--offline` горимоор бүтэн pipeline-ийг 2 удаа ажиллуулахад git зөрүү 0 (дата, тайлан, график бүгд ижил) |
-| 2 | Mapping-гүй багийн нэр 0, C10 зөрүү тайлбартай | ✅ | `UnmappedTeamError` гараагүй; C10: бүх тоглолтоор 79 → энгийн улирлаар 8 зөрүү (MBA-ийн хүснэгт зөвхөн энгийн улирлыг тооцдог), `reports/ppg_validation.csv` |
+| 2 | Mapping-гүй багийн нэр 0, C10 зөрүү тайлбартай | ✅ | `UnmappedTeamError` гараагүй; C10: бүх тоглолтоор 77 зөрүү → энгийн улирлаар, баг сольсон 14 тоглогчийг бүх багаар нэгтгэхэд 0 зөрүү; C13: оноо зөрчилтэй 6 тоглолт (ялагч өөрчлөгдөхгүй) `reports/score_mismatches.csv` |
 | 3 | players_season (GP ≥ 5) ≥ 230, games ≥ 240 | ✅ | 273 тоглогч-улирал, 252 тоглолт |
 | 4 | F1–F6 монгол гарчиг, тэнхлэг, legend, эх сурвалжийн caption | ✅ | `reports/chart_qa.csv`: 29/29 `ok` |
-| 5 | K-Means: silhouette ба bootstrap ARI тайлагнагдсан | ✅ | k = 3, silhouette 0.215, ARI 0.779 (`reports/metrics.json`) |
+| 5 | K-Means: silhouette ба bootstrap ARI тайлагнагдсан | ✅ | k = 3, silhouette 0.209, ARI 0.785 (`reports/metrics.json`) |
 | 6 | Win model: walk-forward CV, 95% CI, 2 baseline | ✅ | Logistic Regression acc 0.592 ± 0.091, AUC 0.655; bootstrap acc 0.585 [0.519, 0.656]; Elo baseline 0.603 → baseline-ийг баттай давахгүй (шударга дүгнэлт) |
 | 7 | P1–P3 Pareto: эрэмбэлсэн, тэнхлэг 0-ээс, 80% шугам, P1 CI зурвас | ✅ | `tests/test_charts_time_cmp.py`, `tests/test_charts_ml.py` |
 | 8 | U1–U9: CI-г cluster bootstrap / Wilson / Fisher-ээр, caption-д аргачлал | ✅ | caption бүрт аргачлал; `src/uncertainty.py` тестүүд |
