@@ -77,19 +77,18 @@ def build(processed_dir: Path, reports_dir: Path, out_dir: Path, n_boot: int = 2
     out.mkdir(parents=True, exist_ok=True)
     ps = pd.read_csv(p / "players_season.csv")
     clusters = pd.read_csv(r / "clusters.csv")
-    ps = ps.merge(clusters[["player_id", "season", "cluster_name", "coassign", "pc1", "pc2"]],
-                  on=["player_id", "season"], how="left")
+    ps = ps.merge(clusters[["player_id", "season", "team_key", "cluster_name", "coassign", "pc1", "pc2"]],
+                  on=["player_id", "season", "team_key"], how="left", validate="one_to_one")
     games = pd.read_csv(p / "games.csv")
-    pg = pd.read_csv(p / "player_games.csv").merge(ps[["player_id", "season", "team_key", "is_import"]],
-                                                    on=["player_id", "season", "team_key"], how="left")
-    pg["is_import"] = pg.is_import.fillna(False).astype(bool)
+    pg = pd.read_csv(p / "player_games.csv")
+    pg["is_import"] = pg.is_import.astype(bool)
     pg_reg = pg[pg.phase == "regular"]
 
     ci_rows = []
-    for (pid, season, team), d in pg_reg.groupby(["player_id", "season", "team_key"]):
+    for (pid, season), d in pg_reg.groupby(["player_id", "season"]):
         for metric, ci in player_ci_fast(d.PTS.to_numpy(float), d.FGA.to_numpy(float), d.FTA.to_numpy(float),
                                          n_boot=n_boot).items():
-            ci_rows.append({"player_id": pid, "season": season, "team_key": team, "metric": metric,
+            ci_rows.append({"player_id": pid, "season": season, "metric": metric, "gp": len(d),
                             "est": ci.est, "lo": ci.lo, "hi": ci.hi})
 
     pareto_rows, team_rows = [], []

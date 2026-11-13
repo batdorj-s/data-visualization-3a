@@ -150,7 +150,7 @@ def test_run_models_smoke(tmp_path):
     rng = np.random.default_rng(0)
     n = 60
     ps = pd.DataFrame({f: rng.normal(size=n) for f in ["pts36", "reb36", "ast36", "stl36", "blk36", "tpa_rate", "ftr", "ts_pct"]})
-    ps = ps.assign(MIN_total=300, eligible=True, player_id=[f"p{i}" for i in range(n)], season="2025-2026",
+    ps = ps.assign(MIN_total=300, eligible=True, player_id=[f"p{i}" for i in range(n)], season="2025-2026", team_key="t",
                    is_import=rng.random(n) < 0.3, position=rng.choice(["PG", "SG", "SF", "PF", "C"], n))
     ps.to_csv(proc / "players_season.csv", index=False)
     pd.DataFrame({"PF": [2000, 1900, 2100], "PA": [1900, 2000, 1950], "W": [15, 9, 16], "L": [9, 15, 8]}).to_csv(

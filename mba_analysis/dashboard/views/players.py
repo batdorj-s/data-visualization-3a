@@ -42,7 +42,7 @@ def player_card():
                        key="card_player", format_func=lambda i: names.get(i, i))
     row = options[options.player_id == pid].iloc[0]
     ci = load("player_ci")
-    ci = ci[(ci.player_id == pid) & (ci.season == f.season) & (ci.team_key == row.team_key)].set_index("metric")
+    ci = ci[(ci.player_id == pid) & (ci.season == f.season)].set_index("metric")
     archetype = row.cluster_name if isinstance(row.cluster_name, str) else "—"
     st.markdown(f"**{row.player_name}** · {row.team} · {row.position} · "
                 f"{'Import' if row.is_import else 'Дотоод'} · архетип: {archetype}")
@@ -75,7 +75,8 @@ def uncertainty():
         n = st.slider("Топ N", 5, 25, 15, key="topn")
         ci = load("player_ci")
         ci = ci[(ci.season == f.season) & (ci.metric == "ppg") & ci.player_id.isin(players.player_id)]
-        top = ci.merge(players[["player_id", "player_name", "is_import"]], on="player_id").nlargest(n, "est")
+        names = players.drop_duplicates(["player_id", "season"])[["player_id", "player_name", "is_import"]]
+        top = ci.merge(names, on="player_id", validate="many_to_one").nlargest(n, "est")
         st.plotly_chart(px_dot_ci(top, f.show_ci, "Оноо / тоглолт"), width="stretch")
 
 

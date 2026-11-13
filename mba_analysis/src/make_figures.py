@@ -31,7 +31,7 @@ def player_ppg_ci(pg: pd.DataFrame, ps: pd.DataFrame, season: str, top: int = 15
     sub = pg[(pg.season == season) & (pg.phase == "regular")]
     rows = []
     for r in cand.itertuples():
-        d = sub[(sub.player_id == r.player_id) & (sub.team_key == r.team_key)]
+        d = sub[sub.player_id == r.player_id]
         ci = cluster_bootstrap(d, "game_id", lambda x: x.PTS.mean(), n_boot=n_boot)
         rows.append({"player": r.player_name.title(), "est": ci.est, "lo": ci.lo, "hi": ci.hi, "is_import": r.is_import})
     return pd.DataFrame(rows)
@@ -41,12 +41,12 @@ def load_inputs(processed_dir: Path, reports_dir: Path, n_boot: int = 2000) -> d
     p, r = Path(processed_dir), Path(reports_dir)
     ps_all = pd.read_csv(p / "players_season.csv")
     ps = ps_all[ps_all.eligible.astype(bool)].reset_index(drop=True)
-    pg = pd.read_csv(p / "player_games.csv").merge(ps_all[["player_id", "season", "team_key", "is_import"]],
-                                                    on=["player_id", "season", "team_key"], how="left")
-    pg["is_import"] = pg.is_import.fillna(False).astype(bool)
+    pg = pd.read_csv(p / "player_games.csv")
+    pg["is_import"] = pg.is_import.astype(bool)
     tg = pd.read_csv(p / "team_games.csv")
     clusters = pd.read_csv(r / "clusters.csv")
-    labels = ps.merge(clusters[["player_id", "season", "cluster_name"]], on=["player_id", "season"], how="left").cluster_name
+    labels = ps.merge(clusters[["player_id", "season", "team_key", "cluster_name"]],
+                      on=["player_id", "season", "team_key"], how="left", validate="one_to_one").cluster_name
     labels.index = ps.index
     rng = np.random.default_rng(42)
     imp, dom = ps[ps.is_import.astype(bool)].PPG.to_numpy(), ps[~ps.is_import.astype(bool)].PPG.to_numpy()

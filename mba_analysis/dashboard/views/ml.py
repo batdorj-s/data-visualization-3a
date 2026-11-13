@@ -14,8 +14,8 @@ def cluster_explorer():
     st.subheader("Төстэй тоглогч хайх (K-Means архетип)")
     cl = load("clusters")
     cl = cl[cl.season == f.season] if (cl.season == f.season).any() else cl
-    names = cl.set_index("player_id").player_name
-    pid = st.selectbox("Тоглогч", cl.sort_values("player_name").player_id, format_func=lambda i: names.get(i, i),
+    names = cl.drop_duplicates("player_id").set_index("player_id").player_name
+    pid = st.selectbox("Тоглогч", cl.sort_values("player_name").player_id.drop_duplicates(), format_func=lambda i: names.get(i, i),
                        key="ml_player")
     me = cl[cl.player_id == pid].iloc[0]
     d = np.hypot(cl.pc1 - me.pc1, cl.pc2 - me.pc2)

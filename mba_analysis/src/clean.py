@@ -148,11 +148,35 @@ def set_dtypes(df: pd.DataFrame, table: str, log: CleaningLog | None = None) -> 
     return out
 
 
+TOTAL_COLS = {"PTS_total": "PTS", "FGM": "FGM", "FGA": "FGA", "TPM": "TPM", "TPA": "TPA", "FTM": "FTM", "FTA": "FTA"}
+
+
+def attach_totals(players_season: pd.DataFrame, player_games: pd.DataFrame) -> pd.DataFrame:
+    """Тоглолтын мөрөөс улирлын нийлбэрийг нэмнэ.
+
+    MBA улирлын дундуур баг сольсон тоглогчид улирлын хүснэгтэд ихэвчлэн НЭГ мөр (бүх багийн нийлбэр) өгдөг тул
+    ийм тоглогчийн нийлбэрийг бүх багаар авна. Хүснэгтэд баг тус бүрээр мөр байвал багаар нь авна.
+    """
+    ps = players_season.drop(columns=[c for c in [*TOTAL_COLS, "GP_games", "traded"] if c in players_season.columns])
+    agg = {k: (v, "sum") for k, v in TOTAL_COLS.items() if v in player_games.columns}
+    gp = ("game_id", "nunique") if "game_id" in player_games.columns else ("PTS", "size")
+    by_team = player_games.groupby(["player_id", "season", "team_key"], as_index=False).agg(**agg, GP_games=gp)
+    by_season = player_games.groupby(["player_id", "season"], as_index=False).agg(
+        **agg, GP_games=gp, traded=("team_key", "nunique"))
+    by_season["traded"] = by_season.traded > 1
+    rows = ps.groupby(["player_id", "season"]).player_id.transform("size")
+    single = ps[rows == 1].merge(by_season, on=["player_id", "season"], how="left")
+    multi = ps[rows > 1].merge(by_team, on=["player_id", "season", "team_key"], how="left").assign(traded=True)
+    out = pd.concat([single, multi]).sort_index(kind="stable").reset_index(drop=True)
+    out["traded"] = out.traded.fillna(False).astype(bool)
+    return out
+
+
 def validate_ppg(players_season: pd.DataFrame, player_games: pd.DataFrame, tol: float = 0.2) -> pd.DataFrame:
     keys = ["player_id", "season", "team_key"]
-    agg = player_games.groupby(keys, observed=True)["PTS"].agg(ppg_games="mean", gp_games="count").reset_index()
-    out = players_season[keys + ["PPG", "GP"]].merge(agg, on=keys, how="left")
-    out["ppg_games"] = out["ppg_games"].round(2)
+    out = attach_totals(players_season[keys + ["PPG", "GP"]], player_games)
+    out["gp_games"] = out.GP_games
+    out["ppg_games"] = (out.PTS_total / out.GP_games).round(2)
     out["diff"] = (out["PPG"] - out["ppg_games"]).abs().round(2)
     out["flag"] = out["diff"] > tol
     return out
@@ -280,10 +304,11 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     pg_regular = pg[pg.phase == "regular"]
 
     # MBA-ийн улирлын хүснэгт зөвхөн regular season-ийг тооцдог тул нийлбэрийг мөн regular-аас авна
-    totals = pg_regular.groupby(["player_id", "season", "team_key"], as_index=False).agg(
-        PTS_total=("PTS", "sum"), FGM=("FGM", "sum"), FGA=("FGA", "sum"), TPM=("TPM", "sum"), TPA=("TPA", "sum"),
-        FTM=("FTM", "sum"), FTA=("FTA", "sum"), GP_games=("game_id", "nunique"))
-    ps = ps.merge(totals, on=["player_id", "season", "team_key"], how="left")
+    ps = attach_totals(ps, pg_regular)
+    playoff_only = sorted(set(pg.player_id) - set(ps.player_id))
+    log.add("C10b", "Улирлын дундуур баг сольсон тоглогчийн нийлбэрийг бүх багаар нь тооцов", len(ps), len(ps),
+            f"баг сольсон тоглогч-улирал: {int(ps.traded.sum())} (MBA-ийн хүснэгт тэдэнд нэг мөр өгдөг); "
+            f"зөвхөн playoff-д тоглосон, улирлын хүснэгтэд байхгүй: {', '.join(playoff_only) or 'алга'}")
 
     # profiles
     prof = pd.read_csv(raw_dir / "players_profile_raw.csv")
@@ -291,6 +316,7 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     ps = ps.merge(prof[["player_slug", "position", "height_cm", "birth_year", "is_import", "FT_pct"]],
                   on="player_slug", how="left")
     ps["is_import"] = ps.is_import.fillna(False).astype(bool)
+    pg["is_import"] = pg.player_id.map(ps.groupby("player_id").is_import.max()).fillna(False).astype(bool)
     ps = fix_implausible_values(ps, log)
     ps = fix_zero_attempt_pct(ps, log)
     ps = flag_eligible(ps, 5, log)
@@ -302,7 +328,8 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     validation = validate_ppg(ps, pg_regular)
     log.add("C10", "Улирлын PPG-ийг тоглолтын мөрөөс тооцсонтой харьцуулав (tol 0.2)", len(ps), len(ps),
             f"бүх тоглолтоор {int(validation_all.flag.sum())} зөрүүтэй → MBA-ийн хүснэгт зөвхөн regular season-ийг "
-            f"тооцдог нь тогтоогдов; regular-аар {int(validation.flag.sum())} зөрүүтэй")
+            f"тооцдог нь тогтоогдов; regular-аар, баг сольсон тоглогчийг бүх багаар нэгтгэхэд "
+            f"{int(validation.flag.sum())} зөрүүтэй")
 
     # standings
     st23 = pd.read_csv(raw_dir / "standings_2023_24_raw.csv")

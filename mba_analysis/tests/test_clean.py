@@ -149,3 +149,29 @@ def test_fix_implausible_values():
     assert pd.isna(out.height_cm[1]) and out.height_cm[0] == 202
     assert log.to_frame().iloc[-1].step == "C12"
     assert "3" in log.to_frame().iloc[-1].note
+
+
+def _pg(rows):
+    return pd.DataFrame(rows, columns=["player_id", "season", "team_key", "game_id", "PTS", "FGM", "FGA", "TPM", "TPA",
+                                       "FTM", "FTA"])
+
+
+def test_attach_totals_traded_player_uses_all_teams():
+    from src.clean import attach_totals
+    ps = pd.DataFrame({"player_id": ["p1"], "season": ["s"], "team_key": ["b"], "GP": [5], "PPG": [12.0]})
+    pg = _pg([("p1", "s", "a", 1, 10, 4, 8, 0, 1, 2, 2), ("p1", "s", "a", 2, 10, 4, 8, 0, 1, 2, 2),
+              ("p1", "s", "b", 3, 20, 8, 15, 1, 3, 3, 4), ("p1", "s", "b", 4, 10, 4, 9, 0, 1, 2, 2),
+              ("p1", "s", "b", 5, 10, 4, 9, 0, 1, 2, 2)])
+    out = attach_totals(ps, pg).iloc[0]
+    assert (out.PTS_total, out.GP_games, out.FGA) == (60, 5, 49)
+    assert bool(out.traded) is True
+
+
+def test_attach_totals_two_season_rows_stay_per_team():
+    from src.clean import attach_totals
+    ps = pd.DataFrame({"player_id": ["p2", "p2"], "season": ["s", "s"], "team_key": ["a", "b"], "GP": [1, 1],
+                       "PPG": [10.0, 20.0]})
+    pg = _pg([("p2", "s", "a", 1, 10, 4, 8, 0, 1, 2, 2), ("p2", "s", "b", 2, 20, 8, 15, 1, 3, 3, 4)])
+    out = attach_totals(ps, pg).set_index("team_key")
+    assert out.loc["a", "PTS_total"] == 10 and out.loc["b", "PTS_total"] == 20
+    assert out.GP_games.tolist() == [1, 1]

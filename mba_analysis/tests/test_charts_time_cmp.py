@@ -29,10 +29,7 @@ def games():
 
 @pytest.fixture(scope="module")
 def pg():
-    pg = pd.read_csv(PROC / "player_games.csv")
-    ps = pd.read_csv(PROC / "players_season.csv")[["player_id", "season", "team_key", "is_import"]]
-    return pg.merge(ps, on=["player_id", "season", "team_key"], how="left").assign(
-        is_import=lambda d: d.is_import.fillna(False).astype(bool))
+    return pd.read_csv(PROC / "player_games.csv").assign(is_import=lambda d: d.is_import.astype(bool))
 
 
 @pytest.fixture(autouse=True)

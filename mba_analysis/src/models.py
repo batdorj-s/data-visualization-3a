@@ -325,7 +325,7 @@ def run_models(processed_dir, reports_dir, models_dir, n_boot: int = 1000, stabi
     res.centroids_z.assign(cluster_name=[names[i] for i in range(res.k)]).to_csv(
         reports_dir / "cluster_centroids_z.csv", index=False)
     cluster_composition(df, res.labels, names).to_csv(reports_dir / "cluster_composition.csv", index=False)
-    pd.DataFrame({"player_id": df.player_id, "season": df.season, "cluster": res.labels,
+    pd.DataFrame({"player_id": df.player_id, "season": df.season, "team_key": df.team_key, "cluster": res.labels,
                   "cluster_name": [names[int(l)] for l in res.labels], "coassign": coassign,
                   "pc1": res.pca_xy[:, 0], "pc2": res.pca_xy[:, 1]}).to_csv(reports_dir / "clusters.csv", index=False)
     metrics["kmeans"] = {"k": res.k, "n": int(len(df)), "silhouette_by_k": res.silhouette_by_k,
