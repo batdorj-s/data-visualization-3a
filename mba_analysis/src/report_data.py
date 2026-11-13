@@ -56,7 +56,9 @@ def build_report_data(root: Path) -> dict:
     num = num[num.group == "Бүгд"].set_index("variable")
     log = pd.read_csv(R / "cleaning_log.csv")
     chart_titles = pd.read_csv(R / "chart_qa.csv").set_index("name").title
-    imp_pts = pg.merge(ps[["player_id", "season", "team_key", "is_import"]], on=["player_id", "season", "team_key"])
+    imp_pts = pg.merge(ps[["player_id", "season", "team_key", "is_import"]], on=["player_id", "season", "team_key"],
+                       how="left")
+    imp_pts["is_import"] = imp_pts.is_import.fillna(False).astype(bool)
     share = imp_pts.loc[imp_pts.is_import, "PTS"].sum() / imp_pts.PTS.sum()
     h = hyp.set_index("hid")
     cv = m["win_cv"]

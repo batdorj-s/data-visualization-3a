@@ -67,3 +67,11 @@ def test_pptx_structure(tmp_path, data):
         pics = [s for s in slide.shapes if s.shape_type == MSO_SHAPE_TYPE.PICTURE]
         assert len(pics) <= 1
         assert slide.has_notes_slide and slide.notes_slide.notes_text_frame.text.strip()
+
+
+def test_import_share_matches_figure_f06(data):
+    from src.make_figures import load_inputs
+    inputs = load_inputs(ROOT / "data" / "processed", ROOT / "reports", n_boot=10)
+    pg = inputs["pg"]
+    expected = pg.loc[pg.is_import, "PTS"].sum() / pg.PTS.sum()
+    assert data["kpi"]["import_share"] == pytest.approx(expected)
