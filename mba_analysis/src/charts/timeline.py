@@ -60,7 +60,7 @@ def fig_cum_winpct(team_games: pd.DataFrame, highlight: list[str], bands: bool =
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0%}"))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
     ax.set_xlabel("Огноо")
-    ax.set_ylabel("Хуримтлагдсан ялалтын хувь")
+    ax.set_ylabel("Тухайн өдөр хүртэлх ялалтын хувь")
     final = tg.groupby("team_key").last()
     top = final.winpct.max()
     leaders = [names.get(k, k) for k in final.index[np.isclose(final.winpct, top)]]
@@ -69,13 +69,15 @@ def fig_cum_winpct(team_games: pd.DataFrame, highlight: list[str], bands: bool =
     if bands:
         f0 = final.loc[highlight[0]]
         ci = wilson_ci(int(f0.wins), int(f0.games))
-        title = (f"{names.get(highlight[0], highlight[0])}-ийн ялалтын хувь улирлын эцэст ч "
-                 f"±{(ci.hi - ci.lo) / 2:.0%} тодорхой бус ({int(f0.games)} тоглолт)")
+        title = (f"{int(f0.games)} тоглолтын дараа ч {names.get(highlight[0], highlight[0])}-ийн жинхэнэ хүч "
+                 f"±{(ci.hi - ci.lo) / 2:.0%} тодорхой бус хэвээр")
+    team0 = names.get(highlight[0], highlight[0])
     return finish(fig, title,
-                  f"{season.replace('-20', '–')} энгийн улирал; саарал = бусад баг"
-                  + (f"; зурвас = {names.get(highlight[0], highlight[0])}-ийн 50/80/95% итгэх интервал" if bands else ""),
-                  source_mba(), n=int(tg.team_key.nunique()),
-                  uncertainty_note="Итгэх интервал: Wilson, хуримтлагдсан ялалт/тоглолтоор" if bands else None)
+                  "Шугам бүр 1 баг; улирлын явцад ялалтын хувь хэрхэн өөрчлөгдсөнийг харуулна. Саарал = бусад баг"
+                  + (f". Сүүдэр = {team0}-ийн бодит хүч байж болох хүрээ (бараан 50%, цайвар 95% магадлал): "
+                     "эхэндээ өргөн, тоглолт нэмэгдэх тусам нарийсна" if bands else ""),
+                  f"{source_mba()} · {season.replace('-20', '–')} улирлын үндсэн шат", n=int(tg.team_key.nunique()),
+                  unit="баг")
 
 
 def elo_series(games: pd.DataFrame) -> pd.DataFrame:
@@ -104,13 +106,14 @@ def fig_elo(games: pd.DataFrame, highlight: list[str]):
     boundary = s[s.season == "2026-2027"].date.min()
     if pd.notna(boundary):
         ax.axvline(boundary, color="black", linestyle="--", linewidth=0.8)
-        ax.text(boundary, ax.get_ylim()[1], " 2026–27 (явцын)", va="top", fontsize=7.5)
+        ax.text(boundary, ax.get_ylim()[1], " 2026–27 улирал эхэлсэн", va="top", fontsize=8)
     ax.axhline(1500, color="black", linewidth=0.6, linestyle=":")
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
     ax.set_xlabel("Огноо")
-    ax.set_ylabel("Elo үнэлгээ")
+    ax.set_ylabel("Багийн хүчний оноо (Elo)")
     latest = s.groupby("team_key").last()
     top = latest.elo.idxmax()
-    return finish(fig, f"{names.get(top, top)}-ийн Elo үнэлгээ одоогоор хамгийн өндөр ({latest.loc[top, 'elo']:.0f})",
-                  "Elo: K = 20, эхлэл 1500, улирлын шилжилтэд 75% хадгална; тасархай = улирлын заг",
-                  source_mba(), n=int(s.team_key.nunique()))
+    return finish(fig, f"{names.get(top, top)} одоогоор лигийн хамгийн хүчтэй баг ({latest.loc[top, 'elo']:.0f} оноо)",
+                  "Хүчний оноо тоглолт бүрийн дараа шинэчлэгдэнэ: хүчтэй багийг ялбал их нэмэгдэнэ. "
+                  "Цэгэн шугам 1500 = лигийн дундаж; босоо тасархай = шинэ улирал",
+                  f"{source_mba()} · 2025–26 ба 2026–27 улирлын бүх тоглолт", n=int(s.team_key.nunique()), unit="баг")

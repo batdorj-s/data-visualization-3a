@@ -19,12 +19,15 @@ def apply_style() -> str:
     font = "Arial" if "Arial" in available else "DejaVu Sans"
     plt.rcParams.update({
         "font.family": font,
-        "font.size": 9,
-        "axes.titlesize": 10,
-        "axes.labelsize": 9,
-        "xtick.labelsize": 8,
-        "ytick.labelsize": 8,
-        "legend.fontsize": 8,
+        "font.size": 9.5,
+        "axes.titlesize": 10.5,
+        "axes.labelsize": 9.5,
+        "xtick.labelsize": 8.5,
+        "ytick.labelsize": 8.5,
+        "legend.fontsize": 8.5,
+        "axes.labelcolor": "#333333",
+        "xtick.color": "#4D4D4D",
+        "ytick.color": "#4D4D4D",
         "axes.spines.top": False,
         "axes.spines.right": False,
         "axes.grid": True,
@@ -45,24 +48,33 @@ def source_mba() -> str:
     if snap.exists():
         m = re.search(r"Татсан огноо: (\d{4}-\d{2}-\d{2})", snap.read_text(encoding="utf-8"))
         day = m.group(1) if m else day
-    return f"Эх сурвалж: MBA статистикийн систем, {day}"
+    return f"MBA лигийн албан ёсны статистик (mongolia.basketball), {day}-нд татсан"
 
 
-def finish(fig, title: str, subtitle: str, source: str, n: int, uncertainty_note: str | None = None):
+def finish(fig, title: str, subtitle: str, source: str, n: int, uncertainty_note: str | None = None,
+           unit: str | None = None):
+    """Гарчиг (гол дүгнэлт), дэд гарчиг (хэрхэн унших), доод тайлбар (ямар дата, хэдэн ширхэг) нэмнэ."""
     width_in = fig.get_size_inches()[0]
-    sub_lines = textwrap.wrap(f"{subtitle} · n = {n}", width=int(17 * width_in))
-    cap_lines = textwrap.wrap(source if not uncertainty_note else f"{source}. {uncertainty_note}",
-                              width=int(20 * width_in))
+    title_lines = textwrap.wrap(title, width=int(10.5 * width_in))
+    sub_lines = textwrap.wrap(subtitle, width=int(14 * width_in))
+    count = f"{n} {unit}" if unit else f"n = {n}"
+    caption = f"Дата: {source} · {count}"
+    if uncertainty_note:
+        caption += f". {uncertainty_note}"
+    cap_lines = textwrap.wrap(caption, width=int(17.5 * width_in))
     height_in = fig.get_size_inches()[1]
-    line = 0.16 / height_in
-    fig.suptitle(title, x=0.01, y=0.985, ha="left", va="top", fontsize=11, fontweight="bold")
-    fig.text(0.01, 1 - 0.38 / height_in, "\n".join(sub_lines), ha="left", va="top", fontsize=8.5, color="#4D4D4D")
-    fig.text(0.01, 0.01, "\n".join(cap_lines), ha="left", va="bottom", fontsize=7, color="#6B6B6B")
-    top = 1 - (0.42 / height_in + len(sub_lines) * line)
-    bottom = 0.02 + len(cap_lines) * 0.13 / height_in
+    line = 0.175 / height_in
+    # suptitle биш fig.text: tight_layout нь suptitle-ийн зайг rect дээр давхар хасдаг
+    fig.text(0.01, 1 - 0.06 / fig.get_size_inches()[1], "\n".join(title_lines), ha="left", va="top", fontsize=12,
+             fontweight="bold", color="#1A1A1A")
+    title_h = 0.22 * len(title_lines) / height_in
+    fig.text(0.01, 1 - 0.18 / height_in - title_h, "\n".join(sub_lines), ha="left", va="top", fontsize=9.5, color="#404040")
+    fig.text(0.01, 0.01, "\n".join(cap_lines), ha="left", va="bottom", fontsize=8, color="#5C5C5C")
+    top = 1 - (0.24 / height_in + title_h + len(sub_lines) * line)
+    bottom = 0.02 + len(cap_lines) * 0.15 / height_in
     fig.tight_layout(rect=(0, bottom, 1, top))
     fig._mba_meta = {"title": title, "subtitle": subtitle, "source": source, "n": n,
-                     "uncertainty_note": uncertainty_note}
+                     "uncertainty_note": uncertainty_note, "unit": unit}
     return fig
 
 

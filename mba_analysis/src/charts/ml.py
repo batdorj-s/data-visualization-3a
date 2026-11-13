@@ -12,10 +12,11 @@ from src.style import NEUTRAL, PALETTE, apply_style, finish, source_mba
 from src.uncertainty import wilson_ci
 
 from src.palette import CLUSTER_COLORS, cluster_colors  # noqa: E402,F401
-MODEL_NAMES = {"logreg": "Logistic Regression", "rf": "Random Forest", "baseline_elo": "Baseline: Elo өндөр нь ялна",
-               "baseline_winpct": "Baseline: ялалтын хувь өндөр нь ялна"}
+MODEL_NAMES = {"logreg": "ML загвар (логистик регресс)", "rf": "ML загвар (санамсаргүй ой)",
+               "baseline_elo": "Энгийн дүрэм: хүчний оноо өндөр нь ялна",
+               "baseline_winpct": "Энгийн дүрэм: ялалтын хувь өндөр нь ялна"}
 MODEL_COLORS = {"logreg": PALETTE["blue"], "rf": PALETTE["green"], "baseline_elo": NEUTRAL, "baseline_winpct": "#6B6B6B"}
-ML_SOURCE = "Эх сурвалж: MBA статистикийн систем; загвар: reports/metrics.json"
+ML_SOURCE = "MBA лигийн албан ёсны статистик (mongolia.basketball), 2025–26 ба 2026–27 улирал"
 
 
 
@@ -30,11 +31,12 @@ def fig_elbow_silhouette(inertia_by_k: dict, silhouette_by_k: dict, k: int):
     for ax in (a, b):
         ax.axvline(k, color=PALETTE["vermillion"], linestyle="--", linewidth=1)
         ax.set_xlabel("Бүлгийн тоо (k)")
-    a.set_ylabel("Inertia (бага нь сайн)")
-    b.set_ylabel("Silhouette (их нь сайн)")
-    return finish(fig, f"k = {k} архетипийг сонгосон: k ≥ 3 дотор silhouette хамгийн өндөр",
-                  "Elbow (зүүн) ба silhouette (баруун); k = 2 нь зөвхөн жижиг/том тоглогч гэсэн хуваалт",
-                  ML_SOURCE, n=len(ks))
+    a.set_ylabel("Бүлэг доторх зөрүү (бага нь сайн)")
+    b.set_ylabel("Бүлгүүдийн тодорхой ялгарал (их нь сайн)")
+    return finish(fig, f"Тоглогчдыг {k} хэв маягт хуваах нь хамгийн тохиромжтой",
+                  "Зүүн: бүлэг нэмэх тусам бүлэг доторх зөрүү буурна. Баруун: бүлгүүд хэр тод ялгарч байгаа. "
+                  "2 бүлэг нь зөвхөн «намхан/өндөр» гэсэн хуваалт өгдөг тул 3-аас эхлэн сонгосон",
+                  ML_SOURCE, n=len(ks), unit="хувилбар (бүлгийн тоо)")
 
 
 def fig_pca_clusters(clusters: pd.DataFrame):
@@ -50,12 +52,14 @@ def fig_pca_clusters(clusters: pd.DataFrame):
         cx, cy = part.pc1.mean(), part.pc2.mean()
         ax.text(cx, cy, name, fontsize=8, fontweight="bold", color=color, ha="center",
                 bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.7, "pad": 1})
-    ax.set_xlabel("Гол бүрэлдэхүүн 1 (PCA)")
-    ax.set_ylabel("Гол бүрэлдэхүүн 2 (PCA)")
+    ax.set_xlabel("Хэв маягийн 1-р тэнхлэг")
+    ax.set_ylabel("Хэв маягийн 2-р тэнхлэг")
     unstable = int((clusters.coassign < 0.7).sum())
-    return finish(fig, f"{len(names)} архетип; {unstable} тоглогч бүлгийн заагт (тогтворгүй) байна",
-                  "Цэгийн тод байдал = bootstrap-д ижил бүлэгт орсон давтамж (цайвар = тодорхой бус)",
-                  ML_SOURCE, n=int(len(clusters)), uncertainty_note="Тогтвортой байдал: 100 bootstrap, Hungarian тааруулалт")
+    return finish(fig, f"{len(names)} хэв маяг; {unstable} тоглогч аль бүлэгт орох нь тодорхой бус",
+                  "Цэг бүр 1 тоглогч; олон үзүүлэлтийг 2 тэнхлэгт шахаж зурсан тул ойр цэгүүд төстэй. "
+                  "Цайвар цэг = дахин тооцоход өөр бүлэгт орж байсан (заагийн) тоглогч",
+                  ML_SOURCE, n=int(len(clusters)), unit="тоглогч-улирал",
+                  uncertainty_note="Тогтвортой байдлыг 100 удаа дахин бүлэглэж шалгав")
 
 
 def fig_radar_centroids(centroids_z: pd.DataFrame):
@@ -72,13 +76,15 @@ def fig_radar_centroids(centroids_z: pd.DataFrame):
         vals += vals[:1]
         ax.plot(angles, vals, color=color, linewidth=1.8, label=r.cluster_name)
         ax.fill(angles, vals, color=color, alpha=0.12)
-    ax.set_xticks(angles[:-1], [label(f) for f in feats], fontsize=7)
+    ax.set_xticks(angles[:-1], [label(f) for f in feats], fontsize=8)
     ax.set_yticks([-1, 0, 1])
-    ax.set_yticklabels(["−1σ", "0", "+1σ"], fontsize=6)
-    ax.legend(frameon=False, loc="upper right", bbox_to_anchor=(1.35, 1.1), fontsize=7)
+    ax.set_yticklabels(["", "дундаж", ""], fontsize=7, color="#6B6B6B")
+    ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(1.08, 0.0), fontsize=8)
     ax._qa_skip = True
-    return finish(fig, "Архетип бүр өөр хүчтэй талтай", "Бүлгийн төвийн стандартчилсан утга (0 = лигийн дундаж)",
-                  ML_SOURCE, n=int(len(centroids_z)))
+    return finish(fig, "Хэв маяг бүр өөр хүчтэй талтай",
+                  "Хэв маяг бүрийн дундаж тоглогчийг лигийн дундажтай (дунд цагираг) харьцуулав: "
+                  "гадагш тодорсон тал = тэр бүлгийн хүчтэй тал",
+                  ML_SOURCE, n=int(len(centroids_z)), unit="хэв маяг")
 
 
 def fig_confusion(y: np.ndarray, p: np.ndarray, threshold: float = 0.5):
@@ -90,14 +96,15 @@ def fig_confusion(y: np.ndarray, p: np.ndarray, threshold: float = 0.5):
         for j in range(2):
             ax.text(j, i, str(cm[i, j]), ha="center", va="center", fontsize=12,
                     color="white" if cm[i, j] > (cm.min() + cm.max()) / 2 else "black")
-    ax.set_xticks([0, 1], ["Хожигдоно", "Ялна"])
+    ax.set_xticks([0, 1], ["Хожигдоно гэсэн", "Ялна гэсэн"])
     ax.set_yticks([0, 1], ["Хожигдсон", "Ялсан"])
-    ax.set_xlabel("Таамаглал")
-    ax.set_ylabel("Бодит")
+    ax.set_xlabel("Загварын таамаглал")
+    ax.set_ylabel("Бодит үр дүн")
     ax.grid(False)
     acc = np.trace(cm) / cm.sum()
-    return finish(fig, f"Logistic Regression тоглолтын {acc:.0%}-ийг зөв таамагласан",
-                  "Walk-forward CV-ийн бүх fold-ын таамаглал, босго 0.5", ML_SOURCE, n=int(cm.sum()))
+    return finish(fig, f"Загвар тоглолтын {acc:.0%}-ийн ялагчийг зөв таамагласан",
+                  "Диагональ (зүүн дээд, баруун доод) = зөв таамаглал. Загварт зөвхөн тухайн тоглолтоос өмнөх "
+                  "датаг өгсөн", ML_SOURCE, n=int(cm.sum()), unit="таамагласан тоглолт")
 
 
 def fig_roc(preds: pd.DataFrame):
@@ -111,12 +118,14 @@ def fig_roc(preds: pd.DataFrame):
         style = {"marker": "o"} if model.startswith("baseline") else {}
         ax.plot(fpr, tpr, color=MODEL_COLORS.get(model, NEUTRAL), linewidth=1.6,
                 label=f"{MODEL_NAMES.get(model, model)} (AUC {aucs[model]:.2f})", **style)
-    ax.legend(frameon=False, fontsize=7, loc="lower right")
-    ax.set_xlabel("Худал эерэг хувь (FPR)")
-    ax.set_ylabel("Үнэн эерэг хувь (TPR)")
+    ax.legend(frameon=False, fontsize=7.5, loc="lower right")
+    ax.set_xlabel("Хожигдох тоглолтыг «ялна» гэж андуурсан хувь")
+    ax.set_ylabel("Ялах тоглолтыг зөв олсон хувь")
     best = max(aucs, key=aucs.get)
-    return finish(fig, f"{MODEL_NAMES.get(best, best)}-ийн AUC хамгийн өндөр ({aucs[best]:.2f})",
-                  "ROC муруй, walk-forward CV-ийн таамаглал", ML_SOURCE, n=int(preds.game_id.nunique()))
+    return finish(fig, f"«{MODEL_NAMES.get(best, best)}» ялагчийг хамгийн сайн ялгадаг ({aucs[best]:.2f})",
+                  "Муруй зүүн дээд булан руу ойртох тусам сайн; тасархай = санамсаргүй таавар. "
+                  "Хаалтанд = ялгах чадвар (0.5 санамсаргүй, 1 төгс)", ML_SOURCE, n=int(preds.game_id.nunique()),
+                  unit="таамагласан тоглолт")
 
 
 def fig_metric_distributions(preds: pd.DataFrame, n_boot: int = 1000, seed: int = 42):
@@ -139,16 +148,18 @@ def fig_metric_distributions(preds: pd.DataFrame, n_boot: int = 1000, seed: int 
         ax.hlines(i, lo66, hi66, color="black", linewidth=3)
         ax.scatter([med], [i], color="white", edgecolor="black", s=30, zorder=3)
         summary[m] = (med, lo95, hi95)
-    ax.set_yticks(range(len(models)), [MODEL_NAMES[m] for m in models], fontsize=7.5)
+    ax.set_yticks(range(len(models)), [MODEL_NAMES[m] for m in models], fontsize=8)
     ax.axvline(0.5, color=NEUTRAL, linestyle=":", linewidth=1)
-    ax.set_xlabel("Accuracy (зөв таамагласан хувь)")
-    ax.set_ylabel("Загвар")
+    ax.set_xlabel("Зөв таамагласан хувь")
+    ax.set_ylabel("Арга")
     lr, elo = summary.get("logreg"), summary.get("baseline_elo")
     beats = lr and elo and lr[1] > elo[2]
-    title = ("Загвар Elo baseline-ийг баттай давсан" if beats
-             else "ML загвар энгийн Elo baseline-аас баттай илүү биш")
-    return finish(fig, title, "Half-eye: тархалт + медиан + 66%/95% интервал", ML_SOURCE,
-                  n=int(preds.game_id.nunique()), uncertainty_note=f"Тоглолтоор {n_boot} bootstrap; walk-forward CV")
+    title = ("ML загвар «хүчний оноо өндөр нь ялна» гэсэн энгийн дүрмийг баттай давсан" if beats
+             else "ML загвар «хүчний оноо өндөр нь ялна» гэсэн энгийн дүрмээс баттай илүү биш")
+    return finish(fig, title, "Цагаан цэг = зөв таамагласан хувь, бүдүүн шугам = 66%, нарийн шугам = 95% магадлалтай "
+                  "хүрээ. Хүрээнүүд давхцаж байвал аргуудыг ялгах боломжгүй", ML_SOURCE,
+                  n=int(preds.game_id.nunique()), unit="таамагласан тоглолт",
+                  uncertainty_note=f"Хүрээг тоглолтуудыг {n_boot} удаа дахин сонгож тооцов")
 
 
 def fig_calibration(y: np.ndarray, p: np.ndarray, n_bins: int = 5):
@@ -171,22 +182,26 @@ def fig_calibration(y: np.ndarray, p: np.ndarray, n_bins: int = 5):
     ax.set_xlabel("Таамагласан ялах магадлал")
     ax.set_ylabel("Бодит ялалтын хувь")
     off = sum(not (y_ - lo_ <= x_ <= y_ + hi_) for x_, y_, lo_, hi_ in zip(xs, ys, los, his))
-    title = ("Магадлалын тохируулга: бүх бүлэгт таамаглал бодит хувьтай нийцнэ" if off == 0
-             else f"Магадлалын тохируулга: {off}/{len(xs)} бүлэгт таамаглал бодит хувиас баттай зөрсөн")
+    title = ("Загварын хэлсэн магадлал бодит ялалтын хувьтай таарч байна" if off == 0
+             else f"{len(xs)} бүлгийн {off}-д загварын хэлсэн магадлал бодит ялалтын хувиас зөрсөн")
     return finish(fig, title,
-                  f"Logistic Regression, {n_bins} квантил бүлэг", ML_SOURCE, n=int(len(df)),
-                  uncertainty_note="Шугам: бүлэг бүрийн Wilson 95% CI")
+                  f"Тоглолтуудыг загварын таамагласан магадлалаар {n_bins} бүлэгт хуваав. Цэг тасархай шугам дээр "
+                  "байвал «70% ялна» гэсэн тоглолтуудын бараг 70% нь үнэхээр ялсан гэсэн үг", ML_SOURCE,
+                  n=int(len(df)), unit="таамагласан тоглолт",
+                  uncertainty_note="Босоо шугам = бүлэг бүрийн 95% магадлалтай хүрээ")
 
 
 def fig_importance_pareto(expl: pd.DataFrame):
     vals = expl.set_index("feature").perm_importance.clip(lower=0)
-    names = {"efg": "eFG%", "tov_pct": "TOV%", "orb_pct": "ORB%", "ftr": "FTr"}
+    names = {"efg": "Оновч", "tov_pct": "Бөмбөг алдалт", "orb_pct": "Довт. самбар", "ftr": "Торгууль авалт"}
     vals.index = [names.get(i, i) for i in vals.index]
     fig = fig_pareto(vals, pd.Series(PALETTE["blue"], index=vals.index),
-                     title=f"{vals.idxmax()} ялалтыг хамгийн ихээр тайлбарладаг",
-                     subtitle="Permutation importance (AUC-ийн бууралт), тухайн тоглолтын Four Factors-ийн зөрүү",
-                     xlabel="Хүчин зүйл (эрэмбэлсэн)", ylabel="AUC-ийн бууралт", n=len(vals), threshold=0.8,
-                     uncertainty_note="Шугам: 30 permutation-ийн 95% интервал")
+                     title=f"Ялалтын 4 хүчин зүйлээс «{vals.idxmax()}» хамгийн чухал",
+                     subtitle="Багана = тухайн хүчин зүйлийг загвараас «нуувал» таамаглал хэр муудах вэ "
+                              "(өндөр = чухал). Хар шугам = нийлбэр хувь",
+                     xlabel="Хүчин зүйл (чухлаас нь эрэмбэлсэн)", ylabel="Таамаглал муудах хэмжээ", n=len(vals),
+                     threshold=0.8, unit="хүчин зүйл", source=ML_SOURCE,
+                     uncertainty_note="Багана дээрх зураас = 30 удаагийн туршилтын 95% хүрээ")
     ax = fig.axes[0]
     t = expl.assign(name=[names.get(f, f) for f in expl.feature]).set_index("name").loc[
         vals.sort_values(ascending=False).index]

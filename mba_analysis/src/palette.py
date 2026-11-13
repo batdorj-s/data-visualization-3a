@@ -3,7 +3,7 @@ PALETTE = {
     "blue": "#0072B2", "vermillion": "#D55E00", "purple": "#CC79A7", "black": "#000000",
 }
 IMPORT_COLORS = {True: "#D55E00", False: "#0072B2"}
-IMPORT_LABELS = {True: "Import", False: "Дотоод"}
+IMPORT_LABELS = {True: "Гадаад", False: "Дотоод"}
 POS_COLORS = {"PG": "#E69F00", "SG": "#56B4E9", "SF": "#009E73", "PF": "#CC79A7", "C": "#0072B2"}
 NEUTRAL = "#9E9E9E"
 LIGHT = "#D9D9D9"

@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from src.charts import POS_ORDER, SEASON_NOTE, label
+from src.charts import POS_ORDER, POS_SHORT, SEASON_NOTE, label
 from src.style import IMPORT_COLORS, IMPORT_LABELS, NEUTRAL, PALETTE, POS_COLORS, apply_style, finish, source_mba
 
 MIN_TSA = 30
@@ -21,13 +21,15 @@ def fig_ppg_hist(players: pd.DataFrame):
         ax.axvline(medians[imp], color=IMPORT_COLORS[imp], linestyle="--", linewidth=1.2)
         top = ax.get_ylim()[1]
         ax.text(medians[imp] + 0.4, top * (0.92 if imp else 0.80),
-                f"{IMPORT_LABELS[imp]} (медиан {medians[imp]:.1f}, n={len(s)})",
+                f"{IMPORT_LABELS[imp]}: голч {medians[imp]:.1f} оноо ({len(s)} тоглогч)",
                 color=IMPORT_COLORS[imp], fontsize=8, fontweight="bold")
     ax.set_xlabel(label("PPG"))
     ax.set_ylabel("Тоглогчийн тоо")
     diff = medians[True] - medians[False]
-    return finish(fig, f"Import тоглогчийн медиан оноо дотоодынхоос {diff:.1f}-оор их",
-                  f"Нэг тоглолтын онооны тархалт баруун тийш хазгай · {SEASON_NOTE}", source_mba(), n=len(players))
+    return finish(fig, f"Гадаад тоглогч дотоод тоглогчоос тоглолт бүрт {diff:.1f} оноогоор илүү авдаг",
+                  "Багана = тухайн онооны түвшинд хэдэн тоглогч байгаа; тасархай шугам = голч утга. "
+                  "Ихэнх тоглогч цөөн оноо авдаг, цөөхөн нь маш их оноо авдаг",
+                  f"{source_mba()} · {SEASON_NOTE}", n=len(players), unit="тоглогч-улирал")
 
 
 def _tsa(players: pd.DataFrame) -> pd.Series:
@@ -59,12 +61,16 @@ def fig_ts_box_by_pos(players: pd.DataFrame):
     ax.set_xlabel("Байрлал")
     ax.set_ylabel(label("ts_pct"))
     best = max(POS_ORDER, key=lambda p: df.loc[df.position == p, "ts_pct"].median())
-    return finish(fig, f"{best} байрлалын тоглогчдын шидэлтийн оновч (TS%) хамгийн өндөр",
-                  f"Шидэлтийн оролдлого ≥ {MIN_TSA}; цэг = 1.5·IQR-аас гадуурх тоглогч · {SEASON_NOTE}",
-                  source_mba(), n=len(df))
+    return finish(fig, f"{POS_SHORT[best]} ({best}) байрлалын тоглогчдын шидэлтийн оновч хамгийн өндөр",
+                  "Хайрцаг = тоглогчдын дунд хэсгийн 50%, хар зураас = голч утга, цэг = бусдаасаа эрс ялгарах тоглогч",
+                  f"{source_mba()} · {SEASON_NOTE}, {MIN_TSA}-аас олон шидэлт хийсэн", n=len(df), unit="тоглогч-улирал")
 
 
 CORR_COLS = ["PPG", "RPG", "APG", "SPG", "BPG", "MIN", "ts_pct", "tpa_rate", "height_cm", "age"]
+
+
+CORR_SHORT = {"PPG": "Оноо", "RPG": "Самбар", "APG": "Дамжуулалт", "SPG": "Таслалт", "BPG": "Хаалт", "MIN": "Минут",
+              "ts_pct": "Оновч", "tpa_rate": "3 онооны хувь", "height_cm": "Өндөр", "age": "Нас"}
 
 
 def fig_corr_heatmap(players: pd.DataFrame):
@@ -72,22 +78,24 @@ def fig_corr_heatmap(players: pd.DataFrame):
     corr = players[CORR_COLS].apply(pd.to_numeric, errors="coerce").corr()
     fig, ax = plt.subplots(figsize=(6.3, 5.4))
     im = ax.imshow(corr.values, cmap="RdBu_r", vmin=-1, vmax=1)
-    labels = [label(c) for c in CORR_COLS]
+    labels = [CORR_SHORT[c] for c in CORR_COLS]
     ax.set_xticks(range(len(CORR_COLS)), labels, rotation=45, ha="right")
     ax.set_yticks(range(len(CORR_COLS)), labels)
     ax.grid(False)
     for i in range(len(CORR_COLS)):
         for j in range(len(CORR_COLS)):
             v = corr.values[i, j]
-            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=6.5, color="white" if abs(v) > 0.6 else "black")
+            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=7, color="white" if abs(v) > 0.6 else "black")
     cb = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
-    cb.set_label("Pearson r")
+    cb.set_label("Хамаарлын хүч (−1 … 1)")
     ax.set_xlabel("Хувьсагч")
     ax.set_ylabel("Хувьсагч")
     tri = corr.where(~np.eye(len(corr), dtype=bool)).stack()
     (a, b), r = tri.abs().idxmax(), tri[tri.abs().idxmax()]
-    return finish(fig, f"{label(a)} ба {label(b)} хамгийн хүчтэй хамааралтай (r = {r:.2f})",
-                  f"Тоглогчийн статистикийн корреляцийн матриц · {SEASON_NOTE}", source_mba(), n=len(players))
+    return finish(fig, f"«{CORR_SHORT[a]}» ба «{CORR_SHORT[b]}» хамгийн хүчтэй холбоотой ({r:.2f})",
+                  "Нүд бүр 2 үзүүлэлт хэр хамт өөрчлөгддөгийг харуулна (тоглолтын дунджаар): улаан = хамт өсдөг, "
+                  "цэнхэр = эсрэг, цагаан = холбоогүй",
+                  f"{source_mba()} · {SEASON_NOTE}", n=len(players), unit="тоглогч-улирал")
 
 
 def fig_ppg_violin(players: pd.DataFrame):
@@ -96,18 +104,19 @@ def fig_ppg_violin(players: pd.DataFrame):
     order = ["Guard", "Forward", "Center"]
     names = {"Guard": "Хамгаалагч", "Forward": "Довтлогч", "Center": "Төв"}
     fig, ax = plt.subplots(figsize=(6.3, 3.8))
-    sns.violinplot(data=df, x="pos_group", y="PPG", hue="status", order=order, hue_order=["Дотоод", "Import"],
+    sns.violinplot(data=df, x="pos_group", y="PPG", hue="status", order=order, hue_order=[IMPORT_LABELS[False], IMPORT_LABELS[True]],
                    split=True, inner="quart", cut=0, density_norm="width", linewidth=0.8,
-                   palette={"Дотоод": IMPORT_COLORS[False], "Import": IMPORT_COLORS[True]}, ax=ax)
+                   palette={IMPORT_LABELS[False]: IMPORT_COLORS[False], IMPORT_LABELS[True]: IMPORT_COLORS[True]}, ax=ax)
     ax.set_xticks(range(3), [names[o] for o in order])
     ax.set_xlabel("Байрлалын бүлэг")
     ax.set_ylabel(label("PPG"))
     ax.legend(title="", frameon=False, loc="upper left")
     gap = df.groupby(["pos_group", "status"]).PPG.median().unstack()
-    widest = (gap["Import"] - gap["Дотоод"]).idxmax()
-    return finish(fig, f"Import ба дотоодын онооны ялгаа {names[widest].lower()} байрлалд хамгийн их",
-                  f"Хагас violin: зүүн = дотоод, баруун = Import; тасархай = квартил · {SEASON_NOTE}",
-                  source_mba(), n=len(df))
+    widest = (gap[IMPORT_LABELS[True]] - gap[IMPORT_LABELS[False]]).idxmax()
+    return finish(fig, f"Гадаад ба дотоод тоглогчийн онооны зөрүү {names[widest].lower()} байрлалд хамгийн их",
+                  "Өргөн хэсэг = олон тоглогч тэр оноотой. Зүүн тал = дотоод, баруун тал = гадаад; "
+                  "тасархай = голч ба дунд хэсгийн хил",
+                  f"{source_mba()} · {SEASON_NOTE}", n=len(df), unit="тоглогч-улирал")
 
 
 PAIR_COLS = ["pts36", "reb36", "ast36", "ts_pct"]
@@ -121,12 +130,13 @@ def fig_pairplot(players: pd.DataFrame, labels: pd.Series | None):
         df["Бүлэг"] = labels.reindex(df.index).astype(str)
         from src.charts.ml import cluster_colors
         palette = cluster_colors(df["Бүлэг"].dropna())
-        hue, subtitle = "Бүлэг", "Өнгө = K-Means архетип"
+        hue, subtitle = "Бүлэг", "Өнгө = компьютерийн олсон тоглолтын хэв маяг"
     else:
         df["Бүлэг"] = df.position
         palette = POS_COLORS
         hue, subtitle = "Бүлэг", "Өнгө = байрлал"
-    grid = sns.pairplot(df[PAIR_COLS + [hue]].rename(columns={c: label(c) for c in PAIR_COLS}), hue=hue,
+    short = {"pts36": "Оноо /36 мин", "reb36": "Самбар /36 мин", "ast36": "Дамжуулалт /36 мин", "ts_pct": "Оновч"}
+    grid = sns.pairplot(df[PAIR_COLS + [hue]].rename(columns=short), hue=hue,
                         palette=palette, corner=True, plot_kws={"s": 10, "alpha": 0.7, "linewidth": 0},
                         diag_kws={"common_norm": False})
     fig = grid.figure
@@ -138,8 +148,9 @@ def fig_pairplot(players: pd.DataFrame, labels: pd.Series | None):
             ax._qa_no_ylabel = True
     if grid.legend is not None:
         grid.legend.set_title("")
-    return finish(fig, "Тоглогчдын хэв маяг олон хувьсагчаар ялгардаг",
-                  f"{subtitle} · нийт минут ≥ 150 · {SEASON_NOTE}", source_mba(), n=len(df))
+    return finish(fig, "Тоглогчдын хэв маяг оноо, самбар, дамжуулалтаар тод ялгардаг",
+                  f"Цэг бүр 1 тоглогч; хос үзүүлэлт бүрийг харьцуулсан («/36 мин» = 36 минутад ногдох). {subtitle}",
+                  f"{source_mba()} · {SEASON_NOTE}, 150-аас олон минут тоглосон", n=len(df), unit="тоглогч-улирал")
 
 
 def _half_violin(ax, data, pos, color):
@@ -174,9 +185,10 @@ def fig_raincloud(players: pd.DataFrame, boot_diff: np.ndarray):
     for v in (lo, hi):
         ax2.axvline(v, color="black", linestyle="--", linewidth=1)
     ax2.axvline(0, color=PALETTE["vermillion"], linewidth=1)
-    ax2.set_xlabel("Медиан PPG-ийн зөрүү (Import − дотоод), bootstrap")
-    ax2.set_ylabel("Давтамж")
-    return finish(fig, f"Import тоглогчийн медиан оноо {est:.1f}-оор их (95% CI {lo:.1f}–{hi:.1f})",
-                  f"Дээр: тархалт + хайрцаг + тоглогч бүр; доор: зөрүүний тодорхой бус байдал · {SEASON_NOTE}",
-                  source_mba(), n=len(players),
-                  uncertainty_note=f"95% CI: тоглогчоор {len(boot_diff)} удаагийн bootstrap; улаан шугам = зөрүүгүй")
+    ax2.set_xlabel("Голч онооны зөрүү (гадаад − дотоод), 2000 удаа дахин тооцсон")
+    ax2.set_ylabel("Хэдэн удаа")
+    return finish(fig, f"Гадаад тоглогч {est:.1f}-оор илүү оноо авдаг; бодит зөрүү {lo:.1f}–{hi:.1f} оноо байх магадлалтай",
+                  "Дээр: цэг бүр 1 тоглогч. Доор: зөрүүг 2000 удаа дахин тооцоход гарсан утгууд — "
+                  "тасархай шугамын хооронд 95% нь багтана, улаан шугам (0) = зөрүүгүй",
+                  f"{source_mba()} · {SEASON_NOTE}", n=len(players), unit="тоглогч-улирал",
+                  uncertainty_note=f"Тодорхой бус байдлыг тоглогчдыг {len(boot_diff)} удаа дахин сонгож тооцов")

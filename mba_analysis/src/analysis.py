@@ -77,7 +77,7 @@ def eval_h1(players: pd.DataFrame, n_boot: int = 2000, seed: int = 42) -> Hypoth
     lo, hi = np.percentile(boots, [2.5, 97.5])
     u = stats.mannwhitneyu(imp, dom, alternative="greater")
     rbc = 2 * u.statistic / (imp.size * dom.size) - 1
-    return HypothesisResult("H1", "Import тоглогчид дотоодынхоос илүү оноо авдаг (PPG-ийн медиан зөрүү)",
+    return HypothesisResult("H1", "Гадаад тоглогч дотоод тоглогчоос илүү оноо авдаг",
                             est, float(lo), float(hi), 0.0, float(u.pvalue), int(imp.size + dom.size),
                             f"Mann-Whitney U (нэг талт), rank-biserial r = {rbc:.2f}; CI: тоглогчоор bootstrap {n_boot}")
 
@@ -87,7 +87,7 @@ def eval_h2(games: pd.DataFrame) -> HypothesisResult:
     k = int((games.home_pts > games.away_pts).sum())
     ci = wilson_ci(k, n)
     p = stats.binomtest(k, n, 0.5).pvalue
-    return HypothesisResult("H2", "Гэрийн баг 50%-аас илүү ялдаг (талбайн давуу тал)", ci.est, ci.lo, ci.hi,
+    return HypothesisResult("H2", "Гэрийн талбайдаа тоглосон баг 50%-аас илүү ялдаг", ci.est, ci.lo, ci.hi,
                             0.5, float(p), n, "Binomial тест; CI: Wilson")
 
 
@@ -96,7 +96,7 @@ def eval_h4(players: pd.DataFrame) -> HypothesisResult:
     r, p = stats.pearsonr(d.height_cm, d.RPG)
     rho = stats.spearmanr(d.height_cm, d.RPG).statistic
     ci = fisher_ci(float(r), len(d))
-    return HypothesisResult("H4", "Өндөр тоглогчид илүү их самбар авдаг (Pearson r)", float(r), ci.lo, ci.hi,
+    return HypothesisResult("H4", "Өндөр тоглогч илүү олон самбар авдаг", float(r), ci.lo, ci.hi,
                             0.0, float(p), int(len(d)), f"Pearson r; Spearman ρ = {rho:.2f}; CI: Fisher z")
 
 
@@ -118,7 +118,7 @@ def extra_hypotheses(reports_dir) -> list[HypothesisResult]:
             dom = json.loads((reports_dir / "metrics.json").read_text(encoding="utf-8")).get("explanatory_dominance")
         if dom:
             out.append(HypothesisResult(
-                "H3", "Four Factors дотроос eFG% нь ялалтыг хамгийн хүчтэй тодорхойлдог (|β_eFG| − бусдын хамгийн их |β|)",
+                "H3", "Ялалтын 4 хүчин зүйлээс шидэлтийн оновч хамгийн их нөлөөтэй",
                 float(dom["est"]), float(dom["lo"]), float(dom["hi"]), 0.0, float("nan"), int(dom["n_games"]),
                 f"Стандартчилсан logistic regression, β_eFG = {row.coef:.2f}; |коэф|-ийн эрэмбэ {rank}/{len(e)}; "
                 "CI: тоглолтоор bootstrap"))
@@ -127,7 +127,7 @@ def extra_hypotheses(reports_dir) -> list[HypothesisResult]:
         py = json.loads(metrics_path.read_text(encoding="utf-8")).get("pythagorean")
         if py:
             out.append(HypothesisResult(
-                "H5", "Авсан/алдсан оноо ялалтын хувийн хагасаас илүүг тайлбарладаг (Pythagorean R² > 0.5)",
+                "H5", "Багийн авсан, алдсан оноо ялалтын хувийн талаас илүүг тайлбарладаг",
                 float(py["r2"]), float(py["r2_ci"]["lo"]), float(py["r2_ci"]["hi"]), 0.5, float("nan"), int(py["n"]),
                 f"Pythagorean expectation, тааруулсан экспонент {py['exponent']:.2f}; CI: баг-улирлаар bootstrap"))
     return out
@@ -141,7 +141,7 @@ def run_analysis(processed_dir, reports_dir) -> None:
     ps = pd.read_csv(processed_dir / "players_season.csv")
     elig = ps[ps.eligible.astype(bool)]
     num = pd.concat([describe_numeric(elig, NUMERIC_COLS).assign(group="Бүгд"),
-                     describe_numeric(elig.assign(status=elig.is_import.map({True: "Import", False: "Дотоод"})),
+                     describe_numeric(elig.assign(status=elig.is_import.map({True: "Гадаад", False: "Дотоод"})),
                                       NUMERIC_COLS, by="status").query("group != 'Бүгд'")], ignore_index=True)
     num.to_csv(reports_dir / "descriptive_numeric.csv", index=False)
     describe_categorical(elig, CATEGORICAL_COLS).to_csv(reports_dir / "descriptive_categorical.csv", index=False)

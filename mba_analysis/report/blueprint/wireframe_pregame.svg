@@ -340,10 +340,10 @@ L 211.3776 220.23792
     <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="67.2462" y="83.660845" transform="rotate(-0 67.2462 83.660845)">Ялах магадлал</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start" x="77.7924" y="132.91992" transform="rotate(-0 77.7924 132.91992)">А баг 65% (95% CI 55–74%)</text>
+    <text style="font-size: 7px; font-family: 'Arial'; text-anchor: start" x="77.7924" y="132.91992" transform="rotate(-0 77.7924 132.91992)">А баг 65% (хүрээ 55–74%)</text>
    </g>
    <g id="text_3">
-    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="243.0162" y="83.660845" transform="rotate(-0 243.0162 83.660845)">Four Factors: А vs Б</text>
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="243.0162" y="83.69439" transform="rotate(-0 243.0162 83.69439)">Ялалтын 4 хүчин зүйл: А ба Б</text>
    </g>
    <g id="text_4">
     <text style="font-size: 6.5px; font-family: 'Arial'; text-anchor: start" x="246.5316" y="93.853649" transform="rotate(-0 246.5316 93.853649)">eFG%</text>
@@ -358,7 +358,7 @@ L 211.3776 220.23792
     <text style="font-size: 6.5px; font-family: 'Arial'; text-anchor: start" x="246.5316" y="128.780849" transform="rotate(-0 246.5316 128.780849)">FTr</text>
    </g>
    <g id="text_8">
-    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="67.2462" y="165.164237" transform="rotate(-0 67.2462 165.164237)">Сүүлийн 5 тоглолт (Elo явц)</text>
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="67.2462" y="165.164237" transform="rotate(-0 67.2462 165.164237)">Сүүлийн 5 тоглолт (хүчний онооны явц)</text>
    </g>
    <g id="text_9">
     <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="243.0162" y="165.19119" transform="rotate(-0 243.0162 165.19119)">Гол тоглогчид ба онооны төвлөрөл (Pareto)</text>

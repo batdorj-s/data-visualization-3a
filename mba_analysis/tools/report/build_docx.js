@@ -89,7 +89,7 @@ function bullets(b) {
 
 const children = [
   new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun({ text: "MBA лигийн гүйцэтгэлийн шинжилгээ", font: FONT })] }),
-  para("F.ITC341 Өгөгдлийн дүрслэл · Бие даалт · Өгөгдлийн snapshot: 2026-11-12", { run: { color: "4D4D4D" } }),
+  para("F.ITC341 Өгөгдлийн дүрслэл · Бие даалт · Дата татсан огноо: 2026-11-12", { run: { color: "4D4D4D" } }),
   draft("Шар өнгөөр тодруулсан хэсгүүд нь тоон үр дүнд суурилсан ноорог юм. Даалгаврын шаардлагын дагуу эдгээрийг өөрийн үгээр дахин бичиж, тодруулгыг арилгана."),
 ];
 for (const s of data.sections) {

@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 DASH = Path(__file__).resolve().parents[1] / "dashboard"
 APP = str(DASH / "app.py")
 PAGES = ["views/overview.py", "views/players.py", "views/teams.py", "views/ml.py", "views/quality.py",
-         "views/about.py"]
+         "views/about.py", "views/glossary.py"]
 EMPTY_MSG = "Сонгосон шүүлтүүрт тохирох өгөгдөл алга"
 
 
@@ -44,7 +44,7 @@ def test_ci_toggle_removes_ci_traces():
     without = _plot_specs(run("views/players.py", show_ci=False))
 
     def ci_traces(specs):
-        return sum(1 for s in specs for t in s["data"] if "CI" in str(t.get("name", "")))
+        return sum(1 for s in specs for t in s["data"] if "хүрээ" in str(t.get("name", "")))
     assert ci_traces(with_ci) > 0
     assert ci_traces(without) == 0
 
@@ -62,7 +62,7 @@ def test_highlight_team_drives_overview_fan():
     at = run(None, highlight_team="SG Apes")
     at.session_state["highlight_team"] = "BCH Knights"
     at.run()
-    fan = next(s for s in at.selectbox if s.label == "Баг (fan chart)")
+    fan = next(s for s in at.selectbox if s.label == "Ялалтын явцыг харах баг")
     assert fan.value == "BCH Knights"
 
 
@@ -77,3 +77,24 @@ def test_scatter_selection_updates_card():
     assert state["card_player"] == "z"
     assert apply_selection(state, []) is False
     assert apply_selection(state, ["d"]) is True and state["card_player"] == "d"
+
+
+def test_reset_filters_restores_defaults():
+    at = run("views/players.py", min_gp=20, positions=["C"], import_status="Гадаад")
+    next(b for b in at.button if b.label == "Шүүлтүүрийг цэвэрлэх").click()
+    at.run()
+    assert at.session_state["min_gp"] == 5 and at.session_state["positions"] == []
+    assert at.session_state["import_status"] == "Бүгд"
+
+
+def test_glossary_search_filters_terms():
+    at = run("views/glossary.py")
+    at.text_input(key="glossary_q").input("оновч").run()
+    assert not at.exception
+    text = " ".join(m.value for m in at.markdown)
+    assert "Шидэлтийн оновч" in text and "Багийн хүчний оноо" not in text
+
+
+def test_theme_config_copies_match():
+    root = DASH.parents[1]
+    assert (root / ".streamlit" / "config.toml").read_text() == (DASH.parent / ".streamlit" / "config.toml").read_text()

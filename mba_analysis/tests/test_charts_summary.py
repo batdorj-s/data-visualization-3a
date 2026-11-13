@@ -52,6 +52,6 @@ def _hyp(h2_supported: bool):
 
 def test_hypothesis_title_is_computed():
     all_yes = fig_hypothesis_summary(_hyp(True))._mba_meta["title"]
-    assert all_yes.startswith("5 таамаглалын 5") and "нотлогдоогүй" not in all_yes
+    assert all_yes.startswith("5 таамаглалын 5") and "батлагдаагүй" not in all_yes
     one_no = fig_hypothesis_summary(_hyp(False))._mba_meta["title"]
     assert one_no.startswith("5 таамаглалын 4") and "H2" in one_no

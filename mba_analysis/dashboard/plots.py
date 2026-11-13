@@ -6,24 +6,23 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from src.charts import LABELS as CHART_LABELS
 from src.palette import IMPORT_COLORS, IMPORT_LABELS, NEUTRAL, PALETTE, POS_COLORS, cluster_colors
 from src.uncertainty import funnel_limits
 
 A_COLOR, B_COLOR = PALETTE["blue"], PALETTE["vermillion"]
 LIGHTEST = "#D0D0D0"
-FONT = dict(family="Arial, DejaVu Sans, sans-serif", size=12)
-LABELS = {"PPG": "Оноо / тоглолт", "RPG": "Самбар / тоглолт", "APG": "Дамжуулалт / тоглолт",
-          "SPG": "Таслалт / тоглолт", "BPG": "Хаалт / тоглолт", "MIN": "Минут / тоглолт", "ts_pct": "TS%",
-          "height_cm": "Өндөр (см)", "age": "Нас", "pts36": "Оноо / 36 мин", "reb36": "Самбар / 36 мин",
-          "ast36": "Дамжуулалт / 36 мин", "tpa_rate": "3 онооны шидэлтийн хувь", "EFF": "EFF"}
+FONT = dict(family="Fira Sans, Arial, sans-serif", size=14, color="#0F172A")
+LABELS = {**CHART_LABELS, "EFF": "Үр ашгийн оноо (EFF)"}
 
 
 def _layout(fig: go.Figure, title: str, height: int = 420, **kw) -> go.Figure:
-    fig.update_layout(title=dict(text=title, x=0, font=dict(size=15)), font=FONT, height=height,
-                      margin=dict(l=10, r=10, t=55, b=10), plot_bgcolor="white", hovermode="closest",
-                      legend=dict(orientation="h", y=-0.2), **kw)
-    fig.update_xaxes(showgrid=True, gridcolor="#EBEBEB", zeroline=False)
-    fig.update_yaxes(showgrid=True, gridcolor="#EBEBEB", zeroline=False)
+    fig.update_layout(title=dict(text=title, x=0, font=dict(size=17, color="#0F172A")), font=FONT, height=height,
+                      margin=dict(l=10, r=10, t=60, b=10), plot_bgcolor="white", paper_bgcolor="white",
+                      hovermode="closest", hoverlabel=dict(font=dict(family=FONT["family"], size=14)),
+                      legend=dict(orientation="h", y=-0.22), **kw)
+    fig.update_xaxes(showgrid=True, gridcolor="#E2E8F0", zeroline=False, title_font=dict(size=14))
+    fig.update_yaxes(showgrid=True, gridcolor="#E2E8F0", zeroline=False, title_font=dict(size=14))
     return fig
 
 
@@ -48,7 +47,7 @@ def px_scatter(df: pd.DataFrame, x: str, y: str, color_by: str, highlight_team: 
                           + f"{LABELS.get(y, y)}: " + "%{y:.2f}<extra></extra>"))
     fig.update_xaxes(title=LABELS.get(x, x))
     fig.update_yaxes(title=LABELS.get(y, y))
-    return _layout(fig, f"{LABELS.get(y, y)} ба {LABELS.get(x, x)}", dragmode="select")
+    return _layout(fig, f"{LABELS.get(y, y)} ба {LABELS.get(x, x)} — цэг бүр 1 тоглогч", dragmode="select")
 
 
 def px_funnel(players: pd.DataFrame, show_ci: bool) -> go.Figure:
@@ -58,7 +57,7 @@ def px_funnel(players: pd.DataFrame, show_ci: bool) -> go.Figure:
     fig = go.Figure()
     grid = np.linspace(max(df.tsa.min(), 1), df.tsa.max(), 150)
     if show_ci:
-        for z, name, alpha in ((3.09, "99.8% CI хил", 0.12), (1.96, "95% CI хил", 0.22)):
+        for z, name, alpha in ((3.09, "99.8% хүрээ", 0.12), (1.96, "95% хүрээ", 0.22)):
             lo, hi = funnel_limits(p0, grid, z)
             fig.add_trace(go.Scatter(x=np.r_[grid, grid[::-1]], y=np.r_[hi, lo[::-1]], fill="toself", name=name,
                                      fillcolor=f"rgba(86,180,233,{alpha})", line=dict(width=0), hoverinfo="skip"))
@@ -66,13 +65,13 @@ def px_funnel(players: pd.DataFrame, show_ci: bool) -> go.Figure:
     colors = np.where(df.ts_pct > hi95, PALETTE["green"], np.where(df.ts_pct < lo95, PALETTE["vermillion"], NEUTRAL))
     fig.add_trace(go.Scattergl(x=df.tsa, y=df.ts_pct, mode="markers", name="Тоглогч", marker=dict(color=colors, size=8),
                                customdata=df[["player_name", "team"]],
-                               hovertemplate="<b>%{customdata[0]}</b> (%{customdata[1]})<br>TS% %{y:.1%}<br>"
-                                             "Оролдлого %{x:.0f}<extra></extra>"))
-    fig.add_hline(y=p0, line_color="black", annotation_text=f"Лигийн TS% {p0:.1%}")
-    fig.update_xaxes(title="Шидэлтийн оролдлого (FGA + 0.44·FTA)")
-    fig.update_yaxes(title="TS%", tickformat=".0%")
+                               hovertemplate="<b>%{customdata[0]}</b> (%{customdata[1]})<br>Оновч %{y:.1%}<br>"
+                                             "Шидэлт %{x:.0f}<extra></extra>"))
+    fig.add_hline(y=p0, line_color="black", annotation_text=f"Лигийн дундаж {p0:.0%}")
+    fig.update_xaxes(title="Шидэлтийн тоо (торгуулийг оролцуулан)")
+    fig.update_yaxes(title="Шидэлтийн оновч", tickformat=".0%")
     above = int((df.ts_pct > hi95).sum())
-    return _layout(fig, f"Funnel: {above} тоглогчийн оновч лигийн дунджаас баттай өндөр")
+    return _layout(fig, f"{above} тоглогчийн оновч лигийн дунджаас үнэхээр өндөр")
 
 
 def px_dot_ci(ci: pd.DataFrame, show_ci: bool, metric_label: str) -> go.Figure:
@@ -81,10 +80,10 @@ def px_dot_ci(ci: pd.DataFrame, show_ci: bool, metric_label: str) -> go.Figure:
     err = dict(type="data", symmetric=False, array=df.hi - df.est, arrayminus=df.est - df.lo, color=NEUTRAL,
                thickness=2) if show_ci else None
     fig = go.Figure(go.Scatter(x=df.est, y=df.player_name, mode="markers", error_x=err,
-                               name="95% CI" if show_ci else "Тооцоолсон утга", marker=dict(color=colors, size=10),
+                               name="95% хүрээ" if show_ci else "Тооцоолсон утга", marker=dict(color=colors, size=10),
                                hovertemplate="<b>%{y}</b><br>%{x:.2f}<extra></extra>"))
     fig.update_xaxes(title=metric_label)
-    return _layout(fig, f"Топ {len(df)}: {metric_label}" + (" (цэг + 95% CI)" if show_ci else ""),
+    return _layout(fig, f"Шилдэг {len(df)}: {metric_label}" + (" (шугам = 95% хүрээ)" if show_ci else ""),
                    height=max(320, 26 * len(df) + 120), showlegend=False)
 
 
@@ -95,17 +94,17 @@ def px_pareto(df: pd.DataFrame, show_ci: bool, title: str) -> go.Figure:
                          hovertemplate="#%{x} %{customdata}: %{y:.0f} оноо<extra></extra>"), secondary_y=False)
     if show_ci and "lo" in df:
         fig.add_trace(go.Scatter(x=np.r_[df["rank"], df["rank"][::-1]], y=np.r_[df.hi, df.lo[::-1]], fill="toself",
-                                 fillcolor="rgba(0,0,0,0.15)", line=dict(width=0), name="95% CI (хуримтлагдсан)",
+                                 fillcolor="rgba(0,0,0,0.15)", line=dict(width=0), name="Нийлбэр хувийн 95% хүрээ",
                                  hoverinfo="skip"), secondary_y=True)
     fig.add_trace(go.Scatter(x=df["rank"], y=df.cum_share, mode="lines", line=dict(color="black"),
-                             name="Хуримтлагдсан хувь", hovertemplate="Топ %{x}: %{y:.0%}<extra></extra>"),
+                             name="Нийлбэр хувь", hovertemplate="Эхний %{x} тоглогч: %{y:.0%}<extra></extra>"),
                   secondary_y=True)
     k = int(np.argmax(df.cum_share.to_numpy() >= 0.8)) + 1
     fig.add_hline(y=0.8, line_dash="dash", line_color=B_COLOR, secondary_y=True)
-    fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Топ {k} ({k / len(df):.0%}) = 80%", showarrow=True,
+    fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Эхний {k} ({k / len(df):.0%}) = 80%", showarrow=True,
                        font=dict(color=B_COLOR))
     fig.update_yaxes(title="Оноо", rangemode="tozero", secondary_y=False)
-    fig.update_yaxes(title="Хуримтлагдсан хувь", tickformat=".0%", range=[0, 1.02], secondary_y=True, showgrid=False)
+    fig.update_yaxes(title="Нийлбэр хувь", tickformat=".0%", range=[0, 1.02], dtick=0.2, secondary_y=True, showgrid=False)
     fig.update_xaxes(title="Тоглогч (оноогоор эрэмбэлсэн)")
     return _layout(fig, title)
 
@@ -125,14 +124,14 @@ def px_fan(tg: pd.DataFrame, team_key: str, show_ci: bool, others: bool = True) 
         for lvl, alpha in (("95", 0.12), ("80", 0.2), ("50", 0.3)):
             fig.add_trace(go.Scatter(x=np.r_[t.date, t.date[::-1]], y=np.r_[t[f"hi{lvl}"], t[f"lo{lvl}"][::-1]],
                                      fill="toself", fillcolor=f"rgba(213,94,0,{alpha})", line=dict(width=0),
-                                     name=f"{lvl}% CI", hoverinfo="skip"))
+                                     name=f"{lvl}% хүрээ", hoverinfo="skip"))
     fig.add_trace(go.Scatter(x=t.date, y=t.winpct, mode="lines+markers", line=dict(color=B_COLOR, width=3),
                              name=t.team.iloc[0], customdata=np.c_[t.wins, t.games],
                              hovertemplate="%{y:.0%} (%{customdata[0]}/%{customdata[1]})<extra></extra>"))
     fig.add_hline(y=0.5, line_dash="dot", line_color="black")
-    fig.update_yaxes(title="Хуримтлагдсан ялалтын хувь", tickformat=".0%", range=[0, 1])
+    fig.update_yaxes(title="Тухайн өдөр хүртэлх ялалтын хувь", tickformat=".0%", range=[0, 1])
     fig.update_xaxes(title="Огноо")
-    return _layout(fig, f"{t.team.iloc[0]}: ялалтын хувь улирлын турш" + (" (Wilson CI)" if show_ci else ""))
+    return _layout(fig, f"{t.team.iloc[0]}: ялалтын хувь улирлын турш" + (" (сүүдэр = магадлалтай хүрээ)" if show_ci else ""))
 
 
 
@@ -157,18 +156,19 @@ def px_clusters(clusters: pd.DataFrame, selected: str | None = None) -> go.Figur
         fig.add_trace(go.Scattergl(x=part.pc1, y=part.pc2, mode="markers", name=name,
                                    marker=dict(color=color, size=9, opacity=(0.15 + 0.85 * part.coassign).tolist()),
                                    customdata=np.c_[part.player_name, part.coassign],
-                                   hovertemplate="<b>%{customdata[0]}</b><br>Тогтвортой байдал %{customdata[1]:.0%}"
+                                   hovertemplate="<b>%{customdata[0]}</b><br>Бүлэгтээ тогтвортой %{customdata[1]:.0%}"
                                                  "<extra>" + name + "</extra>"))
     if selected is not None:
         s = clusters[clusters.player_id == selected]
         fig.add_trace(go.Scatter(x=s.pc1, y=s.pc2, mode="markers", name="Сонгосон",
                                  marker=dict(symbol="star", size=20, color="black")))
-    fig.update_xaxes(title="Гол бүрэлдэхүүн 1")
-    fig.update_yaxes(title="Гол бүрэлдэхүүн 2")
-    return _layout(fig, "Тоглогчийн архетип (тод = тогтвортой, цайвар = бүлгийн заагт)")
+    fig.update_xaxes(title="Хэв маягийн 1-р тэнхлэг")
+    fig.update_yaxes(title="Хэв маягийн 2-р тэнхлэг")
+    return _layout(fig, "Тоглолтын хэв маяг: ойр цэг = төстэй тоглогч")
 
 
-FACTORS = [("efg", "eFG%", True), ("tov_pct", "TOV%", False), ("orb_pct", "ORB%", True), ("ftr", "FTr", True)]
+FACTORS = [("efg", "Оновч", True), ("tov_pct", "Бөмбөг алдалт", False), ("orb_pct", "Довт. самбар", True),
+           ("ftr", "Торгууль авалт", True)]
 
 
 def px_four_factors(tg: pd.DataFrame, highlight: str | None = None) -> go.Figure:
@@ -183,9 +183,9 @@ def px_four_factors(tg: pd.DataFrame, highlight: str | None = None) -> go.Figure
         good = dev > 0 if hb else dev < 0
         colors = [("black" if t == highlight else (A_COLOR if g else B_COLOR)) for t, g in zip(dev.index, good)]
         fig.add_trace(go.Bar(x=dev, y=dev.index, orientation="h", marker_color=colors, showlegend=False,
-                             hovertemplate="%{y}: %{x:+.1f} нэгж %<extra>" + lbl + "</extra>"), row=1, col=i)
-        fig.update_xaxes(title="Дунджаас, нэгж %", row=1, col=i)
-    return _layout(fig, "Four Factors: лигийн дунджаас хазайлт (цэнхэр = давуу, улаан = сул)", height=460)
+                             hovertemplate="%{y}: дунджаас %{x:+.1f}<extra>" + lbl + "</extra>"), row=1, col=i)
+        fig.update_xaxes(title="Дунджаас зөрүү", row=1, col=i)
+    return _layout(fig, "Ялалтын 4 хүчин зүйл: баг бүр лигийн дунджаас хэр сайн/сул вэ", height=470)
 
 
 def px_elo(games: pd.DataFrame, highlight: str | None = None) -> go.Figure:
@@ -199,25 +199,35 @@ def px_elo(games: pd.DataFrame, highlight: str | None = None) -> go.Figure:
                                  line=dict(color=B_COLOR if hl else LIGHTEST, width=3 if hl else 1),
                                  hovertemplate=f"{team}: " + "%{y:.0f}<extra></extra>"))
     fig.add_hline(y=1500, line_dash="dot")
-    fig.update_yaxes(title="Elo үнэлгээ")
+    fig.update_yaxes(title="Багийн хүчний оноо (Elo)")
     fig.update_xaxes(title="Огноо")
-    return _layout(fig, "Elo үнэлгээний явц" + (f" — {highlight}" if highlight else ""))
+    return _layout(fig, "Багийн хүчний онооны явц" + (f" — {highlight}" if highlight else ""))
 
 
 def px_map(meta: pd.DataFrame, standings: pd.DataFrame, geojson_path: Path, season: str) -> go.Figure:
     geo = json.loads(Path(geojson_path).read_text(encoding="utf-8"))
-    names = [f["properties"]["shapeName"] for f in geo["features"]]
     st = standings[standings.season == season].assign(winpct=lambda d: d.W / (d.W + d.L)).merge(meta, on="team_key")
     known = st[st.lat.notna()]
-    fig = go.Figure(go.Choropleth(geojson=geo, locations=names, z=[0] * len(names), featureidkey="properties.shapeName",
-                                  colorscale=[[0, "#E3E3E3"], [1, "#E3E3E3"]], showscale=False,
-                                  marker_line_color="#A6A6A6", hoverinfo="skip"))
+    # Аймгийн хилийг шугамаар зурна: geojson-ий эргэлтийн чиглэл plotly-ийн шаардлагаас өөр тул Choropleth дүүргэлт
+    # бүх дэлхийг саарал болгодог.
+    lons, lats = [], []
+    for feat in geo["features"]:
+        g = feat["geometry"]
+        polys = g["coordinates"] if g["type"] == "MultiPolygon" else [g["coordinates"]]
+        for poly in polys:
+            ring = np.asarray(poly[0])[:, :2]
+            lons += ring[:, 0].tolist() + [None]
+            lats += ring[:, 1].tolist() + [None]
+    fig = go.Figure(go.Scattergeo(lon=lons, lat=lats, mode="lines", line=dict(color="#94A3B8", width=0.8),
+                                  hoverinfo="skip", showlegend=False, fill="none"))
     for region, color in (("Улаанбаатар", B_COLOR), ("Орон нутаг", A_COLOR)):
         part = known[known.region == region]
         fig.add_trace(go.Scattergeo(lon=part.lon, lat=part.lat, mode="markers", name=region,
                                     marker=dict(size=10 + 40 * part.winpct, color=color, opacity=0.75),
                                     text=part.canonical_name + " — " + (part.winpct * 100).round(0).astype(str) + "%",
                                     hovertemplate="%{text}<extra></extra>"))
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(visible=False, projection_type="mercator", lonaxis_range=[87, 120.5], lataxis_range=[41.3, 52.3],
+                    bgcolor="white")
     unknown = len(st) - len(known)
-    return _layout(fig, f"Багийн гэр хот ба ялалтын хувь ({unknown} багийн хот тодорхойгүй)", height=380)
+    title = "Багийн хот ба ялалтын хувь" + (f" ({unknown} багийн хот тодорхойгүй)" if unknown else "")
+    return _layout(fig, title, height=400)

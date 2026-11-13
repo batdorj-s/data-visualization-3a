@@ -54,26 +54,28 @@ def fig_team_map(team_meta: pd.DataFrame, standings: pd.DataFrame, geo_path: Pat
         dy = -10 if any(abs(r.lat - lat) < 1.0 and abs(r.lon - lon) < 3 for lat, lon in offsets.values()) else 0
         offsets[r.Index] = (r.lat, r.lon)
         ax.annotate(f"{r.canonical_name} {r.winpct:.0%}", (r.lon, r.lat), xytext=(9, dy), textcoords="offset points",
-                    fontsize=6.5, va="center")
+                    fontsize=7.5, va="center")
     if len(ub):
         cx, cy = ub.lon.mean(), ub.lat.mean()
         lines = "\n".join(f"{r.canonical_name} {r.winpct:.0%}" for r in ub.sort_values("winpct", ascending=False).itertuples())
-        ax.annotate(f"Улаанбаатар:\n{lines}", (cx, cy), xytext=(113.5, 51.6), textcoords="data", fontsize=6.5, va="top",
+        ax.annotate(f"Улаанбаатар:\n{lines}", (cx, cy), xytext=(113.5, 51.6), textcoords="data", fontsize=7.5, va="top",
                     arrowprops={"arrowstyle": "-", "color": "#6B6B6B", "linewidth": 0.6},
                     bbox={"boxstyle": "round,pad=0.3", "facecolor": "white", "edgecolor": LIGHT})
     ax.set_xlim(87, 122)
     ax.set_ylim(41, 52.5)
     ax.set_aspect(1.3)
     ax.axis("off")
-    ax.legend(frameon=False, loc="lower right", fontsize=7, markerscale=0.45,
-              title="Бөмбөгийн хэмжээ = ялалтын хувь", title_fontsize=7)
+    ax.legend(frameon=False, loc="lower right", fontsize=8, markerscale=0.45,
+              title="Тойргийн хэмжээ = ялалтын хувь", title_fontsize=8)
     title = (f"{len(ub)} баг Улаанбаатарт төвлөрсөн; орон нутгийн {len(known) - len(ub)} баг"
              if len(known) else "Багуудын байршил")
-    note = (f"Гэр хот нь эх сурвалжаар батлагдаагүй {len(unknown)} баг зурагдаагүй: "
+    note = (f"Аль хотынх нь батлагдаагүй {len(unknown)} баг зурагдаагүй: "
             f"{', '.join(unknown.canonical_name.fillna(unknown.team_key))}" if len(unknown)
-            else "Бүх багийн гэр хот эх сурвалжтай (0 баг дутуу)")
-    return finish(fig, title, f"Багийн гэр хот ба {season.replace('-20', '–')} энгийн улирлын ялалтын хувь",
-                  f"{source_mba()}; Wikipedia; хил: geoBoundaries (ODbL)", n=int(len(df)), uncertainty_note=note)
+            else "Бүх багийн хот эх сурвалжаар батлагдсан")
+    return finish(fig, title, f"Тойрог бүр 1 баг, байрлал = багийн хот, хэмжээ = {season.replace('-20', '–')} "
+                  "улирлын ялалтын хувь. Улаан = Улаанбаатар, цэнхэр = орон нутаг",
+                  f"{source_mba()}; багийн хот: Wikipedia; аймгийн хил: geoBoundaries", n=int(len(df)), unit="баг",
+                  uncertainty_note=note)
 
 
 def transfer_edges(players_season: pd.DataFrame, src: str = "2025-2026", dst: str = "2026-2027") -> pd.DataFrame:
@@ -100,13 +102,15 @@ def fig_transfer_network(edges: pd.DataFrame, names: dict):
     nx.draw_networkx_nodes(G, pos, ax=ax, node_size=[150 + 120 * incoming[n] for n in G.nodes()],
                            node_color=PALETTE["blue"], alpha=0.9)
     for n, (x, y) in pos.items():
-        ax.text(x * 1.18, y * 1.18, f"{names.get(n, n)}\n(+{incoming[n]})", ha="center", va="center", fontsize=7)
+        ax.text(x * 1.18, y * 1.18, f"{names.get(n, n)}\n(+{incoming[n]})", ha="center", va="center", fontsize=8)
     ax.set_xlim(-1.5, 1.5)
     ax.set_ylim(-1.4, 1.4)
     ax.axis("off")
     top = max(incoming, key=incoming.get) if incoming else None
     title = (f"{names.get(top, top)} хамгийн олон ({incoming[top]}) тоглогч өөр багаас авсан" if top
              else "Улирал хооронд баг сольсон тоглогч алга")
-    return finish(fig, title, "2025–26 → 2026–27 улиралд баг сольсон тоглогчид; сумны зузаан = тоглогчийн тоо, "
-                  "зангилааны хэмжээ = орж ирсэн тоглогч", source_mba(), n=int(edges.n.sum()) or 1,
-                  uncertainty_note="Улирал хоорондын тоглогчийг нэрээр тааруулсан (C2)")
+    return finish(fig, title, "Сум = тоглогч хуучин багаасаа шинэ баг руу шилжсэн. Сум зузаан = олон тоглогч, "
+                  "тойрог том = олон тоглогч авсан баг; хаалтанд = авсан тоглогчийн тоо",
+                  f"{source_mba()} · 2025–26-аас 2026–27 улиралд баг сольсон тоглогчид", n=int(edges.n.sum()) or 1,
+                  unit="шилжилт",
+                  uncertainty_note="Хоёр улирлын тоглогчийг нэрээр нь тааруулсан тул цөөн алдаа байж болно")

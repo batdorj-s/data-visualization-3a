@@ -380,7 +380,7 @@ z
     <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="165.6774" y="83.69439" transform="rotate(-0 165.6774 83.69439)">Архетипийн газрын зураг (PCA) — цайвар цэг = бүлгийн заагт</text>
    </g>
    <g id="text_9">
-    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="165.6774" y="186.14751" transform="rotate(-0 165.6774 186.14751)">Төстэй 5 тоглогч — карт бүр CI-тай</text>
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Arial'; text-anchor: start" x="165.6774" y="186.14751" transform="rotate(-0 165.6774 186.14751)">Төстэй 5 тоглогч — тоо бүр магадлалтай хүрээтэй</text>
    </g>
    <g id="text_10">
     <text style="font-size: 6px; font-family: 'Arial'" transform="translate(177.380044 211.995244)">Тоглогч 1</text>
@@ -417,7 +417,7 @@ z
    <text style="font-weight: 700; font-size: 11px; font-family: 'Arial'; text-anchor: start" x="9.072" y="14.065969" transform="rotate(-0 9.072 14.065969)">Wireframe 1: Скаутын хайлт</text>
   </g>
   <g id="text_16">
-   <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start; fill: #4d4d4d" x="9.072" y="28.728" transform="rotate(-0 9.072 28.728)">Дасгалжуулагч багтаа дутагдаж буй архетипийн тоглогчийг олох</text>
+   <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start; fill: #4d4d4d" x="9.072" y="28.728" transform="rotate(-0 9.072 28.728)">Дасгалжуулагч багтаа дутагдаж буй хэв маягийн тоглогчийг олох</text>
   </g>
  </g>
  <defs>

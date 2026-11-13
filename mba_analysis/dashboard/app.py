@@ -9,17 +9,24 @@ for p in (HERE, HERE.parent):
 import streamlit as st  # noqa: E402
 
 from data_access import filters_sidebar  # noqa: E402
+from ui import inject_css  # noqa: E402
 
-st.set_page_config(page_title="MBA лигийн анализ", page_icon=":material/sports_basketball:", layout="wide")
+st.set_page_config(page_title="MBA лигийн шинжилгээ", page_icon=":material/sports_basketball:", layout="wide")
+inject_css()
 
-pages = [
-    st.Page("views/overview.py", title="Тойм", default=True),
-    st.Page("views/players.py", title="Тоглогчид"),
-    st.Page("views/teams.py", title="Багууд"),
-    st.Page("views/ml.py", title="Машин суралцал"),
-    st.Page("views/quality.py", title="Өгөгдлийн чанар"),
-    st.Page("views/about.py", title="Тухай"),
-]
+pages = {
+    "Шинжилгээ": [
+        st.Page("views/overview.py", title="Тойм", icon=":material/dashboard:", default=True),
+        st.Page("views/players.py", title="Тоглогчид", icon=":material/person:"),
+        st.Page("views/teams.py", title="Багууд", icon=":material/groups:"),
+        st.Page("views/ml.py", title="Машин сургалт", icon=":material/model_training:"),
+    ],
+    "Тусламж": [
+        st.Page("views/glossary.py", title="Нэр томьёо", icon=":material/menu_book:"),
+        st.Page("views/quality.py", title="Өгөгдлийн чанар", icon=":material/fact_check:"),
+        st.Page("views/about.py", title="Тухай", icon=":material/info:"),
+    ],
+}
 nav = st.navigation(pages)
 st.session_state["_filters"] = filters_sidebar()
 nav.run()

@@ -19,7 +19,7 @@ from src.charts import ml as M  # noqa: E402
 from src.charts import relation as R  # noqa: E402
 from src.charts import summary as S  # noqa: E402
 from src.charts import timeline as T  # noqa: E402
-from src.style import IMPORT_COLORS, save_figure  # noqa: E402
+from src.style import IMPORT_COLORS, IMPORT_LABELS, save_figure, source_mba  # noqa: E402
 from src.uncertainty import cluster_bootstrap  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,12 +74,14 @@ def _league_pareto(i: dict):
     k = int(np.argmax(t.cum_share.to_numpy() >= 0.8)) + 1
     return C.fig_pareto(
         vals, imp.reindex(vals.index).map(IMPORT_COLORS),
-        title=f"Топ {k} тоглогч ({k / len(vals):.0%}) лигийн онооны 80%-ийг авдаг",
-        subtitle="Тоглогчдыг улирлын нийт оноогоор эрэмбэлсэн; хар шугам = хуримтлагдсан хувь · 2025–26 энгийн улирал",
-        xlabel="Тоглогч (оноогоор эрэмбэлсэн)", ylabel="Улирлын нийт оноо", n=len(vals),
+        title=f"Тоглогчдын {k / len(vals):.0%} буюу {k} тоглогч лигийн нийт онооны 80%-ийг авдаг",
+        subtitle="Багана бүр 1 тоглогчийн улирлын нийт оноо, ихээс нь эрэмбэлсэн. Хар шугам = эхний N тоглогчийн "
+                 "нийлбэр хувь, саарал сүүдэр = түүний 95% магадлалтай хүрээ",
+        xlabel="Тоглогч (оноогоор эрэмбэлсэн)", ylabel="Улирлын нийт оноо", n=len(vals), unit="тоглогч",
+        source=f"{source_mba()} · 2025–26 улирлын үндсэн шат",
         cum_ci=C.pareto_ci(pg, n_boot=i["n_boot"]),
-        uncertainty_note=f"Саарал зурвас: хуримтлагдсан хувийн 95% CI, тоглолтоор {i['n_boot']} bootstrap",
-        legend={"Import": IMPORT_COLORS[True], "Дотоод": IMPORT_COLORS[False]})
+        uncertainty_note=f"Хүрээг тоглолтуудыг {i['n_boot']} удаа дахин сонгож тооцов",
+        legend={IMPORT_LABELS[True]: IMPORT_COLORS[True], IMPORT_LABELS[False]: IMPORT_COLORS[False]})
 
 
 def _metric_dist(i):
@@ -118,7 +120,7 @@ FIGURE_SPECS: list[tuple[str, Callable[[dict], Any]]] = [
     ("P3_importance_pareto", lambda i: M.fig_importance_pareto(i["expl"])),
     ("U01_ts_funnel", lambda i: R.fig_ts_funnel(i["ps"])),
     ("U02_top_ppg_ci", lambda i: C.fig_top_dot_ci(player_ppg_ci(i["pg"], i["ps"], MAIN_SEASON, n_boot=i["n_boot"]),
-                                                  "Оноо / тоглолт (2025–26)", highlight_col="is_import")),
+                                                  "Тоглолтын дундаж оноо (2025–26)", highlight_col="is_import")),
     ("U03_fan_winpct", lambda i: T.fig_cum_winpct(i["tg"], i["highlight"], bands=True)),
     ("U04_raincloud", lambda i: D.fig_raincloud(i["ps"], i["boot_diff"])),
     ("U05_hypotheses", lambda i: S.fig_hypothesis_summary(i["hyp"])),

@@ -10,7 +10,8 @@ GOOD, BAD = PALETTE["blue"], PALETTE["vermillion"]
 FACTORS = [("efg", True), ("tov_pct", False), ("orb_pct", True), ("ftr", True)]
 
 
-SHORT = {"efg": "eFG%", "tov_pct": "TOV%", "orb_pct": "ORB%", "ftr": "FTr (FTM/FGA)"}
+SHORT = {"efg": "Оновч (3 оноог тооцсон)", "tov_pct": "Бөмбөг алдалт", "orb_pct": "Довтолгооны самбар",
+         "ftr": "Торгууль авалт"}
 
 
 def fig_four_factors(team_games: pd.DataFrame, season: str = "2025-2026"):
@@ -23,16 +24,18 @@ def fig_four_factors(team_games: pd.DataFrame, season: str = "2025-2026"):
         dev = (means[f] - league[f]).sort_values(ascending=not higher_better)
         good = dev > 0 if higher_better else dev < 0
         ax.barh(range(len(dev)), dev * 100, color=np.where(good, GOOD, BAD), height=0.7)
-        ax.set_yticks(range(len(dev)), dev.index, fontsize=7)
+        ax.set_yticks(range(len(dev)), dev.index, fontsize=8)
         ax.axvline(0, color="black", linewidth=0.6)
         ax.xaxis.set_major_locator(plt.MaxNLocator(4))
-        ax.set_title(f"{SHORT[f]} ({'их' if higher_better else 'бага'} нь сайн)", fontsize=8.5)
-        ax.set_xlabel("Лигийн дунджаас зөрүү, нэгж %", fontsize=7)
+        ax.set_title(f"{SHORT[f]} ({'их' if higher_better else 'бага'} нь сайн)", fontsize=9.5)
+        ax.set_xlabel("Лигийн дунджаас зөрүү (%-ийн нэгж)", fontsize=8)
         ax._qa_no_ylabel = True
     best = (means["efg"] - league["efg"]).idxmax()
-    return finish(fig, f"{best} шидэлтийн оновчоороо (eFG%) лигт тэргүүлдэг",
-                  f"Dean Oliver-ийн 4 хүчин зүйл, лигийн дунджаас хазайлт · {season.replace('-20', '–')} энгийн улирал; "
-                  "цэнхэр = давуу, улаан = сул", source_mba(), n=int(len(means)))
+    return finish(fig, f"{best} шидэлтийн оновчоороо лигт тэргүүлдэг",
+                  "Ялалтад хамгийн их нөлөөлдөг 4 үзүүлэлтээр баг бүрийг лигийн дундажтай харьцуулав: "
+                  "цэнхэр = дунджаас сайн, улаан = дунджаас сул",
+                  f"{source_mba()} · {season.replace('-20', '–')} улирлын үндсэн шатны тоглолтууд", n=int(len(means)),
+                  unit="баг")
 
 
 def _import_share(df: pd.DataFrame) -> float:
@@ -47,20 +50,20 @@ def fig_import_share_donut(player_games: pd.DataFrame, n_boot: int = 2000):
     fig, ax = plt.subplots(figsize=(6.3, 3.8))
     wedges, _ = ax.pie([share, 1 - share], colors=[IMPORT_COLORS[True], IMPORT_COLORS[False]], startangle=90,
                        counterclock=False, wedgeprops={"width": 0.38, "edgecolor": "white"})
-    for w, txt, color in zip(wedges, [f"Import\n{share:.0%}", f"Дотоод\n{1 - share:.0%}"],
+    for w, txt, color in zip(wedges, [f"Гадаад\n{share:.0%}", f"Дотоод\n{1 - share:.0%}"],
                              [IMPORT_COLORS[True], IMPORT_COLORS[False]]):
         ang = np.deg2rad((w.theta2 + w.theta1) / 2)
         ax.text(1.28 * np.cos(ang), 1.18 * np.sin(ang), txt, ha="center", va="center", color=color,
                 fontsize=10, fontweight="bold")
     imp_players = player_games.loc[player_games.is_import, "player_id"].nunique()
     all_players = player_games.player_id.nunique()
-    ax.text(0, 0, f"{imp_players / all_players:.0%}\nтоглогч\nImport", ha="center", va="center", fontsize=9)
+    ax.text(0, 0, f"Тоглогчдын\n{imp_players / all_players:.0%} нь\nгадаад", ha="center", va="center", fontsize=9.5)
     ax.set_aspect("equal")
     ax.axis("off")
-    return finish(fig, f"Тоглогчдын {imp_players / all_players:.0%} нь Import ч лигийн онооны {share:.0%}-ийг авдаг",
-                  f"Бүх тоглолтын онооны хуваарь (95% CI {lo:.0%}–{hi:.0%}) · 2025-26 ба 2026-27",
-                  source_mba(), n=int(player_games.game_id.nunique()),
-                  uncertainty_note=f"CI: тоглолтоор {n_boot} bootstrap; n = тоглолтын тоо")
+    return finish(fig, f"Тоглогчдын {imp_players / all_players:.0%} нь гадаад боловч лигийн онооны {share:.0%}-ийг авдаг",
+                  f"Цагираг = лигийн бүх онооны хуваарь. Бодит хувь {lo:.0%}–{hi:.0%} хооронд байх магадлалтай",
+                  f"{source_mba()} · 2025–26 ба 2026–27 улирал", n=int(player_games.game_id.nunique()), unit="тоглолт",
+                  uncertainty_note=f"Хүрээг тоглолтуудыг {n_boot} удаа дахин сонгож тооцов")
 
 
 def pareto_table(values: pd.Series) -> pd.DataFrame:
@@ -87,7 +90,8 @@ def pareto_ci(player_games: pd.DataFrame, n_boot: int = 2000, seed: int = 42) ->
 
 def fig_pareto(values: pd.Series, colors: pd.Series, title: str, subtitle: str, xlabel: str, ylabel: str, n: int,
                cum_ci: tuple[np.ndarray, np.ndarray] | None = None, threshold: float = 0.8,
-               uncertainty_note: str | None = None, legend: dict | None = None):
+               uncertainty_note: str | None = None, legend: dict | None = None, unit: str | None = None,
+               source: str | None = None):
     apply_style()
     t = pareto_table(values)
     x = np.arange(1, len(t) + 1)
@@ -103,20 +107,20 @@ def fig_pareto(values: pd.Series, colors: pd.Series, title: str, subtitle: str, 
     ax2.plot([x[0], x[-1]], [threshold, threshold], color=PALETTE["vermillion"], linestyle="--", linewidth=1)
     k = int(np.argmax(t.cum_share.to_numpy() >= threshold)) + 1
     ax2.plot([k, k], [0, threshold], color=PALETTE["vermillion"], linestyle=":", linewidth=1)
-    ax2.annotate(f"Топ {k} ({k / len(t):.0%}) = {threshold:.0%}", (k, threshold), xytext=(8, -14),
-                 textcoords="offset points", fontsize=8, color=PALETTE["vermillion"], fontweight="bold")
+    ax2.annotate(f"Эхний {k} ({k / len(t):.0%}) = {threshold:.0%}", (k, threshold), xytext=(8, -14),
+                 textcoords="offset points", fontsize=9, color=PALETTE["vermillion"], fontweight="bold")
     ax.set_ylim(0, t.value.max() * 1.05)
     ax2.set_ylim(0, 1.0)
     ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0%}"))
     ax2.grid(False)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax2.set_ylabel("Хуримтлагдсан хувь")
+    ax2.set_ylabel("Нийлбэр хувь (хар шугам)")
     if legend:
         from matplotlib.patches import Patch
         ax.legend(handles=[Patch(color=c, label=l) for l, c in legend.items()], frameon=False, loc="center right")
     fig._pareto_k = k
-    return finish(fig, title, subtitle, source_mba(), n=n, uncertainty_note=uncertainty_note)
+    return finish(fig, title, subtitle, source or source_mba(), n=n, uncertainty_note=uncertainty_note, unit=unit)
 
 
 def players_to_threshold(points: pd.Series, threshold: float = 0.8) -> int:
@@ -141,12 +145,14 @@ def fig_team_concentration(player_games: pd.DataFrame, season: str = "2025-2026"
     ax.hlines(y, df.lo, df.hi, color=NEUTRAL, linewidth=3, alpha=0.7)
     ax.scatter(df.est, y, color=PALETTE["blue"], s=36, zorder=3)
     ax.set_yticks(y, df.team)
-    ax.set_xlabel("Багийн онооны 80%-д хүрэх тоглогчийн тоо")
+    ax.set_xlabel("Багийн нийт онооны 80%-ийг хэдэн тоглогч авдаг вэ")
     ax.set_ylabel("Баг")
     top = df.iloc[0]
-    return finish(fig, f"{top.team} хамгийн цөөн ({top.est:.0f}) тоглогчоосоо хамааралтай",
-                  f"Цэг = тооцоолсон утга, зурвас = 95% CI · {season.replace('-20', '–')}", source_mba(), n=int(len(df)),
-                  uncertainty_note=f"CI: тоглолтоор {n_boot} bootstrap")
+    return finish(fig, f"{top.team} хамгийн цөөн ({top.est:.0f}) тоглогчийн оноонд найддаг",
+                  "Цэг = тооцоолсон тоо, саарал зурвас = бодит тоо байж болох 95% хүрээ. "
+                  "Зүүн тийш байх тусам цөөн од тоглогчоос хамааралтай",
+                  f"{source_mba()} · {season.replace('-20', '–')} улирлын үндсэн шат", n=int(len(df)), unit="баг",
+                  uncertainty_note=f"Хүрээг тоглолтуудыг {n_boot} удаа дахин сонгож тооцов")
 
 
 def fig_top_dot_ci(players_ci: pd.DataFrame, metric_label: str, highlight_col: str | None = None):
@@ -162,7 +168,10 @@ def fig_top_dot_ci(players_ci: pd.DataFrame, metric_label: str, highlight_col: s
     ax.set_xlabel(metric_label)
     ax.set_ylabel("Тоглогч")
     overlap = df.iloc[-1].lo <= df.iloc[-2].hi if len(df) > 1 else False
-    title = (f"Тэргүүлэгч {df.iloc[-1].player}-ийн давуу байдал статистикийн хувьд баттай биш" if overlap
+    title = (f"Тэргүүлэгч {df.iloc[-1].player} 2-р байрныхаас баттай илүү гэж хэлэх боломжгүй" if overlap
              else f"{df.iloc[-1].player} бусдаас баттай тэргүүлж байна")
-    return finish(fig, title, f"Цэг = тооцоолсон утга, шугам = 95% итгэх интервал · топ {len(df)}",
-                  source_mba(), n=int(len(df)), uncertainty_note="CI: тоглолтоор 2000 bootstrap")
+    return finish(fig, title, "Цэг = тоглолтын дундаж оноо, шугам = бодит түвшин байж болох 95% хүрээ. "
+                  "Шугамууд давхцаж байвал тоглогчдыг ялгах боломжгүй"
+                  + (". Улаан-улбар = гадаад, цэнхэр = дотоод тоглогч" if highlight_col else ""),
+                  f"{source_mba()} · 2025–26 улирлын үндсэн шат, хамгийн өндөр оноотой", n=int(len(df)), unit="тоглогч",
+                  uncertainty_note="Хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцов")

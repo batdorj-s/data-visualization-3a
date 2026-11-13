@@ -68,7 +68,7 @@ def test_funnel_ignores_zero_attempts(players):
 def test_hist_direct_labels(players):
     fig = D.fig_ppg_hist(players)
     texts = {t.get_text() for t in fig.axes[0].texts}
-    assert any("Import" in t for t in texts) and any("Дотоод" in t for t in texts)
+    assert any("Гадаад" in t for t in texts) and any("Дотоод" in t for t in texts)
     assert fig.axes[0].get_legend() is None
 
 

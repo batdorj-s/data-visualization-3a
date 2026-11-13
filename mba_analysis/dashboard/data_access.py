@@ -8,8 +8,11 @@ import streamlit as st
 DATA = Path(__file__).parent / "data"
 SEASONS = ["2025-2026", "2026-2027"]
 POSITIONS = ["PG", "SG", "SF", "PF", "C"]
-IMPORT_OPTIONS = ["Бүгд", "Import", "Дотоод"]
-EMPTY_MSG = "Сонгосон шүүлтүүрт тохирох өгөгдөл алга. Шүүлтүүрээ сулруулна уу."
+IMPORT_OPTIONS = ["Бүгд", "Гадаад", "Дотоод"]
+EMPTY_MSG = ("Сонгосон шүүлтүүрт тохирох өгөгдөл алга. Зүүн талын «Шүүлтүүрийг цэвэрлэх» товчийг дарж "
+             "эсвэл тоглолтын доод хязгаарыг бууруулна уу.")
+DEFAULTS = {"season": "2025-2026", "teams": [], "positions": [], "import_status": "Бүгд", "min_gp": 5,
+            "show_ci": True}
 
 
 @st.cache_data(show_spinner=False)
@@ -38,11 +41,18 @@ def team_names(season: str) -> list[str]:
     return sorted(ps.loc[ps.season == season, "team"].dropna().unique())
 
 
+def reset_filters() -> None:
+    for k, v in DEFAULTS.items():
+        st.session_state[k] = list(v) if isinstance(v, list) else v
+    st.session_state.pop("highlight_team", None)
+
+
 def filters_sidebar() -> Filters:
     sb = st.sidebar
     sb.markdown("### Шүүлтүүр")
+    sb.caption("Энд сонгосон зүйл бүх хуудсанд нэг дор үйлчилнэ.")
     season = sb.selectbox("Улирал", SEASONS, key="season",
-                          format_func=lambda s: s.replace("-20", "–") + (" (явцын)" if s == "2026-2027" else ""))
+                          format_func=lambda s: s.replace("-20", "–") + (" (явагдаж буй)" if s == "2026-2027" else ""))
     teams = team_names(season)
     for key in ("teams", "highlight_team"):
         cur = st.session_state.get(key)
@@ -52,14 +62,18 @@ def filters_sidebar() -> Filters:
             st.session_state.pop(key, None)
     sel_teams = sb.multiselect("Баг", teams, key="teams", placeholder="Бүх баг")
     positions = sb.multiselect("Байрлал", POSITIONS, key="positions", placeholder="Бүх байрлал")
-    imp = sb.radio("Тоглогчийн төрөл", IMPORT_OPTIONS, key="import_status", horizontal=True)
-    min_gp = sb.slider("Хамгийн багадаа тоглосон тоглолт (GP)", 1, 30, key="min_gp",
-                       value=st.session_state.get("min_gp", 5))
-    show_ci = sb.toggle("Итгэх интервал харуулах", key="show_ci", value=st.session_state.get("show_ci", True))
+    imp = sb.radio("Тоглогчийн төрөл", IMPORT_OPTIONS, key="import_status", horizontal=True,
+                   help="Гадаад = лигийн гадаад тоглогчийн квотоор тоглож буй тоглогч")
+    min_gp = sb.slider("Хамгийн багадаа хэдэн тоглолт тоглосон", 1, 30, key="min_gp",
+                       value=st.session_state.get("min_gp", 5),
+                       help="Цөөн тоглолттой тоглогчийн дундаж санамсаргүй их хэлбэлздэг тул анхдагчаар 5+")
+    show_ci = sb.toggle("Магадлалтай хүрээг харуулах", key="show_ci", value=st.session_state.get("show_ci", True),
+                        help="Дата цөөн үед бодит утга хаана байж болохыг сүүдэр/шугамаар харуулна (95% магадлал)")
+    sb.button("Шүүлтүүрийг цэвэрлэх", on_click=reset_filters, icon=":material/restart_alt:", width="stretch")
     sb.markdown("---")
-    highlight = sb.selectbox("Онцлох баг (бүх график дээр)", teams, key="highlight_team",
-                             index=None, placeholder="Сонгоогүй")
-    sb.caption(f"Snapshot: {snapshot()} · Эх сурвалж: MBA статистикийн систем")
+    highlight = sb.selectbox("Онцлох баг", teams, key="highlight_team", index=None, placeholder="Сонгоогүй",
+                             help="Сонгосон баг бүх хуудасны график дээр тодорч харагдана")
+    sb.caption(f"Дата: MBA лигийн албан ёсны статистик, {snapshot()}-нд татсан")
     return Filters(season, sel_teams, positions, imp, min_gp, show_ci, highlight)
 
 
@@ -74,7 +88,7 @@ def apply(df: pd.DataFrame, f: Filters) -> pd.DataFrame:
     if f.positions:
         out = out[out.position.isin(f.positions)]
     if f.import_status != "Бүгд":
-        out = out[out.is_import.astype(bool) == (f.import_status == "Import")]
+        out = out[out.is_import.astype(bool) == (f.import_status == "Гадаад")]
     return out[out.GP >= f.min_gp]
 
 

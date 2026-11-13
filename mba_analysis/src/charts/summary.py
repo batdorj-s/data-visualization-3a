@@ -5,10 +5,12 @@ import pandas as pd
 from src.style import NEUTRAL, PALETTE, apply_style, finish, source_mba
 
 VERDICT_COLORS = {"Дэмжигдсэн": PALETTE["green"], "Дэмжигдээгүй": PALETTE["vermillion"], "Тодорхойгүй": NEUTRAL}
-UNITS = {"H1": "PPG-ийн медиан зөрүү (Import − дотоод)", "H2": "Гэрийн багийн ялалтын хувь",
-         "H3": "|β_eFG| − бусад хүчин зүйлийн хамгийн их |β|", "H4": "Pearson r (өндөр ↔ самбар)", "H5": "R² (Pythagorean), босго 0.5"}
-COL_LABELS = {"position": "Байрлал", "height_cm": "Өндөр", "birth_year": "Төрсөн он", "FT_pct": "FT%",
-              "TP_pct": "3P%", "FGA": "FGA"}
+VERDICT_PLAIN = {"Дэмжигдсэн": "Батлагдсан", "Дэмжигдээгүй": "Няцаагдсан", "Тодорхойгүй": "Баттай биш"}
+UNITS = {"H1": "Голч онооны зөрүү (гадаад − дотоод), оноо", "H2": "Гэрийн багийн ялалтын хувь",
+         "H3": "Оновчийн нөлөө бусад хүчин зүйлээс хэр илүү", "H4": "Хамаарлын хүч (өндөр ба самбар)",
+         "H5": "Онооны тайлбарлах хувь (0.5 = тал)"}
+COL_LABELS = {"position": "Байрлал", "height_cm": "Өндөр", "birth_year": "Төрсөн он", "FT_pct": "Торгуулийн оновч",
+              "TP_pct": "3 онооны оновч", "FGA": "Шидэлтийн тоо"}
 
 
 def verdict(row: pd.Series) -> str:
@@ -37,42 +39,46 @@ def fig_hypothesis_summary(hyp: pd.DataFrame):
         ax.set_yticks([])
         ax.grid(axis="y", visible=False)
         ax.spines["left"].set_visible(False)
-        ax.set_title(f"{r.hid}: {r.statement}", fontsize=8, loc="left")
-        ax.set_xlabel(UNITS.get(r.hid, "Утга"), fontsize=7)
-        ax.text(1.01, 0.5, v, transform=ax.transAxes, color=color, fontweight="bold", fontsize=8, va="center")
+        ax.set_title(f"{r.hid}: {r.statement}", fontsize=9, loc="left")
+        ax.set_xlabel(UNITS.get(r.hid, "Утга"), fontsize=8)
+        ax.text(1.01, 0.5, VERDICT_PLAIN[v], transform=ax.transAxes, color=color, fontweight="bold", fontsize=9, va="center")
         ax._qa_no_ylabel = True
     n_yes = verdicts.count("Дэмжигдсэн")
     others = [h for h, v in zip(hyp.hid, verdicts) if v != "Дэмжигдсэн"]
-    title = f"{len(hyp)} таамаглалын {n_yes} нь дэмжигдсэн" + (f"; {', '.join(others)} нотлогдоогүй" if others else "")
+    title = f"{len(hyp)} таамаглалын {n_yes} нь датагаар батлагдсан" + (f"; {', '.join(others)} батлагдаагүй" if others else "")
     return finish(fig, title,
-                  "Цэг = тооцоолсон утга, зурвас = 95% итгэх интервал, тасархай = нөлөөгүй үеийн утга",
-                  "Эх сурвалж: MBA (2025–27), Wikipedia; тооцоо: reports/hypotheses.csv", n=int(len(hyp)),
-                  uncertainty_note="CI: bootstrap (H1, H3, H5), Wilson (H2), Fisher z (H4)")
+                  "Цэг = датаас гарсан утга, өнгөт зурвас = бодит утга байж болох 95% хүрээ, тасархай = «нөлөөгүй» "
+                  "үеийн утга. Зурвас бүхэлдээ тасархайн баруун талд байвал таамаглал батлагдана",
+                  "MBA статистик (2025–27), Wikipedia (2023–24)", n=int(len(hyp)), unit="таамаглал",
+                  uncertainty_note="Хүрээг таамаглал бүрт тохирох статистик аргаар тооцов (арга зүйг тайлангаас үзнэ үү)")
 
 
 def fig_data_quality(missing: pd.DataFrame, matches: pd.DataFrame, ppg_val: pd.DataFrame):
     apply_style()
-    fig, (a, b, c) = plt.subplots(1, 3, figsize=(6.3, 3.0))
+    fig, (a, b, c) = plt.subplots(1, 3, figsize=(6.3, 3.4), gridspec_kw={"width_ratios": [1.25, 1, 1]})
     m = missing.sort_values("pct_missing")
     a.barh([COL_LABELS.get(x, x) for x in m.column], m.pct_missing, color=PALETTE["blue"])
-    a.set_xlabel("Дутуу утга, %")
-    a.set_title("Дутуу утга", fontsize=8.5)
+    a.set_xlabel("Дутуу, %")
+    a.set_title("Дутуу утга", fontsize=9.5)
     a._qa_no_ylabel = True
     relinked = matches[matches.left_id != matches.right_id]
     b.hist(relinked.score, bins=np.linspace(0.85, 1.0, 7), color=PALETTE["blue"], edgecolor="white")
-    b.set_xlabel("Нэрийн тааруулалтын оноо")
-    b.set_ylabel("Хосын тоо")
-    b.set_title(f"Улирал хоорондын холбоо ({len(relinked)})", fontsize=8.5)
+    b.set_xlabel("Нэрийн төстэй байдал")
+    b.set_ylabel("Тоглогчийн тоо")
+    b.set_title(f"Нэр холбосон: {len(relinked)}", fontsize=9.5)
     diff = ppg_val["diff"].dropna()
     c.hist(np.clip(diff, 0, 1.0), bins=np.arange(0, 1.051, 0.05), color=NEUTRAL, edgecolor="white")
     c.set_yscale("symlog", linthresh=10)
     c.axvline(0.2, color=PALETTE["vermillion"], linestyle="--", linewidth=1)
     if (diff > 1).any():
-        c.text(0.98, 0.9, f"> 1: {int((diff > 1).sum())}", transform=c.transAxes, ha="right", fontsize=7)
-    c.set_xlabel("PPG-ийн зөрүү (оноо)")
+        c.text(0.98, 0.9, f"> 1: {int((diff > 1).sum())}", transform=c.transAxes, ha="right", fontsize=8)
+    c.set_xlabel("Зөрүү (оноо)")
     c.set_ylabel("Тоглогч")
-    c.set_title(f"PPG шалгалт ({int(ppg_val.flag.sum())} > 0.2)", fontsize=8.5)
+    c.set_title(f"Оноо тулгалт: {int(ppg_val.flag.sum())} зөрүү", fontsize=9.5)
     worst = missing.loc[missing.pct_missing.idxmax()]
     return finish(fig, f"Өгөгдөл бараг бүрэн: хамгийн их дутуу нь {COL_LABELS.get(worst.column, worst.column)} "
-                  f"({worst.pct_missing:.0f}%)", "Цэвэрлэгээний тайлангаас (C6, C2, C10)", source_mba(),
-                  n=int(len(ppg_val)), uncertainty_note="Улаан тасархай = зөвшөөрөх хязгаар 0.2 оноо")
+                  f"({worst.pct_missing:.0f}%)", "Зүүн: үзүүлэлт бүрийн дутуу хувь. Дунд: өөр улиралд нэр нь бага зэрэг "
+                  "өөр бичигдсэн тоглогчийг холбосон (1 = нэр яг ижил). Баруун: сайтын нэгтгэсэн оноо ба тоглолт бүрийн "
+                  "онооны нийлбэрийн зөрүү",
+                  source_mba(), n=int(len(ppg_val)), unit="тоглогч-улирал",
+                  uncertainty_note="Улаан тасархай = зөвшөөрөх хязгаар 0.2 оноо")
