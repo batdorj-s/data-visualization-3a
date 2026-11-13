@@ -37,10 +37,11 @@ class Fetcher:
     def cache_path(self, url: str) -> Path:
         return self.cache_dir / f"{hashlib.sha1(url.encode('utf-8')).hexdigest()}.html"
 
-    def get(self, url: str) -> str:
+    def get(self, url: str, refresh: bool = False) -> str:
+        """refresh=True: кэштэй ч дахин татна (явагдаж буй улирлын хуудсанд). Offline үед кэшийг л уншина."""
         _check_allowed(url)
         path = self.cache_path(url)
-        if path.exists():
+        if path.exists() and (self.offline or not refresh):
             return path.read_text(encoding="utf-8")
         if self.offline:
             raise CacheMiss(url)

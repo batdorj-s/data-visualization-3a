@@ -20,9 +20,9 @@ class SpyFetcher(Fetcher):
         super().__init__(*a, **k)
         self.urls = []
 
-    def get(self, url):
+    def get(self, url, refresh=False):
         self.urls.append(url)
-        return super().get(url)
+        return super().get(url, refresh=refresh)
 
 
 @pytest.fixture

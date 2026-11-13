@@ -1,0 +1,7 @@
+game_id,home_pts,away_pts,box_away,box_home,q_home,q_away,title_vs_box,title_vs_quarters,winner_differs
+240,84,105,105,84,86,103,False,True,False
+203,88,109,101,88,96,93,True,True,False
+162,86,67,67,86,85,68,False,True,False
+151,97,74,74,88,88,74,True,True,False
+263,61,86,78,59,59,78,True,True,False
+217,41,120,120,41,73,88,False,True,False

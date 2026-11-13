@@ -47,7 +47,7 @@ def parse_schedule(html: str, month: str) -> list[dict]:
         home_name = next(teams[0].stripped_strings)
         away_name = next(teams[1].stripped_strings)
         game_link = li.find("a", href=re.compile(r"^/en/games/\d+$"))
-        played = "–" in strings and game_link is not None
+        played = "Final" in strings and "–" in strings and game_link is not None
         home_pts = away_pts = None
         if played:
             dash = strings.index("–")
@@ -57,7 +57,7 @@ def parse_schedule(html: str, month: str) -> list[dict]:
         rows.append({
             "game_id": int(game_link["href"].rsplit("/", 1)[1]) if played else None,
             "date": _card_date(li, month),
-            "status": "Final" if played else "Scheduled",
+            "status": "Final" if played else ("Scheduled" if "vs" in strings else "Live"),
             "stage": stage,
             "venue_raw": venue,
             "home_name": home_name,

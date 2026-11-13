@@ -91,3 +91,22 @@ def test_parse_game_overtime_columns():
     assert len(g["quarters"]["home"]) == 5
     assert sum(g["quarters"]["home"]) == g["home_pts"] == 95
     assert sum(g["quarters"]["away"]) == g["away_pts"] == 90
+
+
+LIVE_CARD = """
+<html><body><main><section><h3>Sat 14 Nov</h3><ul>
+<li><span>Q3</span><span>LIVE</span><span>M BANK ARENA</span>
+<a href="/en/teams/a"><span>Team A</span><span>AAA</span></a><span>45</span><span>–</span><span>40</span>
+<a href="/en/teams/b"><span>Team B</span><span>BBB</span></a><a href="/en/games/900">Box score</a></li>
+<li><span>Final</span><span>M BANK ARENA</span>
+<a href="/en/teams/a"><span>Team A</span><span>AAA</span></a><span>80</span><span>–</span><span>70</span>
+<a href="/en/teams/b"><span>Team B</span><span>BBB</span></a><a href="/en/games/901">Box score</a></li>
+</ul></section></main></body></html>
+"""
+
+
+def test_parse_schedule_live_game_is_not_final():
+    rows = {r["game_id"] or "live": r for r in parse_schedule(LIVE_CARD, "2026-11")}
+    assert rows[901]["status"] == "Final"
+    live = [r for r in parse_schedule(LIVE_CARD, "2026-11") if r["status"] != "Final"]
+    assert len(live) == 1 and live[0]["game_id"] is None and live[0]["home_pts"] is None

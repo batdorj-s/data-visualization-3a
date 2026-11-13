@@ -182,6 +182,20 @@ def validate_ppg(players_season: pd.DataFrame, player_games: pd.DataFrame, tol: 
     return out
 
 
+def check_score_consistency(games: pd.DataFrame, team_games: pd.DataFrame) -> pd.DataFrame:
+    """Гарчгийн (албан ёсны) оноо, box score-ийн нийлбэр, quarter-уудын нийлбэрийг тулгана (C13)."""
+    box = team_games.pivot_table(index="game_id", columns="side", values="PTS", aggfunc="sum")
+    out = games[["game_id", "home_pts", "away_pts"]].set_index("game_id").join(
+        box.rename(columns={"home": "box_home", "away": "box_away"}))
+    for side in ("home", "away"):
+        out[f"q_{side}"] = games.set_index("game_id")[f"quarters_{side}"].astype(str).map(
+            lambda q: sum(int(x) for x in q.split("|") if x.strip().lstrip("-").isdigit()))
+    out["title_vs_box"] = (out.home_pts != out.box_home) | (out.away_pts != out.box_away)
+    out["title_vs_quarters"] = (out.home_pts != out.q_home) | (out.away_pts != out.q_away)
+    out["winner_differs"] = (out.home_pts > out.away_pts) != (out.box_home > out.box_away)
+    return out[out.title_vs_box | out.title_vs_quarters].reset_index()
+
+
 def stage_to_phase(stage: str) -> str:
     if stage not in PHASES:
         raise ValueError(f"Мэдэгдэхгүй үе шат: {stage!r}")
@@ -280,6 +294,10 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     tg = split_made_att(tg, log=log)
     tg = tg.merge(g[["game_id", "date", "phase"]], on="game_id", how="left")
     tg = dedupe(tg, ["game_id", "team_key"], log)
+    scores = check_score_consistency(g, tg)
+    log.add("C13", "Гарчгийн оноо, box score, quarter-уудын нийлбэрийг тулгав (албан ёсны үр дүн = гарчиг)",
+            len(g), len(g), f"гарчиг≠box: {int(scores.title_vs_box.sum())}, гарчиг≠quarter: "
+            f"{int(scores.title_vs_quarters.sum())}, ялагч өөрчлөгдөх: {int(scores.winner_differs.sum())}")
 
     # players_season + ids
     ps = pd.read_csv(raw_dir / "players_season_raw.csv")
@@ -366,6 +384,7 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
     missing.to_csv(reports_dir / "missing.csv", index=False)
     matches.to_csv(reports_dir / "name_matches.csv", index=False)
     validation.to_csv(reports_dir / "ppg_validation.csv", index=False)
+    scores.to_csv(reports_dir / "score_mismatches.csv", index=False)
 
     from src.features import add_all_features
 

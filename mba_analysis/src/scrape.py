@@ -44,10 +44,12 @@ def scrape_all(raw_dir: Path, fetcher: Fetcher) -> dict[str, int]:
     raw_dir.mkdir(parents=True, exist_ok=True)
     counts: dict[str, int] = {"missing_games": 0, "missing_profiles": 0}
 
+    current = max(SEASONS)  # явагдаж буй улирлын хуудсуудыг шинэчилнэ; дууссан тоглолтын хуудас өөрчлөгдөхгүй
     schedule = []
     for season, (sid, months) in SEASONS.items():
         for month in months:
-            for row in parse_schedule(fetcher.get(schedule_url(sid, month)), month):
+            page = fetcher.get(schedule_url(sid, month), refresh=season == current)
+            for row in parse_schedule(page, month):
                 schedule.append({"season": season, **row})
     sched_df = pd.DataFrame(schedule)
     counts["schedule"] = _write(sched_df, raw_dir / "schedule.csv")
@@ -86,7 +88,7 @@ def scrape_all(raw_dir: Path, fetcher: Fetcher) -> dict[str, int]:
     counts["missing_stats"] = 0
     for season, (sid, _) in SEASONS.items():
         try:
-            page = fetcher.get(stats_url(sid))
+            page = fetcher.get(stats_url(sid), refresh=season == current)
         except CacheMiss:
             counts["missing_stats"] += 1
             continue

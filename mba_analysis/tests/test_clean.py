@@ -175,3 +175,16 @@ def test_attach_totals_two_season_rows_stay_per_team():
     out = attach_totals(ps, pg).set_index("team_key")
     assert out.loc["a", "PTS_total"] == 10 and out.loc["b", "PTS_total"] == 20
     assert out.GP_games.tolist() == [1, 1]
+
+
+def test_check_score_consistency_flags_mismatches():
+    from src.clean import check_score_consistency
+    games = pd.DataFrame({"game_id": [1, 2, 3], "home_pts": [80, 90, 70], "away_pts": [70, 85, 60],
+                          "quarters_home": ["20|20|20|20", "20|20|20|20", "20|20|20|10"],
+                          "quarters_away": ["20|20|20|10", "20|20|20|25", "15|15|15|15"]})
+    tg = pd.DataFrame({"game_id": [1, 1, 2, 2, 3, 3], "side": ["home", "away"] * 3,
+                       "PTS": [80, 70, 88, 85, 70, 60]})
+    out = check_score_consistency(games, tg).set_index("game_id")
+    assert list(out.index) == [2]
+    assert out.loc[2, "title_vs_box"] and out.loc[2, "title_vs_quarters"]
+    assert out.loc[2, "box_home"] == 88

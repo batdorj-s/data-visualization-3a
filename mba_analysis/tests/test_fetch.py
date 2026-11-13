@@ -67,3 +67,18 @@ def test_refuses_disallowed_hosts(tmp_path, calls, url):
     with pytest.raises(ValueError):
         Fetcher(tmp_path).get(url)
     assert calls["get"] == []
+
+
+def test_refresh_refetches_cached_page(tmp_path, calls):
+    f = Fetcher(tmp_path)
+    url = "https://mongolia.basketball/en/competitions/league/schedule?month=2026-11"
+    f.get(url)
+    f.get(url, refresh=True)
+    assert len(calls["get"]) == 2
+
+
+def test_refresh_offline_uses_cache(tmp_path, calls):
+    url = "https://mongolia.basketball/en/stats"
+    Fetcher(tmp_path).get(url)
+    assert Fetcher(tmp_path, offline=True).get(url, refresh=True).startswith("<html>")
+    assert len(calls["get"]) == 1
