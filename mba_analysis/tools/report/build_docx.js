@@ -8,7 +8,7 @@ const {
 
 const [, , dataPath, outPath] = process.argv;
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-const ROOT = data.root;
+const ROOT = path.resolve(path.dirname(dataPath), ".."); // report_data.json нь mba_analysis/report/ дотор
 const FONT = "Arial";
 const CONTENT_DXA = 11906 - 2 * 1134; // A4, 2 см захтай
 const HEADER_FILL = "0072B2";

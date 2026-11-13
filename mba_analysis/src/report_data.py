@@ -261,7 +261,7 @@ def build_report_data(root: Path) -> dict:
     ]
     hyp_records = hyp.astype(object).where(hyp.notna(), None).to_dict(orient="records")
     return {"kpi": kpi, "hypotheses": hyp_records, "sections": sections, "slides": slides,
-            "draft_label": DRAFT_LABEL, "root": str(root)}
+            "draft_label": DRAFT_LABEL}
 
 
 if __name__ == "__main__":

@@ -56,3 +56,24 @@ def test_quantile_dots():
     colors = list(fig.data[0].marker.color)
     assert len(colors) == 20
     assert colors.count(A_COLOR) == 12
+
+
+def test_highlight_team_drives_overview_fan():
+    at = run(None, highlight_team="SG Apes")
+    at.session_state["highlight_team"] = "BCH Knights"
+    at.run()
+    fan = next(s for s in at.selectbox if s.label == "Баг (fan chart)")
+    assert fan.value == "BCH Knights"
+
+
+def test_scatter_selection_updates_card():
+    sys.path.insert(0, str(DASH))
+    from data_access import apply_selection
+    state = {"card_player": "a"}
+    assert apply_selection(state, ["b", "c"]) is True
+    assert state["card_player"] == "b"
+    state["card_player"] = "z"  # хэрэглэгч картаа гараар сольсон
+    assert apply_selection(state, ["b", "c"]) is False  # ижил сонголт картыг буцааж дарахгүй
+    assert state["card_player"] == "z"
+    assert apply_selection(state, []) is False
+    assert apply_selection(state, ["d"]) is True and state["card_player"] == "d"

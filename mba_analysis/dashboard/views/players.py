@@ -1,6 +1,6 @@
 import streamlit as st
 
-from data_access import apply, current_filters, empty_notice, load
+from data_access import apply, apply_selection, current_filters, empty_notice, load
 from plots import LABELS, px_dot_ci, px_funnel, px_scatter
 
 f = current_filters()
@@ -23,8 +23,9 @@ def explorer():
                             on_select="rerun", selection_mode=("points", "box", "lasso"), key="scatter")
     selected = [p["customdata"][0] for p in (event.selection.points if event and event.selection else [])
                 if p.get("customdata")]
+    if apply_selection(st.session_state, selected):
+        st.rerun(scope="app")
     if selected:
-        st.session_state["selected_player"] = selected[0]
         if len(selected) > 1:
             st.dataframe(players[players.player_id.isin(selected)][["player_name", "team", "position", "GP", "PPG",
                                                                     "RPG", "APG", "ts_pct"]],
@@ -33,13 +34,12 @@ def explorer():
 
 @st.fragment
 def player_card():
-    pid = st.session_state.get("selected_player")
     options = players.sort_values("PPG", ascending=False)
-    ids = options.player_id.tolist()
-    idx = ids.index(pid) if pid in ids else 0
+    ids = list(dict.fromkeys(options.player_id))
+    if st.session_state.get("card_player") not in ids:
+        st.session_state.pop("card_player", None)
     names = options.drop_duplicates("player_id").set_index("player_id").player_name
-    pid = st.selectbox("Тоглогчийн карт", list(dict.fromkeys(ids)), index=list(dict.fromkeys(ids)).index(ids[idx]),
-                       key="card_player", format_func=lambda i: names.get(i, i))
+    pid = st.selectbox("Тоглогчийн карт", ids, key="card_player", format_func=lambda i: names.get(i, i))
     row = options[options.player_id == pid].iloc[0]
     ci = load("player_ci")
     ci = ci[(ci.player_id == pid) & (ci.season == f.season)].set_index("metric")

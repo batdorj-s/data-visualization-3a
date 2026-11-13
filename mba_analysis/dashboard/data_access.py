@@ -78,6 +78,15 @@ def apply(df: pd.DataFrame, f: Filters) -> pd.DataFrame:
     return out[out.GP >= f.min_gp]
 
 
+def apply_selection(state, selected_ids: list) -> bool:
+    """Scatter-ийн ШИНЭ сонголтыг тоглогчийн карт руу дамжуулна. Шинэчилсэн бол True (апп-ыг дахин ажиллуулна)."""
+    if not selected_ids or list(selected_ids) == state.get("_last_selection"):
+        return False
+    state["_last_selection"] = list(selected_ids)
+    state["card_player"] = selected_ids[0]
+    return True
+
+
 def empty_notice(df: pd.DataFrame) -> bool:
     if df is None or len(df) == 0:
         st.info(EMPTY_MSG)

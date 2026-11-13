@@ -24,7 +24,7 @@ def standings():
 def team_pareto():
     teams = sorted(tg.team.unique())
     default = f.highlight_team if f.highlight_team in teams else teams[0]
-    team = st.selectbox("Багийн Pareto", teams, index=teams.index(default), key="team_pareto_team")
+    team = st.selectbox("Багийн Pareto", teams, index=teams.index(default), key=f"team_pareto_team::{f.highlight_team}")
     pt = load("pareto_team")
     pt = pt[(pt.season == f.season) & (pt.team_key == team_key_of(team))]
     st.plotly_chart(px_pareto(pt, False, f"{team}: багийн оноо цөөн тоглогчоос хэр хамаардаг вэ"),

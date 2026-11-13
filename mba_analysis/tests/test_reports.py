@@ -88,3 +88,18 @@ def test_report_narrative_numbers_come_from_data(data):
     timing = pd.read_csv(ROOT / "reports" / "dashboard_timing.csv").set_index("metric").value
     assert f"{timing['filter_update_median_ms']:.0f} мс" in text
     assert "~32%" not in text and "80/20" not in text
+
+
+def test_report_data_has_no_absolute_paths(data):
+    text = json.dumps(data, ensure_ascii=False)
+    assert "/Users/" not in text and "root" not in data
+
+
+def test_pptx_builds_without_skill_theme_script(tmp_path, data):
+    import os
+    (ROOT / "report" / "report_data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / "t.pptx"
+    env = {**os.environ, "PPTX_SKILL_DIR": str(tmp_path / "missing")}
+    subprocess.run(["node", str(TOOLS / "build_pptx.js"), str(ROOT / "report" / "report_data.json"), str(out)],
+                   check=True, cwd=TOOLS, capture_output=True, env=env)
+    assert out.exists() and out.stat().st_size > 10_000

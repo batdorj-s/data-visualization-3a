@@ -10,7 +10,7 @@ const SKILL = process.env.PPTX_SKILL_DIR ||
 
 const [, , dataPath, outPath] = process.argv;
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-const ROOT = data.root;
+const ROOT = path.resolve(path.dirname(dataPath), "..");
 
 const THEME = {
   name: "MBA Court",
@@ -128,7 +128,12 @@ data.slides.forEach((s, i) => {
 
 (async () => {
   await pres.writeFile({ fileName: outPath });
-  const { applyTheme } = require(path.join(SKILL, "scripts", "apply_theme.js"));
-  await applyTheme(outPath, THEME);
+  const themeScript = path.join(SKILL, "scripts", "apply_theme.js");
+  if (fs.existsSync(themeScript)) {
+    const { applyTheme } = require(themeScript);
+    await applyTheme(outPath, THEME);
+  } else {
+    console.warn("apply_theme.js олдсонгүй — theme-ийн өнгө Office-ийн стандарт хэвээр (PPTX_SKILL_DIR-ийг тохируулна уу)");
+  }
   console.log("wrote", outPath);
 })();
