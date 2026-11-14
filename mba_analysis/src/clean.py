@@ -376,8 +376,10 @@ def run_cleaning(raw_dir: Path = ROOT / "data" / "raw", out_dir: Path = ROOT / "
 
     shots, sst = clean_shots(pd.read_csv(raw_dir / "shots_raw.csv"), pg)
     log.add("C14", "Шидэлтийг тоглогчтой (тоглолт, тал, дугаар) холбож, байршлыг метр, бүс болгов", sst["shots"], sst["shots"],
-            f"холбогдоогүй {sst['unlinked']}; 2/3 оноо нь байршилтайгаа зөрсөн {sst['bad_location']} "
-            f"({sst['bad_location'] / sst['shots']:.1%}) — байршлын шинжилгээнээс хассан")
+            f"холбогдоогүй {sst['unlinked']}; байршил бүртгэгдээгүй {sst['unrecorded_games']} тоглолтын "
+            f"{sst['unrecorded_shots']} шидэлт (2 онооны бүх шидэлт сагснаас хол, тогтмол цэг дээр); бусад тоглолтод 2/3 оноо "
+            f"нь байршилтайгаа зөрсөн {sst['bad_location']} — нийт {(sst['unrecorded_shots'] + sst['bad_location']) / sst['shots']:.1%}-ийг "
+            f"байршлын шинжилгээнээс хассан (оносон эсэх, 2/3 оноо нь зөв тул бусад тооцоонд орно)")
     pbp, pst = clean_pbp(pd.read_csv(raw_dir / "pbp_raw.csv.gz"), pg, g)
     log.add("C15", "Play-by-play: цагийг секунд, онооны зөрүү, тоглогч, багтай болгов", pst["events"], pst["events"],
             f"тоглогчтой холбогдоогүй үйл явдал {pst['unlinked_players']}")

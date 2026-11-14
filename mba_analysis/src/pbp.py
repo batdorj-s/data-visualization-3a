@@ -10,6 +10,8 @@ PX_PER_M = 22.75
 HOOP = (1.575, 7.5)
 PERIOD_SEC = {1: 600, 2: 600, 3: 600, 4: 600}  # FIBA: 4 × 10 мин, нэмэлт цаг 5 мин
 OT_SEC = 300
+NEAR_M = 3.0
+MIN_NEAR_SHARE = 0.10
 ZONES = ["Сагсны доор", "Будсан талбай", "Дунд зай", "Булангийн 3", "Гадна 3"]
 
 
@@ -41,8 +43,16 @@ def clean_shots(shots: pd.DataFrame, pg: pd.DataFrame) -> tuple[pd.DataFrame, di
     s = pd.concat([s.reset_index(drop=True), shot_geometry(s.x, s.y)], axis=1)
     s["zone"] = shot_zone(s.court_x, s.court_y, s.dist, s.three.astype(bool))
     # 3 онооны шугам 6.75 м (булан 6.6 м): шугамаас эрс зөрсөн шидэлтийг байршлын шинжилгээнээс хасна
-    s["location_ok"] = ~((s.three & (s.dist < 6.3)) | (~s.three & (s.dist > 7.0)))
-    stats = {"shots": len(s), "unlinked": int(s.player_id.isna().sum()), "bad_location": int((~s.location_ok).sum())}
+    mismatch = (s.three & (s.dist < 6.3)) | (~s.three & (s.dist > 7.0))
+    # Зарим тоглолтод байршлыг бүртгээгүй: 2 онооны бүх шидэлт сагснаас хол, цөөн тогтмол цэг дээр байдаг.
+    # Хэвийн тоглолтод 2 онооны шидэлтийн 60%+ нь 3 м дотор байдаг тул 10%-иас бага бол бүртгэгдээгүй гэж үзнэ.
+    near = (~s.three & (s.dist <= NEAR_M)).groupby(s.game_id).sum() / (~s.three).groupby(s.game_id).sum().clip(lower=1)
+    unrecorded = set(near.index[near < MIN_NEAR_SHARE])
+    in_unrecorded = s.game_id.isin(unrecorded)
+    s["location_ok"] = ~mismatch & ~in_unrecorded
+    stats = {"shots": len(s), "unlinked": int(s.player_id.isna().sum()),
+             "bad_location": int((mismatch & ~in_unrecorded).sum()), "unrecorded_games": len(unrecorded),
+             "unrecorded_shots": int(in_unrecorded.sum())}
     return s.drop(columns=["player", "shot_player_id", "player_slug", "x", "y"]), stats
 
 

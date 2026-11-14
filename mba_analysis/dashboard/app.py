@@ -20,6 +20,7 @@ pages = {
         st.Page("views/players.py", title="Тоглогчид", icon=":material/person:"),
         st.Page("views/teams.py", title="Багууд", icon=":material/groups:"),
         st.Page("views/shots.py", title="Шидэлт ба тоглолтын явц", icon=":material/sports_basketball:"),
+        st.Page("views/insights.py", title="Олдворууд", icon=":material/lightbulb:"),
         st.Page("views/ml.py", title="Машин сургалт", icon=":material/model_training:"),
     ],
     "Тусламж": [

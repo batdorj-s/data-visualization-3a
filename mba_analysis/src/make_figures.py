@@ -16,6 +16,7 @@ from src.charts import comparison as C  # noqa: E402
 from src.charts import distribution as D  # noqa: E402
 from src.charts import geo_network as G  # noqa: E402
 from src.charts import ml as M  # noqa: E402
+from src.charts import insights as IN  # noqa: E402
 from src.charts import shots as SH  # noqa: E402
 from src.charts import relation as R  # noqa: E402
 from src.charts import summary as S  # noqa: E402
@@ -80,6 +81,26 @@ def _pbp_inputs(p: Path, r: Path, pg: pd.DataFrame) -> dict:
             "player_names": dict(zip(pg.player_id, pg.name.str.title())),
             "player_import": pg.groupby("player_id").is_import.max().to_dict(),
             "team_names": dict(zip(pg.team_key, pg.team))}
+
+
+def _insight(i: dict) -> dict:
+    """Нэмэлт олдворуудын хүснэгтийг нэг удаа тооцож кэшлэнэ (солилтоос бүрэлдэхүүн сэргээх нь хамгийн удаан)."""
+    if "_insight" not in i:
+        from src import insights as I
+
+        stints = I.lineup_stints(i["pbp"])
+        imp = i["player_import"]
+        ok = i["shots"][i["shots"].location_ok]
+        i["_insight"] = {
+            "ioc": I.imports_on_court(stints, imp, i["games"]), "coverage": I.lineup_coverage(stints),
+            "pts_share": I.import_points_by_period(i["pbp"], imp, i["games"]),
+            "lead": I.lead_safety(i["pbp"], i["games"]), "comebacks": I.comebacks(i["pbp"]),
+            "distance": I.distance_curve(i["shots"], n_boot=min(i["n_boot"], 1000)),
+            "league_pps": float((ok.made * (2 + ok.three)).mean()),
+            "assisted": I.assisted_share(i["shots"], i["assists"]), "ratings": I.team_ratings(i["tg"]),
+            "usage": I.usage_table(i["pg"]), "stability": I.season_stability(i["ps_all"]),
+        }
+    return i["_insight"]
 
 
 def _assist_network(i: dict):
@@ -154,6 +175,15 @@ FIGURE_SPECS: list[tuple[str, Callable[[dict], Any]]] = [
     ("F17_assist_network", _assist_network),
     ("F18_game_flow", lambda i: SH.fig_game_flow(i["pbp"], i["games"], i["inplay_params"])),
     ("U10_inplay_accuracy", lambda i: SH.fig_inplay_accuracy(i["inplay_minute"])),
+    ("F19_imports_on_court", lambda i: IN.fig_imports_on_court(_insight(i)["ioc"], _insight(i)["pts_share"],
+                                                               _insight(i)["coverage"])),
+    ("F20_lead_safety", lambda i: IN.fig_lead_safety(_insight(i)["lead"])),
+    ("F21_comebacks", lambda i: IN.fig_comebacks(_insight(i)["comebacks"])),
+    ("F22_distance_curve", lambda i: IN.fig_distance_curve(_insight(i)["distance"], _insight(i)["league_pps"])),
+    ("F23_assisted_share", lambda i: IN.fig_assisted_share(_insight(i)["assisted"])),
+    ("F24_off_def", lambda i: IN.fig_off_def(_insight(i)["ratings"])),
+    ("F25_usage_efficiency", lambda i: IN.fig_usage_efficiency(_insight(i)["usage"])),
+    ("U11_stability", lambda i: IN.fig_stability(_insight(i)["stability"])),
 ]
 
 

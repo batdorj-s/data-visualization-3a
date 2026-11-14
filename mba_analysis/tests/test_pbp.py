@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.pbp import ZONES, clean_pbp, link_assists, shot_geometry, shot_zone
+from src.pbp import ZONES, clean_pbp, clean_shots, link_assists, shot_geometry, shot_zone
 
 
 def test_geometry_folds_both_halves_to_left_hoop():
@@ -45,3 +45,19 @@ def test_link_assists_before_or_after_shot():
     out, stats = link_assists(e)
     assert list(zip(out.passer_id, out.scorer_id, out.three)) == [("P2", "P1", False), ("Q1", "Q2", True)]
     assert stats["share"] == pytest.approx(1.0)
+
+
+def test_clean_shots_flags_games_without_recorded_locations():
+    hoop = (round(1.575 * 22.75), 175)
+    far = (round(5.5 * 22.75), 60)  # сагснаас ~6 м: бүртгэгдээгүй тоглолтын тогтмол цэг шиг
+    rows = []
+    for gid, spots in ((1, [hoop] * 8 + [far] * 2), (2, [far] * 10)):
+        for i, (x, y) in enumerate(spots):
+            rows.append({"game_id": gid, "seq": i, "side": "home", "shot_player_id": "1", "player": "A", "number": 7,
+                         "period": 1, "made": True, "three": False, "x": x, "y": y})
+    pg = pd.DataFrame({"game_id": [1, 2], "side": ["home"] * 2, "number": [7, 7], "player_id": ["a"] * 2,
+                       "player_slug": ["a"] * 2, "team_key": ["t"] * 2, "is_import": [False] * 2})
+    out, stats = clean_shots(pd.DataFrame(rows), pg)
+    assert out[out.game_id == 1].location_ok.all()
+    assert not out[out.game_id == 2].location_ok.any()
+    assert stats["unrecorded_games"] == 1 and stats["unrecorded_shots"] == 10 and stats["bad_location"] == 0

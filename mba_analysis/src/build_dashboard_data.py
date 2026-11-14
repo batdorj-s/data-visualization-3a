@@ -96,7 +96,25 @@ def _pbp_tables(p: Path, r: Path, games: pd.DataFrame, pg: pd.DataFrame, metrics
     game_list = games[["game_id", "season", "phase", "date", "home_team", "away_team", "home_pts", "away_pts",
                        "elo_pre_home", "elo_pre_away"]].merge(lc, left_on="game_id", right_index=True)
     params = metrics["inplay"]["params"]
+    from src import insights as I
+
+    imp = pg.groupby("player_id").is_import.max().to_dict()
+    stints = I.lineup_stints(pbp)
+    ioc = I.imports_on_court(stints, imp, games).merge(I.import_points_by_period(pbp, imp, games), on=["season", "period"])
+    ps_all = pd.read_csv(p / "players_season.csv")
+    insight = {
+        "ins_imports": ioc.assign(coverage=I.lineup_coverage(stints)),
+        "ins_lead": I.lead_safety(pbp, games),
+        "ins_comebacks": I.comebacks(pbp).merge(games[["game_id", "season", "date", "home_team", "away_team", "home_pts",
+                                                       "away_pts"]], on="game_id"),
+        "ins_distance": I.distance_curve(pd.read_csv(p / "shots.csv")),
+        "ins_assisted": I.assisted_share(pd.read_csv(p / "shots.csv"), pd.read_csv(p / "assists.csv")).astype({"zone": str}),
+        "ins_ratings": I.team_ratings(pd.read_csv(p / "team_games.csv")),
+        "ins_usage": I.usage_table(pg),
+        "ins_stability": I.season_stability(ps_all),
+    }
     return {
+        **insight,
         "shots": shots, "assists": assists, "game_flow": flow, "game_list": game_list,
         "inplay_minute": pd.read_csv(r / "inplay_minute.csv"),
         "inplay_params": pd.DataFrame([{"intercept": params["intercept"], **params["coef"]}]),

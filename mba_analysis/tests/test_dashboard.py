@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 DASH = Path(__file__).resolve().parents[1] / "dashboard"
 APP = str(DASH / "app.py")
 PAGES = ["views/overview.py", "views/players.py", "views/teams.py", "views/ml.py", "views/quality.py",
-         "views/about.py", "views/glossary.py", "views/shots.py"]
+         "views/about.py", "views/glossary.py", "views/shots.py", "views/insights.py"]
 EMPTY_MSG = "Сонгосон шүүлтүүрт тохирох өгөгдөл алга"
 
 
@@ -105,3 +105,11 @@ def test_shots_page_follows_highlight_team():
     assert not at.exception, [e.value for e in at.exception]
     team = next(s for s in at.selectbox if s.label == "Баг")
     assert team.value == "BCH Knights"
+
+
+def test_insights_page_ci_toggle_and_empty_usage():
+    def error_bars(at):
+        return sum(1 for s in _plot_specs(at) for t in s["data"] if t.get("error_y") or t.get("error_x"))
+    assert error_bars(run("views/insights.py", show_ci=True)) > error_bars(run("views/insights.py", show_ci=False)) == 0
+    at = run("views/insights.py", teams=["Erdenet Miners"], import_status="Гадаад", season="2026-2027")
+    assert not at.exception, [e.value for e in at.exception]
