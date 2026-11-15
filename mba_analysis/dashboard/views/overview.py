@@ -36,9 +36,10 @@ def kpis():
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Тоглолт", f"{len(g)}", help="Үндсэн шат ба плей-офф", border=True)
     c2.metric(f"Тоглогч ({f.min_gp}+ тоглолт)", f"{len(p)}", border=True)
-    c3.metric("Гадаадын онооны хувь", f"{share:.0%}", border=True,
-              help=f"95% магадлалтай хүрээ {lo:.0%}–{hi:.0%}" if f.show_ci else None)
-    c4.metric("Тоглолтын нийт оноо", f"{(g.home_pts + g.away_pts).mean():.0f}", border=True,
+    c3.metric("Гадаадын оноо", f"{share:.0%}", border=True,
+              help="Лигийн нийт онооны хэдэн хувийг гадаад тоглогч авсан"
+                   + (f" (95% магадлалтай хүрээ {lo:.0%}–{hi:.0%})" if f.show_ci else ""))
+    c4.metric("Тоглолтын оноо", f"{(g.home_pts + g.away_pts).mean():.0f}", border=True,
               help="Нэг тоглолтод хоёр баг нийлээд дунджаар авсан оноо")
 
 

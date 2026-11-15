@@ -17,8 +17,12 @@ LABELS = {**CHART_LABELS, "EFF": "Үр ашгийн оноо (EFF)"}
 
 
 def _layout(fig: go.Figure, title: str, height: int = 420, **kw) -> go.Figure:
+    margin = kw.pop("margin", dict(l=10, r=44, t=60, b=10))
     fig.update_layout(title=dict(text=title, x=0, font=dict(size=17, color="#0F172A")), font=FONT, height=height,
-                      margin=dict(l=10, r=10, t=60, b=10), plot_bgcolor="white", paper_bgcolor="white",
+                      margin=margin, plot_bgcolor="white", paper_bgcolor="white",
+                      # хэрэгслийн самбарыг баруун ирмэгт босоогоор: гарчиг, графикийн бичиг дээр гарахгүй
+                      modebar=dict(orientation="v", bgcolor="rgba(255,255,255,0.85)", color="#94A3B8",
+                                   activecolor="#1E40AF"),
                       hovermode="closest", hoverlabel=dict(font=dict(family=FONT["family"], size=14)),
                       legend=dict(orientation="h", y=-0.22), **kw)
     fig.update_xaxes(showgrid=True, gridcolor="#E2E8F0", zeroline=False, title_font=dict(size=14))
@@ -102,7 +106,7 @@ def px_pareto(df: pd.DataFrame, show_ci: bool, title: str) -> go.Figure:
     k = int(np.argmax(df.cum_share.to_numpy() >= 0.8)) + 1
     fig.add_hline(y=0.8, line_dash="dash", line_color=B_COLOR, secondary_y=True)
     fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Эхний {k} ({k / len(df):.0%}) = 80%", showarrow=True,
-                       font=dict(color=B_COLOR))
+                       font=dict(color=B_COLOR), ax=45, ay=35, bgcolor="rgba(255,255,255,0.9)")
     fig.update_yaxes(title="Оноо", rangemode="tozero", secondary_y=False)
     fig.update_yaxes(title="Нийлбэр хувь", tickformat=".0%", range=[0, 1.02], dtick=0.2, secondary_y=True, showgrid=False)
     fig.update_xaxes(title="Тоглогч (оноогоор эрэмбэлсэн)")
@@ -175,7 +179,7 @@ def px_four_factors(tg: pd.DataFrame, highlight: str | None = None) -> go.Figure
     reg = tg[tg.phase == "regular"]
     means = reg.groupby("team")[[f for f, _, _ in FACTORS]].mean()
     league = reg[[f for f, _, _ in FACTORS]].mean()
-    fig = make_subplots(rows=1, cols=4, subplot_titles=[f"{l} ({'их' if hb else 'бага'} нь сайн)" for _, l, hb in FACTORS],
+    fig = make_subplots(rows=1, cols=4, subplot_titles=[f"{l}<br>({'их' if hb else 'бага'} нь сайн)" for _, l, hb in FACTORS],
                         shared_yaxes=True)
     order = (means["efg"] - league["efg"]).sort_values().index
     for i, (f, lbl, hb) in enumerate(FACTORS, 1):
@@ -185,7 +189,9 @@ def px_four_factors(tg: pd.DataFrame, highlight: str | None = None) -> go.Figure
         fig.add_trace(go.Bar(x=dev, y=dev.index, orientation="h", marker_color=colors, showlegend=False,
                              hovertemplate="%{y}: дунджаас %{x:+.1f}<extra>" + lbl + "</extra>"), row=1, col=i)
         fig.update_xaxes(title="Дунджаас зөрүү", row=1, col=i)
-    return _layout(fig, "Ялалтын 4 хүчин зүйл: баг бүр лигийн дунджаас хэр сайн/сул вэ", height=470)
+    fig.update_annotations(font=dict(size=13))
+    return _layout(fig, "Ялалтын 4 хүчин зүйл: баг бүр лигийн дунджаас хэр сайн/сул вэ", height=500,
+                   margin=dict(l=10, r=44, t=95, b=10))
 
 
 def px_elo(games: pd.DataFrame, highlight: str | None = None) -> go.Figure:
@@ -288,7 +294,8 @@ def px_zone_bars(zones: pd.DataFrame, league_pps: float) -> go.Figure:
                            hovertemplate="%{y}: шидэлт бүрт %{x:.2f} оноо<br>%{customdata[0]} шидэлт "
                                          "(%{customdata[1]:.0%})<extra></extra>"))
     fig.add_vline(x=league_pps, line_dash="dash", line_color=NEUTRAL,
-                  annotation_text=f"Лигийн дундаж {league_pps:.2f}", annotation_position="top")
+                  annotation_text=f"дундаж {league_pps:.2f}", annotation_position="bottom right",
+                  annotation_font=dict(size=11, color="#475569"))
     fig.update_xaxes(title="Шидэлт бүрт ногдох оноо", range=[0, max(1.6, z.pps.max() + 0.25)])
     return _layout(fig, "Бүс бүрийн үр ашиг", height=330, showlegend=False)
 
@@ -521,13 +528,15 @@ def px_import_hypotheses(h: pd.DataFrame, show_ci: bool) -> go.Figure:
         fig.update_xaxes(range=[-span, span], tickformat="+.0%" if pct else None, row=k, col=1)
         fig.update_yaxes(visible=False, row=k, col=1)
     fig.update_annotations(font=dict(size=13), x=0, xanchor="left")
-    return _layout(fig, "Гадаад тоглогчийн 4 таамаглал: датаар шалгасан дүн", height=110 * len(h) + 90)
+    return _layout(fig, "", height=110 * len(h) + 50, margin=dict(l=10, r=44, t=40, b=10))
 
 
 def px_import_pipeline(bg: pd.DataFrame) -> go.Figure:
     f = bg[bg.status == "олдсон"]
     lv = f.level.value_counts().reindex(LEVEL_ORDER[:-1], fill_value=0)
-    last = f.last_league.dropna().value_counts().head(8)
+    from src.charts.imports import LEAGUE_MN
+
+    last = f.last_league.dropna().map(lambda x: LEAGUE_MN.get(x, x)).value_counts().head(8)
     fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.22,
                         subplot_titles=["Өмнө тоглосон хамгийн өндөр түвшин", "Ирэхийн өмнөх сүүлийн лиг"])
     fig.add_trace(go.Bar(x=lv.to_numpy(), y=lv.index, orientation="h", marker_color=[LEVEL_HEX[l] for l in lv.index],
@@ -537,32 +546,37 @@ def px_import_pipeline(bg: pd.DataFrame) -> go.Figure:
                          marker_color=[B_COLOR] + [NEUTRAL] * (len(last) - 1), text=last.to_numpy(), textposition="outside",
                          showlegend=False, hovertemplate="%{y}: %{x} тоглогч<extra></extra>"), row=1, col=2)
     fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(title="Тоглогчийн тоо")
-    return _layout(fig, "Гадаад тоглогчид хаанаас ирж байна", height=400)
+    fig.update_xaxes(title="Тоглогчийн тоо", range=[0, lv.max() * 1.18], row=1, col=1)
+    fig.update_xaxes(title="Тоглогчийн тоо", range=[0, last.max() * 1.18], row=1, col=2)
+    fig.update_traces(cliponaxis=False)
+    return _layout(fig, "", height=400, margin=dict(l=10, r=44, t=40, b=10))
 
 
 def px_import_retention(cmp: pd.DataFrame, show_ci: bool) -> go.Figure:
-    fig = make_subplots(rows=1, cols=len(cmp), subplot_titles=list(cmp.label), horizontal_spacing=0.06)
+    """Үзүүлэлт бүр нэг мөр (нарийн баганад ч уншигдана); мөр бүрт өөрийн тэнхлэг, дүгнэлт гарчигт нь."""
+    titles = [f"{r.label} — {'баттай ялгаатай' if r.clear else 'ялгаа баттай биш'}" for r in cmp.itertuples()]
+    fig = make_subplots(rows=len(cmp), cols=1, subplot_titles=titles, vertical_spacing=0.14)
     for k, r in enumerate(cmp.itertuples(), 1):
         pct = r.metric in ("usage", "ts_pct")
         fmt = ".0%" if pct else ".1f"
         for name, med, lo, hi, color in (("Явсан", r.med_no, r.lo_no, r.hi_no, NEUTRAL),
                                          ("Үлдсэн", r.med_yes, r.lo_yes, r.hi_yes, B_COLOR)):
-            err = dict(type="data", symmetric=False, array=[hi - med], arrayminus=[med - lo], thickness=3, color=color) if show_ci else None
-            fig.add_trace(go.Scatter(x=[med], y=[name], mode="markers", marker=dict(color=color, size=12), error_x=err,
-                                     showlegend=False, hovertemplate=f"{name}: голч %{{x:{fmt}}}<extra>{r.label}</extra>"),
-                          row=1, col=k)
-        fig.update_xaxes(tickformat=".0%" if pct else None, row=1, col=k,
-                         title=dict(text="баттай ялгаатай" if r.clear else "ялгаа баттай биш", font=dict(size=11)))
-        if k > 1:
-            fig.update_yaxes(showticklabels=False, row=1, col=k)
-    fig.update_annotations(font=dict(size=12))
-    return _layout(fig, "Дараа улиралд үлдсэн ба явсан гадаад тоглогч", height=300)
+            err = dict(type="data", symmetric=False, array=[hi - med], arrayminus=[med - lo], thickness=3,
+                       color=color) if show_ci else None
+            fig.add_trace(go.Scatter(x=[med], y=[f"{name}: {format(med, fmt)}"], mode="markers",
+                                     marker=dict(color=color, size=12), error_x=err, showlegend=False,
+                                     hovertemplate=f"{name}: голч %{{x:{fmt}}} (хүрээ {lo:{fmt}}–{hi:{fmt}})"
+                                                   f"<extra>{r.label}</extra>"), row=k, col=1)
+        fig.update_xaxes(tickformat=".0%" if pct else None, nticks=6, row=k, col=1)
+        fig.update_yaxes(range=[-0.6, 1.6], row=k, col=1)
+    fig.update_annotations(font=dict(size=13), x=0, xanchor="left")
+    return _layout(fig, "", height=100 * len(cmp) + 40, margin=dict(l=10, r=44, t=30, b=10))
 
 
 def px_import_position(pm: pd.DataFrame, conc: pd.DataFrame) -> go.Figure:
     order = ["PG", "SG", "SF", "PF", "C"]
-    names = {"PG": "Тоглуулагч (PG)", "SG": "Шидэгч хамг. (SG)", "SF": "Жижиг довт. (SF)", "PF": "Хүчит довт. (PF)", "C": "Төвийн (C)"}
+    names = {"PG": "Тоглуулагч<br>хамгаалагч (PG)", "SG": "Шидэгч<br>хамгаалагч (SG)", "SF": "Жижиг<br>довтлогч (SF)",
+             "PF": "Хүчит<br>довтлогч (PF)", "C": "Төвийн<br>тоглогч (C)"}
     fig = go.Figure()
     colors = ["#FDCC8A", B_COLOR]
     for k, season in enumerate(sorted(pm.season.unique())):
@@ -572,10 +586,13 @@ def px_import_position(pm: pd.DataFrame, conc: pd.DataFrame) -> go.Figure:
                              text=[f"{v:.0%}" for v in d.share], textposition="outside",
                              hovertemplate="%{x}: минутын %{y:.0%} нь гадаад<extra>" + lab + "</extra>"))
         ov = conc.set_index("season").loc[season, "overall_share"]
-        fig.add_hline(y=ov, line_dash="dash", line_color=colors[k], annotation_text=f"{lab} нийт {ov:.0%}",
-                      annotation_position="right")
-    fig.update_yaxes(title="Минутын гадаад хувь", tickformat=".0%", range=[0, 0.85])
-    return _layout(fig, "Аль байрлалд гадаад тоглогч түлхүү тоглодог вэ", height=420, barmode="group")
+        # дундаж шугамыг тайлбар (legend) дотор нэрлэнэ — графикийн дотор бичиг давхцахгүй
+        fig.add_trace(go.Scatter(x=[names[order[0]], names[order[-1]]], y=[ov, ov], mode="lines",
+                                 line=dict(color=colors[k], dash="dash", width=2), name=f"{lab}: бүх байрлалын дундаж {ov:.0%}",
+                                 hoverinfo="skip"))
+    fig.update_yaxes(title="Минутын гадаад хувь", tickformat=".0%", range=[0, 0.8])
+    fig.update_xaxes(tickangle=0)
+    return _layout(fig, "", height=440, barmode="group", margin=dict(l=10, r=44, t=30, b=10))
 
 
 def px_import_age(im: pd.DataFrame) -> go.Figure:

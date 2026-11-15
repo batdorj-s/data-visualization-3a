@@ -46,7 +46,7 @@ def team_pareto():
                         key=f"team_pareto_team::{f.highlight_team}")
     pt = load("pareto_team")
     pt = pt[(pt.season == f.season) & (pt.team_key == team_key_of(team))]
-    st.plotly_chart(px_pareto(pt, False, f"{team}: оноо цөөн тоглогчоос хэр хамаардаг вэ"), width="stretch")
+    st.plotly_chart(px_pareto(pt, False, f"{team}: онооны хуваарь"), width="stretch")
     chart_note("Багана = тоглогчийн улирлын нийт оноо. Хар шугам 80%-д цөөн тоглогчоор хүрвэл баг цөөн од тоглогчоос "
                "хамааралтай — тэр тоглогч гэмтвэл эрсдэлтэй.", f"тоглолт бүрийн оноо, {season_txt}, {len(pt)} тоглогч.")
 
