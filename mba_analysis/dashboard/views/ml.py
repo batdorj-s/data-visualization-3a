@@ -27,7 +27,7 @@ def cluster_explorer():
     cl = cl_all[cl_all.season == f.season] if (cl_all.season == f.season).any() else cl_all
     names = cl.drop_duplicates("player_id").set_index("player_id").player_name
     pid = st.selectbox("Тоглогч", cl.sort_values("player_name").player_id.drop_duplicates(),
-                       format_func=lambda i: names.get(i, i), key="ml_player",
+                       format_func=lambda i: str(names.get(i, i)), key="ml_player",
                        help="Нэрийг бичиж хайна. Од тэмдэг = сонгосон тоглогч")
     me = cl[cl.player_id == pid].iloc[0]
     d = np.hypot(cl.pc1 - me.pc1, cl.pc2 - me.pc2)

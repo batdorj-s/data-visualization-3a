@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="453.543307pt" height="230.371204pt" viewBox="0 0 453.543307 230.371204" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 230.371204 
+L 453.543307 230.371204 
+L 453.543307 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 46.144232 158.204519 
+L 114.391851 158.204519 
+L 114.391851 110.206224 
+L 46.144232 110.206224 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 51.991847 158.204519 
+L 51.991847 110.206224 
+" clip-path="url(#pfe41a2e702)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="mf986387a4b" d="M 0 0 
+L 0 3.5 
+" style="stroke: #4d4d4d; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mf986387a4b" x="51.991847" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="51.991847" y="170.300711" transform="rotate(-0 51.991847 170.300711)">10</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 91.003584 158.204519 
+L 91.003584 110.206224 
+" clip-path="url(#pfe41a2e702)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#mf986387a4b" x="91.003584" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="91.003584" y="170.300711" transform="rotate(-0 91.003584 170.300711)">20</text>
+     </g>
+    </g>
+    <g id="text_3">
+     <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #6b6b6b" x="80.268042" y="181.271121" transform="rotate(-0 80.268042 181.271121)">ялгаа баттай биш</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_5">
+      <defs>
+       <path id="m3fba8f0df0" d="M 0 0 
+L -3.5 0 
+" style="stroke: #4d4d4d; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="46.144232" y="146.776354" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="39.144232" y="149.87047" transform="rotate(-0 39.144232 149.87047)">Явсан</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="46.144232" y="123.920023" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="39.144232" y="127.014139" transform="rotate(-0 39.144232 127.014139)">Үлдсэн</text>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_1">
+    <path d="M 49.246396 146.776354 
+L 70.522422 146.776354 
+" clip-path="url(#pfe41a2e702)" style="fill: none; stroke: #9e9e9e; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="LineCollection_2">
+    <path d="M 56.834179 123.920023 
+L 111.289687 123.920023 
+" clip-path="url(#pfe41a2e702)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 46.144232 158.204519 
+L 46.144232 110.206224 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 46.144232 158.204519 
+L 114.391851 158.204519 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m68b553649f" d="M 0 3.162278 
+C 0.838646 3.162278 1.643056 2.82908 2.236068 2.236068 
+C 2.82908 1.643056 3.162278 0.838646 3.162278 0 
+C 3.162278 -0.838646 2.82908 -1.643056 2.236068 -2.236068 
+C 1.643056 -2.82908 0.838646 -3.162278 0 -3.162278 
+C -0.838646 -3.162278 -1.643056 -2.82908 -2.236068 -2.236068 
+C -2.82908 -1.643056 -3.162278 -0.838646 -3.162278 0 
+C -3.162278 0.838646 -2.82908 1.643056 -2.236068 2.236068 
+C -1.643056 2.82908 -0.838646 3.162278 0 3.162278 
+z
+" style="stroke: #9e9e9e"/>
+    </defs>
+    <g clip-path="url(#pfe41a2e702)">
+     <use xlink:href="#m68b553649f" x="60.184312" y="146.776354" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+    </g>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #9e9e9e" x="60.184312" y="141.747961" transform="rotate(-0 60.184312 141.747961)">12.1</text>
+   </g>
+   <g id="PathCollection_2">
+    <defs>
+     <path id="mfad8807290" d="M 0 3.162278 
+C 0.838646 3.162278 1.643056 2.82908 2.236068 2.236068 
+C 2.82908 1.643056 3.162278 0.838646 3.162278 0 
+C 3.162278 -0.838646 2.82908 -1.643056 2.236068 -2.236068 
+C 1.643056 -2.82908 0.838646 -3.162278 0 -3.162278 
+C -0.838646 -3.162278 -1.643056 -2.82908 -2.236068 -2.236068 
+C -2.82908 -1.643056 -3.162278 -0.838646 -3.162278 0 
+C -3.162278 0.838646 -2.82908 1.643056 -2.236068 2.236068 
+C -1.643056 2.82908 -0.838646 3.162278 0 3.162278 
+z
+" style="stroke: #d55e00"/>
+    </defs>
+    <g clip-path="url(#pfe41a2e702)">
+     <use xlink:href="#mfad8807290" x="88.467821" y="123.920023" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #d55e00" x="88.467821" y="118.89163" transform="rotate(-0 88.467821 118.89163)">19.4</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle" x="80.268042" y="104.206224" transform="rotate(-0 80.268042 104.206224)">Оноо / тоглолт</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_5">
+    <path d="M 128.150132 158.204519 
+L 196.397751 158.204519 
+L 196.397751 110.206224 
+L 128.150132 110.206224 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_3">
+     <g id="line2d_7">
+      <path d="M 150.527593 158.204519 
+L 150.527593 110.206224 
+" clip-path="url(#pf5d9201d32)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#mf986387a4b" x="150.527593" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="150.527593" y="170.300711" transform="rotate(-0 150.527593 170.300711)">25</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_9">
+      <path d="M 174.28759 158.204519 
+L 174.28759 110.206224 
+" clip-path="url(#pf5d9201d32)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#mf986387a4b" x="174.28759" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="174.28759" y="170.300711" transform="rotate(-0 174.28759 170.300711)">30</text>
+     </g>
+    </g>
+    <g id="text_11">
+     <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #6b6b6b" x="162.273941" y="181.271121" transform="rotate(-0 162.273941 181.271121)">ялгаа баттай биш</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_3">
+     <g id="line2d_11">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="128.150132" y="146.776354" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="128.150132" y="123.920023" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_3">
+    <path d="M 131.252296 146.776354 
+L 159.556392 146.776354 
+" clip-path="url(#pf5d9201d32)" style="fill: none; stroke: #9e9e9e; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="LineCollection_4">
+    <path d="M 134.845996 123.920023 
+L 193.295587 123.920023 
+" clip-path="url(#pf5d9201d32)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 128.150132 158.204519 
+L 128.150132 110.206224 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 128.150132 158.204519 
+L 196.397751 158.204519 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_3">
+    <g clip-path="url(#pf5d9201d32)">
+     <use xlink:href="#m68b553649f" x="149.339593" y="146.776354" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+    </g>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #9e9e9e" x="149.339593" y="141.747961" transform="rotate(-0 149.339593 141.747961)">24.8</text>
+   </g>
+   <g id="PathCollection_4">
+    <g clip-path="url(#pf5d9201d32)">
+     <use xlink:href="#mfad8807290" x="181.177989" y="123.920023" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #d55e00" x="181.177989" y="118.89163" transform="rotate(-0 181.177989 118.89163)">31.4</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle" x="162.273941" y="104.206224" transform="rotate(-0 162.273941 104.206224)">Минут / тоглолт</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_8">
+    <path d="M 210.156031 158.204519 
+L 278.403651 158.204519 
+L 278.403651 110.206224 
+L 210.156031 110.206224 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_5">
+    <g id="xtick_5">
+     <g id="line2d_13">
+      <path d="M 214.859324 158.204519 
+L 214.859324 110.206224 
+" clip-path="url(#p0eac334f23)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#mf986387a4b" x="214.859324" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="214.859324" y="170.300711" transform="rotate(-0 214.859324 170.300711)">20%</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_15">
+      <path d="M 257.341048 158.204519 
+L 257.341048 110.206224 
+" clip-path="url(#p0eac334f23)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#mf986387a4b" x="257.341048" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="257.341048" y="170.300711" transform="rotate(-0 257.341048 170.300711)">30%</text>
+     </g>
+    </g>
+    <g id="text_17">
+     <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #6b6b6b" x="244.279841" y="181.271121" transform="rotate(-0 244.279841 181.271121)">ялгаа баттай биш</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_6">
+    <g id="ytick_5">
+     <g id="line2d_17">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="210.156031" y="146.776354" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="210.156031" y="123.920023" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_5">
+    <path d="M 213.258196 146.776354 
+L 245.909757 146.776354 
+" clip-path="url(#p0eac334f23)" style="fill: none; stroke: #9e9e9e; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="LineCollection_6">
+    <path d="M 214.854868 123.920023 
+L 275.301486 123.920023 
+" clip-path="url(#p0eac334f23)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 210.156031 158.204519 
+L 210.156031 110.206224 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 210.156031 158.204519 
+L 278.403651 158.204519 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_5">
+    <g clip-path="url(#p0eac334f23)">
+     <use xlink:href="#m68b553649f" x="225.544028" y="146.776354" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+    </g>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #9e9e9e" x="225.544028" y="141.747961" transform="rotate(-0 225.544028 141.747961)">23%</text>
+   </g>
+   <g id="PathCollection_6">
+    <g clip-path="url(#p0eac334f23)">
+     <use xlink:href="#mfad8807290" x="247.815347" y="123.920023" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #d55e00" x="247.815347" y="118.89163" transform="rotate(-0 247.815347 118.89163)">28%</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle" x="244.279841" y="104.206224" transform="rotate(-0 244.279841 104.206224)">Довтолгооны ачаалал</text>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_11">
+    <path d="M 292.161931 158.204519 
+L 360.409551 158.204519 
+L 360.409551 110.206224 
+L 292.161931 110.206224 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_7">
+    <g id="xtick_7">
+     <g id="line2d_19">
+      <path d="M 300.903446 158.204519 
+L 300.903446 110.206224 
+" clip-path="url(#pbf09f2eedd)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#mf986387a4b" x="300.903446" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_21">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="300.903446" y="170.300711" transform="rotate(-0 300.903446 170.300711)">55%</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_21">
+      <path d="M 335.271565 158.204519 
+L 335.271565 110.206224 
+" clip-path="url(#pbf09f2eedd)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#mf986387a4b" x="335.271565" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_22">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="335.271565" y="170.300711" transform="rotate(-0 335.271565 170.300711)">60%</text>
+     </g>
+    </g>
+    <g id="text_23">
+     <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #6b6b6b" x="326.285741" y="181.271121" transform="rotate(-0 326.285741 181.271121)">ялгаа баттай биш</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_8">
+    <g id="ytick_7">
+     <g id="line2d_23">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="292.161931" y="146.776354" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_24">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="292.161931" y="123.920023" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_7">
+    <path d="M 295.264096 146.776354 
+L 330.314889 146.776354 
+" clip-path="url(#pbf09f2eedd)" style="fill: none; stroke: #9e9e9e; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="LineCollection_8">
+    <path d="M 308.931543 123.920023 
+L 357.307386 123.920023 
+" clip-path="url(#pbf09f2eedd)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 292.161931 158.204519 
+L 292.161931 110.206224 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 292.161931 158.204519 
+L 360.409551 158.204519 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_7">
+    <g clip-path="url(#pbf09f2eedd)">
+     <use xlink:href="#m68b553649f" x="317.238417" y="146.776354" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+    </g>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #9e9e9e" x="317.238417" y="141.747961" transform="rotate(-0 317.238417 141.747961)">57%</text>
+   </g>
+   <g id="PathCollection_8">
+    <g clip-path="url(#pbf09f2eedd)">
+     <use xlink:href="#mfad8807290" x="323.193427" y="123.920023" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #d55e00" x="323.193427" y="118.89163" transform="rotate(-0 323.193427 118.89163)">58%</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle" x="326.285741" y="104.206224" transform="rotate(-0 326.285741 104.206224)">Шидэлтийн оновч</text>
+   </g>
+  </g>
+  <g id="axes_5">
+   <g id="patch_14">
+    <path d="M 374.167831 158.204519 
+L 442.41545 158.204519 
+L 442.41545 110.206224 
+L 374.167831 110.206224 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_9">
+    <g id="xtick_9">
+     <g id="line2d_25">
+      <path d="M 390.564986 158.204519 
+L 390.564986 110.206224 
+" clip-path="url(#p28b0771309)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26">
+      <g>
+       <use xlink:href="#mf986387a4b" x="390.564986" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_27">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="390.564986" y="170.300711" transform="rotate(-0 390.564986 170.300711)">27.5</text>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_27">
+      <path d="M 412.723304 158.204519 
+L 412.723304 110.206224 
+" clip-path="url(#p28b0771309)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_28">
+      <g>
+       <use xlink:href="#mf986387a4b" x="412.723304" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_28">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="412.723304" y="170.300711" transform="rotate(-0 412.723304 170.300711)">30.0</text>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_29">
+      <path d="M 434.881622 158.204519 
+L 434.881622 110.206224 
+" clip-path="url(#p28b0771309)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_30">
+      <g>
+       <use xlink:href="#mf986387a4b" x="434.881622" y="158.204519" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_29">
+      <text style="font-size: 7px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="434.881622" y="170.300711" transform="rotate(-0 434.881622 170.300711)">32.5</text>
+     </g>
+    </g>
+    <g id="text_30">
+     <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #6b6b6b" x="408.291641" y="181.271121" transform="rotate(-0 408.291641 181.271121)">ялгаа баттай биш</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_10">
+    <g id="ytick_9">
+     <g id="line2d_31">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="374.167831" y="146.776354" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_32">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="374.167831" y="123.920023" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_9">
+    <path d="M 377.269995 146.776354 
+L 403.859977 146.776354 
+" clip-path="url(#p28b0771309)" style="fill: none; stroke: #9e9e9e; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="LineCollection_10">
+    <path d="M 381.701659 123.920023 
+L 439.313286 123.920023 
+" clip-path="url(#p28b0771309)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.6; stroke-width: 3"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 374.167831 158.204519 
+L 374.167831 110.206224 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 374.167831 158.204519 
+L 442.41545 158.204519 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_9">
+    <g clip-path="url(#p28b0771309)">
+     <use xlink:href="#m68b553649f" x="394.99665" y="146.776354" style="fill: #9e9e9e; stroke: #9e9e9e"/>
+    </g>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #9e9e9e" x="394.99665" y="141.747961" transform="rotate(-0 394.99665 141.747961)">28.0</text>
+   </g>
+   <g id="PathCollection_10">
+    <g clip-path="url(#p28b0771309)">
+     <use xlink:href="#mfad8807290" x="434.881622" y="123.920023" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 7.5px; font-family: 'Arial'; text-anchor: middle; fill: #d55e00" x="434.881622" y="118.89163" transform="rotate(-0 434.881622 118.89163)">32.5</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle" x="408.291641" y="104.206224" transform="rotate(-0 408.291641 104.206224)">Нас</text>
+   </g>
+  </g>
+  <g id="text_34">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 14.008874)">Дараа улиралд үлдсэн 8 гадаад тоглогч голчоор 19.4 оноо авч байсан</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 27.123327)">(явсан нь 12.1), гэхдээ ялгаа баттай биш</text>
+  </g>
+  <g id="text_35">
+   <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 52.30966)">2025–26 улирлын 34 гадаад тоглогчоос дараа улиралд MBA-д (аль ч багт) үлдсэн ба явсныг</text>
+   <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 62.696388)">харьцуулав. Цэг = голч утга, шугам = 95% магадлалтай хүрээ; хүрээ давхцаж байвал ялгааг</text>
+   <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 73.083117)">баттай гэж хэлж чадахгүй</text>
+  </g>
+  <g id="text_36">
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 208.330226)">Дата: MBA лигийн албан ёсны статистик (mongolia.basketball), 2026-11-12-нд татсан · 2025–26 ба 2026–27 улирал,</text>
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 217.037413)">5+ тоглолт тоглосон · 34 гадаад тоглогч. Хүрээг тоглогчдыг 2000 удаа дахин сонгож тооцов; үлдсэн тоглогч цөөн</text>
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 225.784132)">(8) тул хүрээ өргөн. Гэрээний мэдээлэл нийтэд ил биш тул «үлдсэн» = дараа улирлын статистикт гарсан</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pfe41a2e702">
+   <rect x="46.144232" y="110.206224" width="68.24762" height="47.998295"/>
+  </clipPath>
+  <clipPath id="pf5d9201d32">
+   <rect x="128.150132" y="110.206224" width="68.24762" height="47.998295"/>
+  </clipPath>
+  <clipPath id="p0eac334f23">
+   <rect x="210.156031" y="110.206224" width="68.24762" height="47.998295"/>
+  </clipPath>
+  <clipPath id="pbf09f2eedd">
+   <rect x="292.161931" y="110.206224" width="68.24762" height="47.998295"/>
+  </clipPath>
+  <clipPath id="p28b0771309">
+   <rect x="374.167831" y="110.206224" width="68.24762" height="47.998295"/>
+  </clipPath>
+ </defs>
+</svg>

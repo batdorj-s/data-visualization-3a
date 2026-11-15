@@ -184,7 +184,7 @@ L -3.5 0
       </g>
      </g>
      <g id="text_10">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="181.903166" transform="rotate(-0 146.529559 181.903166)">Шидэлтийн оновч (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="181.903166" transform="rotate(-0 146.529559 181.903166)">3 онооны оновч (28)</text>
      </g>
     </g>
     <g id="ytick_2">
@@ -199,7 +199,7 @@ L 437.165354 167.679638
       </g>
      </g>
      <g id="text_11">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="170.773754" transform="rotate(-0 146.529559 170.773754)">3 онооны оновч (27)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="170.773754" transform="rotate(-0 146.529559 170.773754)">Шидэлтийн оновч (42)</text>
      </g>
     </g>
     <g id="ytick_3">
@@ -214,7 +214,7 @@ L 437.165354 156.550226
       </g>
      </g>
      <g id="text_12">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="159.64675" transform="rotate(-0 146.529559 159.64675)">Оноо (36 минутад) (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="159.644342" transform="rotate(-0 146.529559 159.644342)">Минут / тоглолт (42)</text>
      </g>
     </g>
     <g id="ytick_4">
@@ -229,7 +229,7 @@ L 437.165354 145.420815
       </g>
      </g>
      <g id="text_13">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="148.514931" transform="rotate(-0 146.529559 148.514931)">Минут / тоглолт (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="148.517338" transform="rotate(-0 146.529559 148.517338)">Оноо (36 минутад) (42)</text>
      </g>
     </g>
     <g id="ytick_5">
@@ -244,7 +244,7 @@ L 437.165354 134.291403
       </g>
      </g>
      <g id="text_14">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="137.385519" transform="rotate(-0 146.529559 137.385519)">Дамжуулалт (36 минутад) (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="137.385519" transform="rotate(-0 146.529559 137.385519)">Дамжуулалт (36 минутад) (42)</text>
      </g>
     </g>
     <g id="ytick_6">
@@ -259,7 +259,7 @@ L 437.165354 123.161991
       </g>
      </g>
      <g id="text_15">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="126.258515" transform="rotate(-0 146.529559 126.258515)">Оноо / тоглолт (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="126.258515" transform="rotate(-0 146.529559 126.258515)">Оноо / тоглолт (42)</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -274,7 +274,7 @@ L 437.165354 112.03258
       </g>
      </g>
      <g id="text_16">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="115.147697" transform="rotate(-0 146.529559 115.147697)">Самбар (36 минутад) (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="115.147697" transform="rotate(-0 146.529559 115.147697)">Самбар (36 минутад) (42)</text>
      </g>
     </g>
     <g id="ytick_8">
@@ -289,7 +289,7 @@ L 437.165354 100.903168
       </g>
      </g>
      <g id="text_17">
-      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="103.997284" transform="rotate(-0 146.529559 103.997284)">3 оноогоор шидсэн хувь (40)</text>
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="146.529559" y="103.997284" transform="rotate(-0 146.529559 103.997284)">3 оноогоор шидсэн хувь (42)</text>
      </g>
     </g>
     <g id="text_18">
@@ -297,29 +297,29 @@ L 437.165354 100.903168
     </g>
    </g>
    <g id="LineCollection_1">
-    <path d="M 195.081012 178.80905 
-L 312.763203 178.80905 
+    <path d="M 194.215898 178.80905 
+L 334.120857 178.80905 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 187.413556 167.679638 
-L 330.568217 167.679638 
+    <path d="M 217.86422 167.679638 
+L 330.405089 167.679638 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #d55e00; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 327.14278 156.550226 
-L 398.748548 156.550226 
+    <path d="M 334.108801 156.550226 
+L 400.690476 156.550226 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 336.009733 145.420815 
-L 402.588741 145.420815 
+    <path d="M 336.379636 145.420815 
+L 401.683404 145.420815 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 374.901767 134.291403 
-L 417.682907 134.291403 
+    <path d="M 364.989282 134.291403 
+L 413.347222 134.291403 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 377.380035 123.161991 
-L 418.558655 123.161991 
+    <path d="M 378.99629 123.161991 
+L 418.540728 123.161991 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 390.258453 112.03258 
-L 422.96243 112.03258 
+    <path d="M 393.173528 112.03258 
+L 423.491822 112.03258 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
-    <path d="M 395.246665 100.903168 
-L 424.604675 100.903168 
+    <path d="M 394.118166 100.903168 
+L 423.811449 100.903168 
 " clip-path="url(#p4e3c4ad9e4)" style="fill: none; stroke: #0072b2; stroke-opacity: 0.5; stroke-width: 2.6"/>
    </g>
    <g id="line2d_33">
@@ -352,34 +352,34 @@ z
 "/>
     </defs>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="254.549757" y="178.80905" style="fill: #d55e00; stroke: #d55e00"/>
+     <use xlink:href="#C0_0_82aab373d4" x="266.745201" y="178.80905" style="fill: #d55e00; stroke: #d55e00"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="260.824976" y="167.679638" style="fill: #d55e00; stroke: #d55e00"/>
+     <use xlink:href="#C0_0_82aab373d4" x="276.726021" y="167.679638" style="fill: #d55e00; stroke: #d55e00"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="370.145642" y="156.550226" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="374.145617" y="156.550226" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="376.333102" y="145.420815" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="375.73124" y="145.420815" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="401.706153" y="134.291403" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="394.873379" y="134.291403" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="403.232127" y="123.161991" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="403.714831" y="123.161991" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="410.999369" y="112.03258" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="412.335004" y="112.03258" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
     <g clip-path="url(#p4e3c4ad9e4)">
-     <use xlink:href="#C0_0_82aab373d4" x="413.936592" y="100.903168" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#C0_0_82aab373d4" x="412.898065" y="100.903168" style="fill: #0072b2; stroke: #0072b2"/>
     </g>
    </g>
   </g>
   <g id="text_19">
-   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 13.965749)">Тоглогчийн хэв маяг улирлаас улиралд хадгалагддаг (0.65–0.88),</text>
-   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 27.037077)">оновч хадгалагддаггүй (0.05)</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 13.965749)">Тоглогчийн хэв маяг улирлаас улиралд хадгалагддаг (0.67–0.87),</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 27.037077)">оновч хадгалагддаггүй (0.13)</text>
   </g>
   <g id="text_20">
    <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 52.30966)">Цэг = нэг тоглогчийн өмнөх ба энэ улирлын үзүүлэлт хэр төстэй вэ, шугам = 95%</text>
@@ -388,7 +388,7 @@ z
   </g>
   <g id="text_21">
    <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 236.838662)">Дата: MBA лигийн албан ёсны статистик (mongolia.basketball), 2026-11-12-нд татсан · 2025–26 ба 2026–27 улиралд</text>
-   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 245.585381)">хоёуланд нь тоглосон · 40 тоглогч. Улирал бүрт 50-аас олон шидэлт (3 онооны оновчид 30-аас олон 3 онооны</text>
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 245.585381)">хоёуланд нь тоглосон · 42 тоглогч. Улирал бүрт 50-аас олон шидэлт (3 онооны оновчид 30-аас олон 3 онооны</text>
    <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 254.292569)">шидэлт) хийсэн тоглогчид; хүрээ: Fisher-ийн арга; 2026–27 улирал дуусаагүй</text>
   </g>
  </g>

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from src.names import given_score, normalize, same_person, split_mba_name
+from src.names import given_score, normalize, same_person, split_mba_name, same_person_any_order
 
 ROOT = Path(__file__).resolve().parents[1]
 LATEST_SEASON = "2026-2027"
@@ -216,6 +216,11 @@ def assign_player_ids(players_season: pd.DataFrame, overrides: pd.DataFrame | No
         cands = [(r.player_slug, r.team_key, given_score(a[1], split_mba_name(r.player_name)[1]))
                  for r in latest.itertuples() if same_person(a, split_mba_name(r.player_name))
                  and (row.player_slug, r.player_slug) not in blocked]
+        if not cands:
+            # нэрийн дараалал солигдсон тохиолдол (C2c): үгийн олонлогоор харьцуулна
+            cands = [(r.player_slug, r.team_key, 0.9) for r in latest.itertuples()
+                     if same_person_any_order(row.player_name, r.player_name)
+                     and (row.player_slug, r.player_slug) not in blocked]
         if not cands:
             continue
         cands.sort(key=lambda c: (c[1] != row.team_key, -c[2]))

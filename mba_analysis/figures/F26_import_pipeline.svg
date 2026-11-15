@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="453.543307pt" height="280.764904pt" viewBox="0 0 453.543307 280.764904" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 280.764904 
+L 453.543307 280.764904 
+L 453.543307 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 120.103737 204.03041 
+L 230.114761 204.03041 
+L 230.114761 97.607799 
+L 120.103737 97.607799 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 120.103737 204.03041 
+L 120.103737 97.607799 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="mf986387a4b" d="M 0 0 
+L 0 3.5 
+" style="stroke: #4d4d4d; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mf986387a4b" x="120.103737" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="120.103737" y="217.218643" transform="rotate(-0 120.103737 217.218643)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 163.758905 204.03041 
+L 163.758905 97.607799 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#mf986387a4b" x="163.758905" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="163.758905" y="217.218643" transform="rotate(-0 163.758905 217.218643)">5</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 207.414074 204.03041 
+L 207.414074 97.607799 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#mf986387a4b" x="207.414074" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="207.414074" y="217.218643" transform="rotate(-0 207.414074 217.218643)">10</text>
+     </g>
+    </g>
+    <g id="text_4">
+     <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: middle; fill: #333333" x="175.109249" y="229.923721" transform="rotate(-0 175.109249 229.923721)">Тоглогчийн тоо</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_7">
+      <path d="M 120.103737 109.207135 
+L 230.114761 109.207135 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <defs>
+       <path id="m3fba8f0df0" d="M 0 0 
+L -3.5 0 
+" style="stroke: #4d4d4d; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="120.103737" y="109.207135" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="113.103737" y="112.301252" transform="rotate(-0 113.103737 112.301252)">NBA</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_9">
+      <path d="M 120.103737 130.01312 
+L 230.114761 130.01312 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="120.103737" y="130.01312" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="113.103737" y="133.107236" transform="rotate(-0 113.103737 133.107236)">EuroLeague / EuroCup</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_11">
+      <path d="M 120.103737 150.819105 
+L 230.114761 150.819105 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="120.103737" y="150.819105" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="113.103737" y="153.913221" transform="rotate(-0 113.103737 153.913221)">G League</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_13">
+      <path d="M 120.103737 171.625089 
+L 230.114761 171.625089 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="120.103737" y="171.625089" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="113.103737" y="174.719205" transform="rotate(-0 113.103737 174.719205)">Бусад мэргэжлийн лиг</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_15">
+      <path d="M 120.103737 192.431074 
+L 230.114761 192.431074 
+" clip-path="url(#pbcc25c25c6)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="120.103737" y="192.431074" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="113.103737" y="195.52519" transform="rotate(-0 113.103737 195.52519)">Мэргэжлийн туршлагагүй</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 120.103737 102.44519 
+L 172.489939 102.44519 
+L 172.489939 115.96908 
+L 120.103737 115.96908 
+z
+" clip-path="url(#pbcc25c25c6)" style="fill: #08306b"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 120.103737 123.251175 
+L 137.565804 123.251175 
+L 137.565804 136.775065 
+L 120.103737 136.775065 
+z
+" clip-path="url(#pbcc25c25c6)" style="fill: #0072b2"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 120.103737 144.05716 
+L 224.876141 144.05716 
+L 224.876141 157.58105 
+L 120.103737 157.58105 
+z
+" clip-path="url(#pbcc25c25c6)" style="fill: #56b4e9"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 120.103737 164.863144 
+L 216.145108 164.863144 
+L 216.145108 178.387034 
+L 120.103737 178.387034 
+z
+" clip-path="url(#pbcc25c25c6)" style="fill: #9ecae1"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 120.103737 185.669129 
+L 137.565804 185.669129 
+L 137.565804 199.193019 
+L 120.103737 199.193019 
+z
+" clip-path="url(#pbcc25c25c6)" style="fill: #d9d9d9"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 120.103737 204.03041 
+L 120.103737 97.607799 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 120.103737 204.03041 
+L 230.114761 204.03041 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="175.109249" y="111.406842" transform="rotate(-0 175.109249 111.406842)">6</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="140.185115" y="132.212827" transform="rotate(-0 140.185115 132.212827)">2</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="227.495451" y="153.018812" transform="rotate(-0 227.495451 153.018812)">12</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="218.764418" y="173.824796" transform="rotate(-0 218.764418 173.824796)">11</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="140.185115" y="194.630781" transform="rotate(-0 140.185115 194.630781)">2</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: start" x="120.103737" y="91.607799" transform="rotate(-0 120.103737 91.607799)">Өмнө тоглосон хамгийн өндөр түвшин</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_10">
+    <path d="M 318.620322 204.03041 
+L 439.632449 204.03041 
+L 439.632449 97.607799 
+L 318.620322 97.607799 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_4">
+     <g id="line2d_17">
+      <path d="M 318.620322 204.03041 
+L 318.620322 97.607799 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#mf986387a4b" x="318.620322" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="318.620322" y="217.218643" transform="rotate(-0 318.620322 217.218643)">0</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_19">
+      <path d="M 371.006524 204.03041 
+L 371.006524 97.607799 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#mf986387a4b" x="371.006524" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_17">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="371.006524" y="217.218643" transform="rotate(-0 371.006524 217.218643)">5</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_21">
+      <path d="M 423.392726 204.03041 
+L 423.392726 97.607799 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#mf986387a4b" x="423.392726" y="204.03041" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_18">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: middle; fill: #4d4d4d" x="423.392726" y="217.218643" transform="rotate(-0 423.392726 217.218643)">10</text>
+     </g>
+    </g>
+    <g id="text_19">
+     <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: middle; fill: #333333" x="379.126385" y="229.923721" transform="rotate(-0 379.126385 229.923721)">Тоглогчийн тоо</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_6">
+     <g id="line2d_23">
+      <path d="M 318.620322 106.080224 
+L 439.632449 106.080224 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_24">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="106.080224" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_20">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="109.174341" transform="rotate(-0 311.620322 109.174341)">Мексик</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_25">
+      <path d="M 318.620322 117.264945 
+L 439.632449 117.264945 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="117.264945" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_21">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="120.359061" transform="rotate(-0 311.620322 120.359061)">G League (АНУ)</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_27">
+      <path d="M 318.620322 128.449665 
+L 439.632449 128.449665 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_28">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="128.449665" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_22">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="131.543781" transform="rotate(-0 311.620322 131.543781)">Польш</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_29">
+      <path d="M 318.620322 139.634385 
+L 439.632449 139.634385 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_30">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="139.634385" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_23">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="142.728501" transform="rotate(-0 311.620322 142.728501)">Грек</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_31">
+      <path d="M 318.620322 150.819105 
+L 439.632449 150.819105 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_32">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="150.819105" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_24">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="153.913221" transform="rotate(-0 311.620322 153.913221)">Хятад</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_33">
+      <path d="M 318.620322 162.003825 
+L 439.632449 162.003825 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_34">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="162.003825" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_25">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="165.097941" transform="rotate(-0 311.620322 165.097941)">Унгар</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_35">
+      <path d="M 318.620322 173.188545 
+L 439.632449 173.188545 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_36">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="173.188545" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_26">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="176.282661" transform="rotate(-0 311.620322 176.282661)">Израиль</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_37">
+      <path d="M 318.620322 184.373265 
+L 439.632449 184.373265 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_38">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="184.373265" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_27">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="187.467381" transform="rotate(-0 311.620322 187.467381)">Африкийн лиг</text>
+     </g>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_39">
+      <path d="M 318.620322 195.557985 
+L 439.632449 195.557985 
+" clip-path="url(#p3474b2871f)" style="fill: none; stroke: #ebebeb; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_40">
+      <g>
+       <use xlink:href="#m3fba8f0df0" x="318.620322" y="195.557985" style="fill: #4d4d4d; stroke: #4d4d4d; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_28">
+      <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: end; fill: #4d4d4d" x="311.620322" y="198.652101" transform="rotate(-0 311.620322 198.652101)">Бусад</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_11">
+    <path d="M 318.620322 102.44519 
+L 381.483764 102.44519 
+L 381.483764 109.715258 
+L 318.620322 109.715258 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #d55e00"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 318.620322 113.62991 
+L 371.006524 113.62991 
+L 371.006524 120.899979 
+L 318.620322 120.899979 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 318.620322 124.814631 
+L 339.574803 124.814631 
+L 339.574803 132.084699 
+L 318.620322 132.084699 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 318.620322 135.999351 
+L 339.574803 135.999351 
+L 339.574803 143.269419 
+L 318.620322 143.269419 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 318.620322 147.184071 
+L 339.574803 147.184071 
+L 339.574803 154.454139 
+L 318.620322 154.454139 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 318.620322 158.368791 
+L 329.097562 158.368791 
+L 329.097562 165.638859 
+L 318.620322 165.638859 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 318.620322 169.553511 
+L 329.097562 169.553511 
+L 329.097562 176.823579 
+L 318.620322 176.823579 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 318.620322 180.738231 
+L 329.097562 180.738231 
+L 329.097562 188.008299 
+L 318.620322 188.008299 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 318.620322 191.922951 
+L 433.869966 191.922951 
+L 433.869966 199.193019 
+L 318.620322 199.193019 
+z
+" clip-path="url(#p3474b2871f)" style="fill: #9e9e9e"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 318.620322 204.03041 
+L 318.620322 97.607799 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 318.620322 204.03041 
+L 439.632449 204.03041 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="383.05535" y="108.279931" transform="rotate(-0 383.05535 108.279931)">6</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="372.57811" y="119.464652" transform="rotate(-0 372.57811 119.464652)">5</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="341.146389" y="130.649372" transform="rotate(-0 341.146389 130.649372)">2</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="341.146389" y="141.834092" transform="rotate(-0 341.146389 141.834092)">2</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="341.146389" y="153.018812" transform="rotate(-0 341.146389 153.018812)">2</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="330.669148" y="164.203532" transform="rotate(-0 330.669148 164.203532)">1</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="330.669148" y="175.388252" transform="rotate(-0 330.669148 175.388252)">1</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="330.669148" y="186.572972" transform="rotate(-0 330.669148 186.572972)">1</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start" x="435.441552" y="197.757692" transform="rotate(-0 435.441552 197.757692)">11</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: start" x="318.620322" y="91.607799" transform="rotate(-0 318.620322 91.607799)">Ирэхийн өмнөх сүүлийн лиг</text>
+   </g>
+  </g>
+  <g id="text_39">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 13.965749)">Олдсон гадаад тоглогчдын 28/33 нь АНУ-ын иргэн; хамгийн олон нь</text>
+   <text style="font-weight: 700; font-size: 12px; font-family: 'Arial'; fill: #1a1a1a" transform="translate(4.535433 27.026296)">Мексик-ээс ирсэн</text>
+  </g>
+  <g id="text_40">
+   <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 52.30966)">Зүүн: ирэхээсээ өмнө тоглож байсан хамгийн өндөр лиг. Баруун: Монголд ирэхийн өмнөх</text>
+   <text style="font-size: 9.5px; font-family: 'Arial'; fill: #404040" transform="translate(4.535433 62.696388)">сүүлийн мэргэжлийн лиг. 33 тоглогч (46%)-ийн карьерыг эх сурвалжаар баталгаажуулсан</text>
+  </g>
+  <g id="text_41">
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 258.21999)">Дата: ShamSports-ийн тоглогчийн карьерын хуудас; MBA тоглогчийн профайлтай төрсөн он/өндрөөр тулгасан · 33</text>
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 266.927177)">гадаад тоглогч. Үлдсэн 39 тоглогч (ихэнх нь Азийн квотын) эх сурвалжид олдоогүй тул дүр зураг АНУ-ын тоглогч</text>
+   <text style="font-size: 8px; font-family: 'Arial'; fill: #5c5c5c" transform="translate(4.535433 275.673896)">руу хазайсан байж болно</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pbcc25c25c6">
+   <rect x="120.103737" y="97.607799" width="110.011024" height="106.422611"/>
+  </clipPath>
+  <clipPath id="p3474b2871f">
+   <rect x="318.620322" y="97.607799" width="121.012127" height="106.422611"/>
+  </clipPath>
+ </defs>
+</svg>

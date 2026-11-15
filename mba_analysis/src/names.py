@@ -58,3 +58,11 @@ def match_names(left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
             if score >= GIVEN_RATIO:
                 rows.append({"left_id": l.id, "right_id": r.id, "score": round(score, 3)})
     return pd.DataFrame(rows, columns=["left_id", "right_id", "score"])
+
+
+def same_person_any_order(name_a: str, name_b: str) -> bool:
+    """MBA нэрийн дарааллыг холимог бичдэг («MILLER Ian» ↔ «IAN Miller», «MCKENZIE Moore» ↔ «MOORE Mckenzie Zachary»).
+    Дарааллаас үл хамааран богино нэрийн бүх үг урт нэрэнд байвал (≥ 2 үг) нэг хүн гэж үзнэ."""
+    ta, tb = set(normalize(name_a).split()), set(normalize(name_b).split())
+    small, big = (ta, tb) if len(ta) <= len(tb) else (tb, ta)
+    return len(small) >= 2 and small <= big

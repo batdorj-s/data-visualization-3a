@@ -31,10 +31,11 @@ pip install -r requirements.txt
 ```bash
 .venv/bin/python -m src.scrape --offline   # MBA + шидэлтийн байршил, play-by-play (кэшгүй бол --offline-ийг хасна, ~15 мин)
 .venv/bin/python -m src.wiki               # Wikipedia / FIBA
-.venv/bin/python -m src.clean              # C1–C16 + шинэ хувьсагч, Elo; shots.csv, pbp.csv.gz, assists.csv
+.venv/bin/python -m src.clean              # C1–C16 (C2c: нэрийн дараалал солигдсон тоглогч) + шинэ хувьсагч, Elo; shots.csv, pbp.csv.gz, assists.csv
+.venv/bin/python -m src.import_sources --offline  # гадаад тоглогчийн гарал үүсэл (ShamSports; кэшгүй бол --offline-ийг хасна)
 .venv/bin/python -m src.models             # K-Means, ялалтын загвар, тоглолтын дундах магадлал (analysis-аас өмнө)
 .venv/bin/python -m src.analysis           # статистик, H1–H5
-.venv/bin/python -m src.make_figures       # 42 график + chart_qa
+.venv/bin/python -m src.make_figures       # 47 график + chart_qa
 .venv/bin/python -m src.blueprint          # шийдлийн зураг төсөл
 .venv/bin/python -m src.build_dashboard_data
 .venv/bin/python -m src.report_data

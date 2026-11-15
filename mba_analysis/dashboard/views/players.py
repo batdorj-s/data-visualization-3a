@@ -3,6 +3,7 @@ import streamlit as st
 from data_access import apply, apply_selection, current_filters, empty_notice, load
 from plots import LABELS, px_dot_ci, px_funnel, px_scatter
 from src.palette import IMPORT_LABELS
+from import_view import import_section
 from ui import chart_note, filter_summary, findings, page_header
 
 f = current_filters()
@@ -119,9 +120,13 @@ def uncertainty():
                    f"тоглолт бүрийн оноо, {season_txt}; хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцсон.")
 
 
-left, right = st.columns([3, 2], gap="large")
-with left:
-    explorer()
-with right:
-    player_card()
-uncertainty()
+tab_explore, tab_imports = st.tabs(["Тоглогч судлах", "Гадаад тоглогч ба солилцоо"])
+with tab_explore:
+    left, right = st.columns([3, 2], gap="large")
+    with left:
+        explorer()
+    with right:
+        player_card()
+    uncertainty()
+with tab_imports:
+    import_section(f)

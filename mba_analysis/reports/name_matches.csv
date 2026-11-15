@@ -1,6 +1,8 @@
 left_id,left_name,right_id,right_name,score,same_team,n_candidates
 byron-wesley-2,BYRON Wesley,byron-wesley,BYRON Wesley,1.0,False,1
 scrubb-jay,SCRUBB Jay,scrubb-jayden-amari,SCRUBB Jayden Amari,0.95,True,1
+mckenzie-moore,MCKENZIE Moore,moore-mckenzie-zachary,MOORE Mckenzie Zachary,0.9,False,1
+miller-ian,MILLER Ian,ian-bennett-miller,IAN Miller,0.9,False,1
 mcdaniels-kevin,MCDANIELS Kevin,mcdaniels-kevin,MCDANIELS Kevin,1.0,True,1
 gankhuyag-dulguun-2,GANKHUYAG Dulguun,gankhuyag-dulguun,GANKHUYAG Dulguun,1.0,True,1
 amarbayasgalan-enkhbayasgalan,AMARBAYASGALAN Enkhbayasgalan,amarbayasgalan-enkhbayasgalan,AMARBAYASGALAN Enkhbayasgalan,1.0,True,1
@@ -21,6 +23,7 @@ ganzorig-baljinnyam,GANZORIG Baljinnyam,ganzorig-baljinnyam,GANZORIG Baljinnyam,
 elbeg-tushig-2,ELBEG Tushig,elbeg-tushig,ELBEG Tushig,1.0,False,1
 enkhtaivan-iderjavkhlan-3,ENKHTAIVAN Iderjavkhlan,enkhtaivan-iderjavkhlan-2,ENKHTAIVAN Iderjavkhlan,1.0,True,1
 narangerel-batbayar,NARANGEREL Batbayar,narangerel-batbayar,NARANGEREL Batbayar,1.0,True,1
+emmanuel-ejesu,EMMANUEL Ejesu,ejesu-emmanuel-chinedu,EJESU Emmanuel Chinedu,0.9,False,1
 tungalag-sanchir,TUNGALAG Sanchir,tungalag-sanchir,TUNGALAG Sanchir,1.0,False,1
 tsogt-otgonjargal,TSOGT Otgonjargal,tsogt-otgonjargal,TSOGT Otgonjargal,1.0,True,1
 munkhbat-munkhzolboo,MUNKHBAT Munkhzolboo,munkhbat-munkhzolboo,MUNKHBAT Munkhzolboo,1.0,True,1

@@ -393,8 +393,8 @@ z
    <g id="patch_14">
     <path d="M 263.864575 179.392758 
 L 276.112713 179.392758 
-L 276.112713 179.392758 
-L 263.864575 179.392758 
+L 276.112713 168.830701 
+L 263.864575 168.830701 
 z
 " clip-path="url(#p4541eb0ad4)" style="fill: #0072b2; stroke: #ffffff; stroke-linejoin: miter"/>
    </g>
@@ -433,7 +433,7 @@ L 316.531567 179.392758
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_21">
-    <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: middle" x="276.112713" y="88.368204" transform="rotate(-0 276.112713 88.368204)">Нэр холбосон: 25</text>
+    <text style="font-size: 9.5px; font-family: 'Arial'; text-anchor: middle" x="276.112713" y="88.368204" transform="rotate(-0 276.112713 88.368204)">Нэр холбосон: 28</text>
    </g>
   </g>
   <g id="axes_3">

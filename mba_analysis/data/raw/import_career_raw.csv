@@ -1,0 +1,385 @@
+year,league,team,g,mpg,ppg,fg_pct,tp_pct,player_id
+2011-12,NCAA,Mississippi,28.0,8.5,1.4,51.6,0.0,aaron-jones
+2012-13,NCAA,Mississippi,20.0,16.9,3.5,55.6,33.3,aaron-jones
+2013-14,NCAA,Mississippi,33.0,27.1,6.0,43.0,16.7,aaron-jones
+2013-14,NCAA,UTEP,10.0,5.1,0.6,28.6,0.0,aaron-jones
+2014-15,NCAA,Mississippi,24.0,12.9,3.0,47.4,0.0,aaron-jones
+2015-16,Germany,RheinStars Koeln,29.0,27.4,11.2,48.7,37.5,aaron-jones
+2016-17,Bulgaria,Beroe,33.0,25.3,12.5,49.0,22.9,aaron-jones
+2017-18,Finland,Salon Vilpas,53.0,28.2,15.6,63.2,32.3,aaron-jones
+2018-19,Greece,A.G.O. Rethymno,22.0,20.2,6.3,52.6,18.8,aaron-jones
+2019-20,Germany,Crailsheim,21.0,27.8,11.8,60.6,26.3,aaron-jones
+2020-21,BCL Europe,Bilbao,2.0,16.5,5.0,36.4,50.0,aaron-jones
+2020-21,BCL Europe,Cholet,3.0,31.4,9.3,63.2,0.0,aaron-jones
+2020-21,France,Cholet,28.0,21.9,7.6,50.3,33.9,aaron-jones
+2020-21,Spain,Bilbao,8.0,19.7,4.1,41.9,37.5,aaron-jones
+2021-22,BCL Europe,Treviso,14.0,22.5,6.1,48.1,20.0,aaron-jones
+2021-22,Italy,Treviso,30.0,21.4,7.4,56.1,22.9,aaron-jones
+2023-24,Estonia,Tallinn Kalev,1.0,27.2,9.0,36.4,25.0,aaron-jones
+2023-24,Greece,Karditsas,5.0,8.3,2.4,55.6,33.3,aaron-jones
+2023-24,Kosovo,Ylli,15.0,13.8,5.3,61.8,18.2,aaron-jones
+2023-24,Latvia,VEF Riga,1.0,9.2,8.0,60.0,0.0,aaron-jones
+2024-25,Hungary,Zalakeramia,21.0,25.0,7.6,45.8,31.4,aaron-jones
+2014-15,NCAA,North Carolina State,36.0,19.1,6.4,46.8,20.0,abu-abdul-malik
+2015-16,NCAA,North Carolina State,33.0,28.3,12.9,49.0,0.0,abu-abdul-malik
+2016-17,NCAA,North Carolina State,32.0,28.5,11.8,52.9,0.0,abu-abdul-malik
+2017-18,NCAA,North Carolina State,27.0,14.9,5.2,46.7,10.0,abu-abdul-malik
+2019-20,Portugal,Sporting Clube,21.0,25.3,14.0,60.7,36.8,abu-abdul-malik
+2020-21,Turkey,Fethiye,28.0,23.9,11.1,51.3,33.3,abu-abdul-malik
+2021-22,Germany,Wuerzburg,11.0,13.6,6.7,63.0,33.3,abu-abdul-malik
+2021-22,South Korea,LG Sakers,27.0,10.2,5.1,50.4,31.8,abu-abdul-malik
+2022-23,Adriatic League,MZT Skopje,12.0,23.1,8.8,51.3,0.0,abu-abdul-malik
+2022-23,Europe Cup,Hapoel Galil Elyon,6.0,21.6,10.0,75.7,0.0,abu-abdul-malik
+2022-23,Israel,Hapoel Galil Elyon,8.0,17.1,6.3,55.8,0.0,abu-abdul-malik
+2023-24,Spain,Fuenlabrada,11.0,16.1,7.0,62.5,33.3,abu-abdul-malik
+2024-25,Poland,Torun,33.0,20.9,8.8,65.2,30.8,abu-abdul-malik
+2015-16,NCAA,Cal State Fullerton,30.0,27.3,14.3,42.9,32.7,ahmad-khalil
+2016-17,NCAA,Cal State Fullerton,21.0,27.4,11.2,40.2,31.5,ahmad-khalil
+2017-18,NCAA,Cal State Fullerton,32.0,31.3,15.1,41.8,32.0,ahmad-khalil
+2018-19,NCAA,Cal State Fullerton,34.0,31.4,18.2,43.6,31.8,ahmad-khalil
+2022-23,Israel,Hapoel Be'er Sheva,29.0,23.5,12.9,42.3,26.6,ahmad-khalil
+2023-24,BCL Europe,Oostende,9.0,22.6,12.8,40.7,26.3,ahmad-khalil
+2023-24,Belgium,Oostende,42.0,22.9,17.0,52.7,38.2,ahmad-khalil
+2025-26,Israel,Maccabi Rishon LeZion,17.0,31.0,16.5,46.2,28.6,ahmad-khalil
+2018-19,NCAA,Seton Hall,34.0,10.5,2.4,34.5,30.0,ant-nelson
+2019-20,NCAA,Seton Hall,27.0,12.4,2.7,43.8,26.7,ant-nelson
+2020-21,NCAA,Manhattan,20.0,31.7,13.4,37.8,28.4,ant-nelson
+2021-22,NCAA,Manhattan,26.0,27.0,10.9,42.1,36.1,ant-nelson
+2022-23,NCAA,Manhattan,30.0,33.5,15.1,39.9,28.0,ant-nelson
+2023-24,Basketball Africa League,Petro de Luanda,4.0,18.1,8.3,35.5,28.6,ant-nelson
+2012-13,NCAA,Charleston Southern,30.0,10.1,2.2,34.0,42.1,bernard-malcolm-alexander
+2013-14,NCAA,Charleston Southern,28.0,14.5,3.4,36.6,25.0,bernard-malcolm-alexander
+2015-16,NCAA,Florida A&M,28.0,32.6,14.4,42.1,21.1,bernard-malcolm-alexander
+2016-17,NCAA,Xavier,38.0,28.0,6.6,41.8,39.3,bernard-malcolm-alexander
+2017-18,G League,Grand Rapids Drive,17.0,15.8,3.0,27.8,21.7,bernard-malcolm-alexander
+2018-19,Finland,BC Nokia,14.0,30.4,15.2,44.5,29.2,bernard-malcolm-alexander
+2020-21,Belgium,Leuven Bears,10.0,21.5,9.8,48.5,29.4,bernard-malcolm-alexander
+2022-23,Australia,South East Melbourne Phoenix,3.0,15.0,4.7,46.2,50.0,bernard-malcolm-alexander
+2025-26,Estonia,Tartu Ulikool,29.0,27.2,13.7,38.8,31.7,bernard-malcolm-alexander
+2025-26,Europe Cup,Tartu Ulikool,6.0,27.3,10.0,30.4,22.2,bernard-malcolm-alexander
+2011-12,NCAA,USC,32.0,34.6,9.6,40.9,11.1,byron-wesley
+2012-13,NCAA,USC,32.0,31.8,10.2,44.4,39.7,byron-wesley
+2013-14,NCAA,USC,30.0,34.6,17.8,46.7,33.8,byron-wesley
+2014-15,NCAA,Gonzaga,38.0,26.7,10.6,51.4,31.3,byron-wesley
+2015-16,D League,Sioux Falls Skyforce,13.0,7.8,2.8,61.5,0.0,byron-wesley
+2016-17,BCL Europe,Kataja,4.0,31.8,14.0,40.0,28.6,byron-wesley
+2016-17,Finland,Kataja,6.0,29.0,17.5,42.4,31.6,byron-wesley
+2016-17,Poland,MKS Dabrowa,23.0,20.6,10.8,49.2,38.1,byron-wesley
+2018-19,Poland,Spojnia Stargard,4.0,18.2,9.3,55.6,42.9,byron-wesley
+2019-20,Finland,KTP Basket,34.0,31.4,19.6,53.1,31.6,byron-wesley
+2020-21,France,Antibes Sharks,24.0,34.7,17.1,43.0,28.9,byron-wesley
+2024-25,Greece,Ermis,10.0,34.0,21.7,51.7,36.4,byron-wesley
+2009-10,D League,Iowa Energy,3.0,34.3,20.7,50.0,,clark-earl-rashod
+2009-10,NBA,Phoenix Suns,51.0,7.5,2.7,37.1,40.0,clark-earl-rashod
+2010-11,NBA,Phoenix Suns,9.0,8.0,3.2,38.7,,clark-earl-rashod
+2010-11,NBA,Orlando Magic,33.0,11.9,4.1,44.1,0.0,clark-earl-rashod
+2010-11,NBA,Total (NBA),42.0,11.0,3.9,43.0,0.0,clark-earl-rashod
+2011-12,NBA,Orlando Magic,45.0,12.4,2.7,36.7,,clark-earl-rashod
+2012-13,NBA,L.A. Lakers,59.0,23.1,7.3,44.0,33.7,clark-earl-rashod
+2013-14,NBA,Cleveland Cavaliers,45.0,15.5,5.2,37.5,34.5,clark-earl-rashod
+2013-14,NBA,New York Knicks,9.0,7.8,2.6,33.3,16.7,clark-earl-rashod
+2013-14,NBA,Total (NBA),54.0,14.2,4.8,37.2,33.6,clark-earl-rashod
+2014-15,China,Shanghai Sharks,20.0,32.6,26.4,44.0,44.7,clark-earl-rashod
+2014-15,D League,Rio Grande Valley Vipers,6.0,34.3,26.2,45.0,33.3,clark-earl-rashod
+2014-15,NBA,Brooklyn Nets,10.0,9.3,2.7,36.7,28.6,clark-earl-rashod
+2015-16,D League,Bakersfield Jam,22.0,35.1,20.2,39.6,36.5,clark-earl-rashod
+2015-16,D League,Delaware 87ers,11.0,28.2,15.2,47.3,48.6,clark-earl-rashod
+2015-16,D League,Total (D League),33.0,32.8,18.5,41.4,39.7,clark-earl-rashod
+2016-17,BCL Europe,Besiktas,16.0,26.6,13.8,45.2,34.0,clark-earl-rashod
+2016-17,Turkey,Besiktas,39.0,27.8,13.4,44.0,38.6,clark-earl-rashod
+2017-18,BCL Europe,Besiktas,11.0,23.4,10.7,36.3,32.8,clark-earl-rashod
+2017-18,Turkey,Besiktas,27.0,23.6,8.6,37.9,35.1,clark-earl-rashod
+2018-19,Adriatic League,Buducnost,30.0,25.6,12.1,43.0,31.1,clark-earl-rashod
+2018-19,EuroLeague,Buducnost,29.0,27.5,11.7,39.9,38.8,clark-earl-rashod
+2019-20,BCL Europe,Burgos,16.0,25.4,12.8,47.1,36.4,clark-earl-rashod
+2019-20,Spain,Burgos,23.0,27.5,12.2,41.1,30.8,clark-earl-rashod
+2020-21,EuroCup,Gran Canaria,2.0,11.5,3.5,37.5,25.0,clark-earl-rashod
+2020-21,South Korea,Anyang KGC,22.0,21.4,14.0,44.1,31.6,clark-earl-rashod
+2020-21,Spain,Gran Canaria,4.0,13.2,8.3,54.2,71.4,clark-earl-rashod
+2021-22,South Korea,Mobis Phoebus,23.0,22.9,12.1,48.5,37.0,clark-earl-rashod
+2013-14,EuroLeague,Baskonia,14.0,9.7,2.6,52.0,0.0,diop-ilimane
+2013-14,Spain,Baskonia,21.0,9.2,2.9,52.6,0.0,diop-ilimane
+2014-15,EuroLeague,Baskonia,7.0,4.4,1.7,37.5,0.0,diop-ilimane
+2014-15,Spain,Baskonia,21.0,6.7,1.6,40.7,0.0,diop-ilimane
+2015-16,EuroLeague,Baskonia,27.0,9.2,2.6,48.9,0.0,diop-ilimane
+2015-16,Spain,Baskonia,36.0,12.1,3.6,56.3,0.0,diop-ilimane
+2016-17,EuroLeague,Baskonia,33.0,13.8,4.1,57.3,0.0,diop-ilimane
+2016-17,Spain,Baskonia,35.0,15.6,4.4,49.1,0.0,diop-ilimane
+2017-18,EuroLeague,Baskonia,25.0,9.5,3.5,53.7,28.6,diop-ilimane
+2017-18,Spain,Baskonia,38.0,13.4,4.9,54.5,28.6,diop-ilimane
+2018-19,EuroLeague,Baskonia,33.0,11.5,3.9,49.4,23.1,diop-ilimane
+2018-19,Spain,Baskonia,36.0,13.1,4.9,56.4,25.0,diop-ilimane
+2019-20,EuroLeague,Baskonia,27.0,10.6,3.7,50.7,28.6,diop-ilimane
+2019-20,Spain,Baskonia,28.0,14.1,5.7,45.5,30.8,diop-ilimane
+2020-21,EuroLeague,Baskonia,27.0,6.7,1.3,35.3,33.3,diop-ilimane
+2020-21,Spain,Baskonia,31.0,10.3,4.2,42.2,35.7,diop-ilimane
+2021-22,EuroCup,Gran Canaria,18.0,12.3,3.6,47.1,37.5,diop-ilimane
+2021-22,Spain,Gran Canaria,24.0,11.3,3.0,38.1,14.3,diop-ilimane
+2022-23,BCL Europe,Murcia,15.0,12.8,6.3,45.3,27.8,diop-ilimane
+2022-23,Spain,Murcia,33.0,12.8,5.7,41.0,32.7,diop-ilimane
+2023-24,BCL Europe,Oostende,7.0,19.5,6.4,50.0,0.0,diop-ilimane
+2023-24,BCL Europe,Tenerife,8.0,7.8,3.8,66.7,0.0,diop-ilimane
+2023-24,Belgium,Oostende,11.0,19.5,8.4,46.6,0.0,diop-ilimane
+2023-24,Spain,Unicaja Malaga,1.0,0.7,0.0,0.0,0.0,diop-ilimane
+2023-24,Spain,Tenerife,15.0,8.8,3.3,62.1,33.3,diop-ilimane
+2024-25,BCL Europe,Tenerife,6.0,8.6,3.8,52.9,25.0,diop-ilimane
+2024-25,Spain,Tenerife,8.0,3.7,1.8,30.0,25.0,diop-ilimane
+2025-26,Spain,Coruna,38.0,19.4,8.6,48.9,20.0,diop-ilimane
+2010-11,NCAA,Florida State,23.0,14.4,5.5,37.5,35.8,ian-bennett-miller
+2011-12,NCAA,Florida State,24.0,23.5,10.3,39.7,35.4,ian-bennett-miller
+2012-13,NCAA,Florida State,28.0,18.8,5.3,32.7,27.7,ian-bennett-miller
+2013-14,NCAA,Florida State,33.0,28.4,13.7,44.9,39.9,ian-bennett-miller
+2015-16,Italy,Torino,21.0,21.0,8.9,38.0,30.9,ian-bennett-miller
+2016-17,VTB United League,Astana Tigers,27.0,28.2,14.7,37.1,34.0,ian-bennett-miller
+2017-18,France,Gravelines-Dunkerque,8.0,23.3,10.1,37.0,32.5,ian-bennett-miller
+2017-18,Turkey,Usak Sportlif,19.0,21.7,9.3,40.4,28.4,ian-bennett-miller
+2018-19,Israel,Hapoel Gilboa Galil,29.0,25.8,15.4,41.7,41.0,ian-bennett-miller
+2019-20,France,Chorale Roanne,25.0,28.2,17.2,40.5,38.2,ian-bennett-miller
+2020-21,EuroCup,Promitheas,10.0,25.5,15.6,40.9,35.7,ian-bennett-miller
+2020-21,France,Cholet,17.0,24.7,13.4,38.6,33.0,ian-bennett-miller
+2020-21,Greece,Promitheas,12.0,23.7,12.1,41.4,30.8,ian-bennett-miller
+2021-22,Greece,Peristeri,10.0,22.4,10.4,36.3,31.3,ian-bennett-miller
+2021-22,Turkey,Buyukcekmece,16.0,26.7,13.6,41.3,35.1,ian-bennett-miller
+2024-25,Lithuania,Juventus,6.0,17.0,11.0,45.2,36.4,ian-bennett-miller
+2015-16,NCAA,UC Irvine,38.0,14.4,2.7,55.4,0.0,jonathan-galloway
+2016-17,NCAA,UC Irvine,36.0,25.3,4.4,43.2,0.0,jonathan-galloway
+2017-18,NCAA,UC Irvine,35.0,25.5,3.6,47.2,0.0,jonathan-galloway
+2018-19,NCAA,UC Irvine,37.0,24.6,6.9,60.6,0.0,jonathan-galloway
+2019-20,Europe Cup,Bakken Bears,14.0,10.5,2.9,68.2,100.0,jonathan-galloway
+2020-21,Adriatic League,KK Zadar,3.0,10.5,1.0,25.0,0.0,jonathan-galloway
+2020-21,Switzerland,Monthey,25.0,33.1,14.2,59.9,100.0,jonathan-galloway
+2021-22,Czech Republic,Decin,8.0,16.1,4.0,47.1,0.0,jonathan-galloway
+2021-22,Finland,Nilan Bisons,23.0,23.1,8.3,54.9,0.0,jonathan-galloway
+2022-23,Switzerland,SAM Massagno,40.0,22.9,10.2,60.9,0.0,jonathan-galloway
+2023-24,Cyprus,APOEL Nicosia,12.0,16.9,5.4,60.6,0.0,jonathan-galloway
+2024-25,Kosovo,Peja,11.0,28.8,9.0,59.3,0.0,jonathan-galloway
+2024-25,Switzerland,Geneva Lions,4.0,20.9,10.8,69.6,0.0,jonathan-galloway
+2016-17,NCAA,Georgia,30.0,16.5,4.7,43.4,44.9,jordan-harris
+2017-18,NCAA,Georgia,18.0,15.8,3.5,40.4,27.3,jordan-harris
+2018-19,NCAA,Georgia,29.0,19.9,7.8,48.7,41.5,jordan-harris
+2019-20,NCAA,Georgia,23.0,20.0,7.1,50.4,29.2,jordan-harris
+2022-23,Belgium,Willebroek Kangoeroes,16.0,18.1,7.0,43.8,37.9,jordan-harris
+2022-23,Poland,Arka Gdynia,15.0,20.5,6.1,38.1,30.8,jordan-harris
+2023-24,Belgium,Brussels Basketball,31.0,23.7,11.9,57.0,36.1,jordan-harris
+2024-25,Italy,Varese,8.0,18.4,8.1,42.9,38.9,jordan-harris
+2017-18,NCAA,Lehigh,30.0,22.9,7.1,46.4,0.0,karnik-james
+2018-19,NCAA,Lehigh,31.0,22.5,9.3,59.2,0.0,karnik-james
+2019-20,NCAA,Lehigh,22.0,28.3,12.2,57.2,0.0,karnik-james
+2020-21,NCAA,Boston College,14.0,19.9,6.8,43.9,26.7,karnik-james
+2021-22,NCAA,Boston College,33.0,23.0,9.8,55.8,26.3,karnik-james
+2022-23,Czech Republic,Brno,5.0,9.9,4.8,35.3,33.3,karnik-james
+2022-23,Switzerland,Geneva Lions,3.0,22.6,10.3,38.5,0.0,karnik-james
+2024-25,Netherlands,Donar Groningen,34.0,27.4,15.4,55.4,20.0,karnik-james
+2025-26,EuroCup,Neptunas,6.0,18.8,12.0,62.2,25.0,karnik-james
+2025-26,Lithuania,Neptunas,6.0,12.0,5.7,62.5,50.0,karnik-james
+2025-26,Spain,Girona,6.0,14.1,6.2,40.6,0.0,karnik-james
+2016-17,NCAA,Oregon,37.0,9.8,3.0,45.5,0.0,kavell-chevano-bigby-williams
+2018-19,NCAA,Louisiana State,35.0,21.2,7.9,61.7,0.0,kavell-chevano-bigby-williams
+2019-20,G League,Erie BayHawks,26.0,22.4,8.1,46.1,10.0,kavell-chevano-bigby-williams
+2019-20,G League,Sioux Falls Skyforce,7.0,13.9,4.9,50.0,0.0,kavell-chevano-bigby-williams
+2019-20,G League,Fort Wayne Mad Ants,3.0,20.3,2.7,37.5,,kavell-chevano-bigby-williams
+2019-20,G League,Total (G League),36.0,20.6,7.0,46.3,9.1,kavell-chevano-bigby-williams
+2020-21,Belgium,Antwerp Giants,17.0,16.6,7.0,50.6,0.0,kavell-chevano-bigby-williams
+2020-21,Italy,Cantu,7.0,15.0,6.4,50.0,0.0,kavell-chevano-bigby-williams
+2021-22,G League,Fort Wayne Mad Ants,23.0,14.4,6.1,53.8,25.0,kavell-chevano-bigby-williams
+2021-22,Poland,Anwil Wloclawek,12.0,21.1,8.0,57.6,0.0,kavell-chevano-bigby-williams
+2022-23,France,Boulazac,4.0,19.5,3.0,30.8,0.0,kavell-chevano-bigby-williams
+2024-25,China,Jilin,35.0,24.5,13.4,54.2,0.0,kavell-chevano-bigby-williams
+2024-25,Mexico,Astros de Jalisco,2.0,16.0,7.0,31.6,0.0,kavell-chevano-bigby-williams
+2020-21,NCAA,High Point,24.0,26.8,11.0,48.9,13.0,lydell-devron-elmore
+2021-22,G League,Westchester Knicks,23.0,12.4,5.1,68.9,0.0,lydell-devron-elmore
+2022-23,G League,Westchester Knicks,4.0,16.5,3.0,35.7,0.0,lydell-devron-elmore
+2024-25,Mexico,Correcaminos UAT Victoria,32.0,28.1,9.8,49.4,20.0,lydell-devron-elmore
+2017-18,NCAA,North Carolina,37.0,10.0,5.4,56.6,0.0,manley-sterling
+2018-19,NCAA,North Carolina,18.0,8.3,3.5,57.8,0.0,manley-sterling
+2020-21,NCAA,North Carolina,4.0,1.0,0.5,50.0,0.0,manley-sterling
+2021-22,China,Sichuan,10.0,14.5,7.7,40.3,0.0,manley-sterling
+2024-25,G League,Rip City Remix,23.0,18.1,12.4,63.7,,manley-sterling
+2016-17,NCAA,Penn State,33.0,23.8,9.7,59.0,0.0,mike-watkins
+2017-18,NCAA,Penn State,29.0,26.3,12.1,68.5,0.0,mike-watkins
+2018-19,NCAA,Penn State,27.0,20.8,7.8,56.1,0.0,mike-watkins
+2019-20,NCAA,Penn State,30.0,21.1,9.7,54.5,0.0,mike-watkins
+2021-22,Israel,Hapoel Haifa,1.0,11.0,4.0,100.0,0.0,mike-watkins
+2023-24,G League,Delaware Blue Coats,2.0,5.5,1.0,50.0,,mike-watkins
+2024-25,Mexico,Soles de Mexicali,25.0,16.8,9.4,57.3,20.0,mike-watkins
+2012-13,NCAA,UTEP,25.0,24.4,8.6,45.4,35.1,moore-mckenzie-zachary
+2013-14,NCAA,UTEP,11.0,27.3,13.1,44.4,37.0,moore-mckenzie-zachary
+2014-15,New Zealand,Nelson Giants,19.0,30.6,21.7,46.7,26.2,moore-mckenzie-zachary
+2015-16,Belgium,Leuven Bears,1.0,13.0,4.0,28.6,0.0,moore-mckenzie-zachary
+2015-16,New Zealand,Canterbury Rams,13.0,34.4,22.4,46.5,37.3,moore-mckenzie-zachary
+2016-17,Greece,Promitheas,26.0,29.6,11.0,44.2,30.0,moore-mckenzie-zachary
+2016-17,New Zealand,Canterbury Rams,6.0,35.9,17.8,43.0,37.5,moore-mckenzie-zachary
+2017-18,Greece,Lavrio,25.0,27.9,17.1,50.0,35.7,moore-mckenzie-zachary
+2018-19,BCL Europe,Bandirma,8.0,29.4,13.0,51.4,26.7,moore-mckenzie-zachary
+2018-19,Europe Cup,Avtodor Saratov,2.0,26.4,14.0,55.6,40.0,moore-mckenzie-zachary
+2018-19,Turkey,Bandirma,9.0,26.9,9.1,36.8,19.0,moore-mckenzie-zachary
+2018-19,VTB United League,Avtodor Saratov,4.0,26.8,13.5,40.9,22.2,moore-mckenzie-zachary
+2019-20,BCL Europe,Anwil Wloclawek,1.0,18.9,11.0,33.3,50.0,moore-mckenzie-zachary
+2019-20,Poland,Anwil Wloclawek,1.0,24.1,16.0,66.7,66.7,moore-mckenzie-zachary
+2020-21,Israel,Ironi Nahariya,9.0,28.1,13.2,51.5,38.5,moore-mckenzie-zachary
+2020-21,Poland,Anwil Wloclawek,12.0,28.5,11.8,38.0,28.3,moore-mckenzie-zachary
+2013-14,D League,Delaware 87ers,35.0,13.1,5.5,51.3,0.0,norvel-pelle-2
+2014-15,D League,Delaware 87ers,4.0,10.5,5.3,75.0,,norvel-pelle-2
+2016-17,BCL Europe,Varese,13.0,18.4,6.8,56.4,0.0,norvel-pelle-2
+2016-17,Italy,Varese,29.0,15.7,7.2,67.2,0.0,norvel-pelle-2
+2017-18,Italy,Varese,19.0,15.4,5.7,67.2,0.0,norvel-pelle-2
+2017-18,Italy,Torino,10.0,13.2,6.8,60.5,0.0,norvel-pelle-2
+2018-19,G League,Delaware Blue Coats,36.0,22.8,11.1,69.9,,norvel-pelle-2
+2019-20,G League,Delaware Blue Coats,8.0,22.5,13.9,64.8,0.0,norvel-pelle-2
+2019-20,NBA,Philadelphia 76ers,24.0,9.7,2.4,52.1,0.0,norvel-pelle-2
+2020-21,G League,Canton Charge,3.0,24.3,10.0,70.0,0.0,norvel-pelle-2
+2020-21,NBA,Brooklyn Nets,3.0,9.3,2.0,42.9,,norvel-pelle-2
+2020-21,NBA,New York Knicks,9.0,5.8,1.2,71.4,,norvel-pelle-2
+2020-21,NBA,Sacramento Kings,1.0,4.0,3.0,0.0,,norvel-pelle-2
+2020-21,NBA,Total (NBA),13.0,6.5,1.5,53.3,,norvel-pelle-2
+2021-22,G League,Cleveland Charge,19.0,16.7,6.6,64.9,42.9,norvel-pelle-2
+2021-22,NBA,Utah Jazz,3.0,6.3,2.0,60.0,,norvel-pelle-2
+2022-23,G League,Fort Wayne Mad Ants,11.0,13.2,5.0,45.7,,norvel-pelle-2
+2020-21,G League,G League Ignite,4.0,6.3,2.3,50.0,100.0,princepal-singh
+2010-11,NCAA,Drake,31.0,30.1,13.8,40.2,29.5,rayvonte-rice
+2011-12,NCAA,Drake,33.0,33.3,16.8,43.6,24.1,rayvonte-rice
+2013-14,NCAA,Illinois,35.0,32.7,15.9,43.0,29.5,rayvonte-rice
+2014-15,NCAA,Illinois,24.0,30.0,16.5,47.1,43.6,rayvonte-rice
+2016-17,France,Aix Maurienne,21.0,23.6,10.2,39.4,28.9,rayvonte-rice
+2018-19,Mexico,Soles de Mexicali,14.0,31.7,21.1,46.3,39.3,rayvonte-rice
+2019-20,Israel,Hapoel Eilat,8.0,33.0,18.1,41.7,38.0,rayvonte-rice
+2019-20,Israel,Ironi Nes Ziona,10.0,30.9,13.4,38.8,31.6,rayvonte-rice
+2019-20,VTB United League,Avtodor Saratov,2.0,12.9,4.5,23.1,0.0,rayvonte-rice
+2020-21,Japan,Kyoto Hannaryz,51.0,25.3,19.6,45.1,33.0,rayvonte-rice
+2021-22,G League,Salt Lake City Stars,23.0,29.1,11.8,40.4,31.9,rayvonte-rice
+2021-22,Greece,Ionikos,2.0,21.1,12.5,38.1,41.7,rayvonte-rice
+2024-25,China,Guangdong,3.0,1.7,0.0,0.0,0.0,rayvonte-rice
+2020-21,NCAA,Central Florida,20.0,12.9,5.0,48.7,0.0,reynolds-jamille-reakwon
+2021-22,NCAA,Central Florida,25.0,9.6,3.4,49.2,100.0,reynolds-jamille-reakwon
+2022-23,NCAA,Temple,22.0,19.9,10.1,60.4,50.0,reynolds-jamille-reakwon
+2023-24,NCAA,Cincinnati,28.0,14.3,5.5,53.3,42.9,reynolds-jamille-reakwon
+2024-25,NCAA,South Florida,29.0,26.2,12.5,53.0,14.8,reynolds-jamille-reakwon
+2025-26,China,Tianjin,41.0,13.0,6.6,64.4,25.0,reynolds-jamille-reakwon
+2015-16,NCAA,Syracuse,37.0,34.4,13.4,36.9,35.3,richardson-malachi
+2016-17,D League,Reno Bighorns,11.0,35.0,21.0,42.6,44.0,richardson-malachi
+2016-17,NBA,Sacramento Kings,22.0,9.0,3.6,41.2,28.6,richardson-malachi
+2017-18,G League,Reno Bighorns,6.0,28.8,12.0,35.3,34.6,richardson-malachi
+2017-18,G League,Raptors 905,12.0,21.0,7.2,31.2,28.3,richardson-malachi
+2017-18,G League,Total (G League),18.0,23.6,8.8,32.9,30.6,richardson-malachi
+2017-18,NBA,Sacramento Kings,25.0,12.8,3.5,33.0,30.8,richardson-malachi
+2017-18,NBA,Toronto Raptors,1.0,5.0,2.0,50.0,0.0,richardson-malachi
+2017-18,NBA,Total (NBA),26.0,12.5,3.4,33.3,30.0,richardson-malachi
+2018-19,G League,Raptors 905,12.0,35.2,20.8,41.3,39.3,richardson-malachi
+2018-19,NBA,Toronto Raptors,22.0,4.7,1.4,31.0,32.0,richardson-malachi
+2019-20,BCL Europe,Hapoel Holon,8.0,21.9,11.3,50.0,52.0,richardson-malachi
+2019-20,Israel,Hapoel Tel Aviv,7.0,23.9,12.0,34.8,35.5,richardson-malachi
+2019-20,Italy,Vanoli Cremona,6.0,29.0,11.8,44.2,46.2,richardson-malachi
+2020-21,G League,Canton Charge,14.0,19.9,8.4,40.4,45.0,richardson-malachi
+2021-22,Italy,Fortitudo Bologna,6.0,22.5,10.3,36.4,38.1,richardson-malachi
+2021-22,Poland,King Szczecin,16.0,27.3,15.4,45.8,42.2,richardson-malachi
+2022-23,Poland,GTK Gliwice,17.0,29.8,16.0,39.6,37.4,richardson-malachi
+2024-25,Mexico,Astros de Jalisco,3.0,30.0,11.0,34.4,22.2,richardson-malachi
+2018-19,NCAA,Kent State,31.0,17.6,5.9,42.6,28.6,roberts-nathaniel-anthony
+2019-20,NCAA,Kent State,30.0,29.0,12.7,44.0,36.3,roberts-nathaniel-anthony
+2020-21,NCAA,St. Bonaventure,3.0,21.3,5.3,26.1,16.7,roberts-nathaniel-anthony
+2021-22,NCAA,Stony Brook,29.0,29.6,16.3,40.9,31.5,roberts-nathaniel-anthony
+2022-23,Portugal,Vitoria Guimaraes,30.0,31.0,21.9,47.6,32.9,roberts-nathaniel-anthony
+2023-24,France,Le Portel,4.0,26.0,10.3,33.3,14.3,roberts-nathaniel-anthony
+2023-24,Hungary,Alba Fehervar,23.0,22.4,14.2,48.9,41.6,roberts-nathaniel-anthony
+2024-25,Poland,Stal Ostrow,7.0,31.4,13.7,48.7,35.0,roberts-nathaniel-anthony
+2024-25,Romania,Dinamo Bucuresti,31.0,23.5,14.6,44.1,29.4,roberts-nathaniel-anthony
+2010-11,NCAA,Kansas,33.0,14.6,7.6,60.1,0.0,robinson-thomas
+2011-12,NCAA,Kansas,39.0,31.8,17.7,50.5,50.0,robinson-thomas
+2012-13,NBA,Houston Rockets,19.0,13.0,4.5,44.9,0.0,robinson-thomas
+2012-13,NBA,Sacramento Kings,51.0,15.9,4.8,42.4,,robinson-thomas
+2012-13,NBA,Total (NBA),70.0,15.1,4.8,43.0,0.0,robinson-thomas
+2013-14,NBA,Portland Trail Blazers,70.0,12.5,4.8,48.1,0.0,robinson-thomas
+2014-15,NBA,Portland Trail Blazers,32.0,12.2,3.6,51.6,,robinson-thomas
+2014-15,NBA,Philadelphia 76ers,22.0,18.5,8.8,46.7,0.0,robinson-thomas
+2014-15,NBA,Total (NBA),54.0,14.8,5.7,48.5,0.0,robinson-thomas
+2015-16,NBA,Brooklyn Nets,71.0,12.9,4.3,44.7,0.0,robinson-thomas
+2016-17,NBA,L.A. Lakers,48.0,11.7,5.0,53.6,0.0,robinson-thomas
+2017-18,EuroLeague,Khimki,20.0,15.6,8.2,48.6,0.0,robinson-thomas
+2017-18,VTB United League,Khimki,8.0,16.4,9.3,49.1,0.0,robinson-thomas
+2018-19,China,Beikong Fly Dragons,26.0,31.3,21.9,51.4,10.0,robinson-thomas
+2018-19,G League,Maine Red Claws,4.0,26.5,19.0,58.5,25.0,robinson-thomas
+2019-20,China,Sichuan,11.0,27.8,16.5,51.4,0.0,robinson-thomas
+2019-20,EuroLeague,Khimki,4.0,10.7,4.3,61.5,0.0,robinson-thomas
+2019-20,VTB United League,Khimki,2.0,12.0,8.0,53.8,0.0,robinson-thomas
+2020-21,EuroCup,Bahcesehir,2.0,27.8,12.5,40.0,0.0,robinson-thomas
+2020-21,Turkey,Bahcesehir,9.0,25.0,11.3,53.2,0.0,robinson-thomas
+2021-22,South Korea,Seoul Samsung Thunders,15.0,23.0,16.1,44.1,16.7,robinson-thomas
+2024-25,Mexico,Astros de Jalisco,3.0,22.2,11.0,46.7,0.0,robinson-thomas
+2020-21,NBA,L.A. Clippers,4.0,21.0,8.8,38.9,22.2,scrubb-jayden-amari
+2021-22,G League,Agua Caliente Clippers,3.0,18.3,16.0,45.0,43.8,scrubb-jayden-amari
+2021-22,NBA,L.A. Clippers,18.0,6.7,2.7,39.1,28.6,scrubb-jayden-amari
+2022-23,G League,Lakeland Magic,28.0,30.8,22.2,45.7,28.3,scrubb-jayden-amari
+2022-23,NBA,Orlando Magic,2.0,15.0,6.5,71.4,100.0,scrubb-jayden-amari
+2024-25,G League,Maine Celtics,31.0,24.7,16.0,43.4,33.5,scrubb-jayden-amari
+2025-26,G League,Long Island Nets,4.0,12.3,5.8,36.8,16.7,scrubb-jayden-amari
+2025-26,Turkey,Manisa,4.0,21.5,5.5,50.0,0.0,scrubb-jayden-amari
+2013-14,NCAA,UNLV,31.0,14.4,3.8,40.7,35.0,smith-kendall
+2014-15,NCAA,UNLV,2.0,7.0,0.5,0.0,0.0,smith-kendall
+2015-16,NCAA,Cal State Northridge,21.0,34.3,15.3,38.6,27.2,smith-kendall
+2016-17,NCAA,Cal State Northridge,30.0,33.4,16.7,44.8,37.5,smith-kendall
+2017-18,NCAA,Oklahoma State,35.0,26.9,13.1,40.1,41.0,smith-kendall
+2018-19,BCL Europe,Nymburk,3.0,14.5,6.0,30.4,0.0,smith-kendall
+2018-19,Belgium,Okapi Aalstar,28.0,22.3,11.1,42.2,29.9,smith-kendall
+2018-19,Czech Republic,Nymburk,7.0,20.0,12.4,43.2,19.4,smith-kendall
+2019-20,G League,Stockton Kings,7.0,7.1,2.9,38.9,20.0,smith-kendall
+2019-20,G League,Westchester Knicks,3.0,12.3,2.0,33.3,,smith-kendall
+2019-20,G League,Total (G League),10.0,8.7,2.6,37.5,20.0,smith-kendall
+2021-22,G League,Santa Cruz Warriors,25.0,27.6,10.3,41.9,29.3,smith-kendall
+2022-23,Greece,Kolossos Rhodes,16.0,21.2,10.9,45.7,40.0,smith-kendall
+2023-24,BCL Europe,PAOK Thessaloniki,4.0,21.8,11.3,43.8,50.0,smith-kendall
+2023-24,Greece,PAOK Thessaloniki,7.0,26.1,10.9,38.2,36.7,smith-kendall
+2023-24,VTB United League,Nizhny Novgorod,10.0,17.7,11.7,44.7,34.8,smith-kendall
+2024-25,China,Qingdao,14.0,9.5,3.7,36.2,33.3,smith-kendall
+2024-25,France,Chorale Roanne,6.0,20.8,11.2,41.3,33.3,smith-kendall
+2024-25,Greece,Panionios,8.0,29.0,12.3,37.6,31.4,smith-kendall
+2025-26,Greece,Koroivos,9.0,32.6,21.8,41.1,34.6,smith-kendall
+2012-13,NCAA,Northern Illinois,18.0,19.8,7.7,33.1,25.0,springs-akeem
+2014-15,NCAA,Milwaukee,28.0,31.0,10.3,40.7,28.6,springs-akeem
+2015-16,NCAA,Milwaukee,32.0,31.9,13.2,49.0,35.1,springs-akeem
+2016-17,NCAA,Minnesota,32.0,24.0,9.5,38.1,38.3,springs-akeem
+2017-18,G League,Canton Charge,16.0,13.5,4.3,37.1,28.6,springs-akeem
+2017-18,G League,Salt Lake City Stars,12.0,22.8,8.8,37.5,36.8,springs-akeem
+2017-18,G League,Total (G League),28.0,17.5,6.2,37.3,33.3,springs-akeem
+2018-19,G League,Salt Lake City Stars,13.0,15.5,4.5,31.7,28.3,springs-akeem
+2016-17,Australia,Adelaide 36ers,30.0,15.2,4.6,38.1,31.3,terrance-ferguson
+2017-18,G League,Oklahoma City Blue,3.0,31.0,14.7,47.2,27.8,terrance-ferguson
+2017-18,NBA,Oklahoma City Thunder,61.0,12.5,3.1,41.4,33.3,terrance-ferguson
+2018-19,NBA,Oklahoma City Thunder,74.0,26.1,6.9,42.9,36.6,terrance-ferguson
+2019-20,NBA,Oklahoma City Thunder,56.0,22.4,3.9,35.5,29.2,terrance-ferguson
+2020-21,NBA,Philadelphia 76ers,13.0,3.8,0.2,14.3,0.0,terrance-ferguson
+2021-22,BCL Europe,Lavrio,2.0,17.4,0.0,0.0,0.0,terrance-ferguson
+2021-22,G League,Rio Grande Valley Vipers,21.0,17.8,3.0,29.5,12.8,terrance-ferguson
+2021-22,Greece,Lavrio,1.0,10.2,5.0,66.7,100.0,terrance-ferguson
+2022-23,Poland,GTK Gliwice,29.0,26.9,8.5,43.8,30.1,terrance-ferguson
+2023-24,Kosovo,Bashkimi,1.0,8.4,0.0,0.0,0.0,terrance-ferguson
+2025-26,Mexico,Santos de San Luis Potosi,12.0,29.2,10.0,37.8,25.5,terrance-ferguson
+2011-12,NCAA,Texas Tech,31.0,23.8,11.5,52.1,0.0,tolbert-jordan-wayne
+2012-13,NCAA,Texas Tech,31.0,23.0,9.9,54.2,0.0,tolbert-jordan-wayne
+2013-14,NCAA,Texas Tech,32.0,26.3,10.7,54.8,30.3,tolbert-jordan-wayne
+2015-16,NCAA,Southern Methodist,30.0,26.6,11.6,55.6,50.0,tolbert-jordan-wayne
+2017-18,France,Hyeres-Toulon,27.0,24.2,7.5,49.5,12.5,tolbert-jordan-wayne
+2018-19,France,Caen,29.0,31.1,11.6,57.4,16.7,tolbert-jordan-wayne
+2019-20,Belgium,Brussels Basketball,1.0,18.0,5.0,16.7,0.0,tolbert-jordan-wayne
+2020-21,NCAA,Morgan State,16.0,4.7,1.6,55.0,0.0,venning-chad-roney
+2021-22,NCAA,Morgan State,26.0,13.8,7.2,50.9,0.0,venning-chad-roney
+2022-23,NCAA,St. Bonaventure,32.0,28.0,12.7,58.1,0.0,venning-chad-roney
+2023-24,NCAA,St. Bonaventure,33.0,24.1,13.4,52.9,0.0,venning-chad-roney
+2024-25,NCAA,Boston College,29.0,26.2,12.4,54.8,0.0,venning-chad-roney
+2016-17,NCAA,Michigan State,35.0,19.8,13.9,59.2,0.0,ward-nick
+2017-18,NCAA,Michigan State,35.0,18.9,12.4,64.8,100.0,ward-nick
+2018-19,NCAA,Michigan State,34.0,20.8,12.9,58.0,100.0,ward-nick
+2019-20,G League,College Park Skyhawks,34.0,20.4,13.2,60.5,,ward-nick
+2021-22,Spain,Coruna,36.0,21.1,13.8,58.9,42.9,ward-nick
+2023-24,France,Metropolitans 92,12.0,17.9,10.1,65.2,0.0,ward-nick
+2023-24,Kosovo,Sigal Prishtina,2.0,29.1,19.5,68.2,0.0,ward-nick
+2023-24,Lithuania,Gargzdu,13.0,30.6,20.2,59.2,33.3,ward-nick
+2024-25,Portugal,Sporting Clube,25.0,26.9,15.6,68.0,50.0,ward-nick
+2025-26,France,Quimper,6.0,16.7,11.8,56.6,0.0,ward-nick
+2010-11,NCAA,Norfolk State,32.0,22.2,8.1,45.9,39.4,williams-pendarvis
+2011-12,NCAA,Norfolk State,35.0,28.7,11.9,45.9,38.6,williams-pendarvis
+2012-13,NCAA,Norfolk State,31.0,33.1,14.3,45.3,40.6,williams-pendarvis
+2013-14,NCAA,Norfolk State,34.0,34.5,15.6,49.1,35.5,williams-pendarvis
+2015-16,Italy,Virtus Bologna,11.0,23.6,7.5,41.3,27.6,williams-pendarvis
+2016-17,D League,Maine Red Claws,10.0,6.3,0.6,33.3,0.0,williams-pendarvis
+2018-19,Germany,Goettingen,34.0,22.3,9.1,42.1,31.4,williams-pendarvis
+2019-20,France,Vichy,23.0,28.0,12.8,49.1,33.3,williams-pendarvis

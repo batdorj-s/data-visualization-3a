@@ -16,6 +16,7 @@ from src.charts import comparison as C  # noqa: E402
 from src.charts import distribution as D  # noqa: E402
 from src.charts import geo_network as G  # noqa: E402
 from src.charts import ml as M  # noqa: E402
+from src.charts import imports as IMP  # noqa: E402
 from src.charts import insights as IN  # noqa: E402
 from src.charts import shots as SH  # noqa: E402
 from src.charts import relation as R  # noqa: E402
@@ -103,6 +104,21 @@ def _insight(i: dict) -> dict:
     return i["_insight"]
 
 
+def _imports(i: dict) -> dict:
+    """Гадаад тоглогчийн хүснэгтүүдийг нэг удаа тооцно (import_sources-ийн гаралт байхгүй бол алгасна)."""
+    if "_imports" not in i:
+        from src import imports as IM
+
+        bg = pd.read_csv(ROOT / "data" / "raw" / "import_background_raw.csv")
+        im = IM.import_table(i["ps_all"], i["pg"], bg)
+        ret = IM.retention(i["ps_all"], im)
+        i["_imports"] = {"bg": bg, "im": im, "ret": ret, "n_persons": int(bg.player_id.nunique()),
+                         "ret_cmp": IM.compare_groups(ret, ret.stayed, IM.RET_METRICS),
+                         "pm": IM.position_minutes(i["ps_all"]), "conc": IM.position_concentration(i["ps_all"]),
+                         "age": IM.age_performance(im), "hyp": IM.hypotheses(i["ps_all"], im)}
+    return i["_imports"]
+
+
 def _assist_network(i: dict):
     a = i["assists"][(i["assists"].season == MAIN_SEASON) & (i["assists"].phase == "regular")]
     team = a.team_key.value_counts().idxmax()
@@ -184,6 +200,12 @@ FIGURE_SPECS: list[tuple[str, Callable[[dict], Any]]] = [
     ("F24_off_def", lambda i: IN.fig_off_def(_insight(i)["ratings"])),
     ("F25_usage_efficiency", lambda i: IN.fig_usage_efficiency(_insight(i)["usage"])),
     ("U11_stability", lambda i: IN.fig_stability(_insight(i)["stability"])),
+    ("F26_import_pipeline", lambda i: IMP.fig_import_pipeline(_imports(i)["bg"], _imports(i)["n_persons"])),
+    ("F27_import_retention", lambda i: IMP.fig_import_retention(_imports(i)["ret_cmp"], int(_imports(i)["ret"].stayed.sum()),
+                                                               len(_imports(i)["ret"]))),
+    ("F28_import_position", lambda i: IMP.fig_import_position(_imports(i)["pm"], _imports(i)["conc"])),
+    ("F29_import_age", lambda i: IMP.fig_import_age(_imports(i)["im"], _imports(i)["age"])),
+    ("U12_import_hypotheses", lambda i: IMP.fig_import_hypotheses(_imports(i)["hyp"])),
 ]
 
 

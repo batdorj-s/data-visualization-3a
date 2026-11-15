@@ -178,6 +178,16 @@ NOTEBOOKS = {
         md("## 4. Шалтгаан, үр дагавар"),
         md(f"{DRAFT} Хамт өөрчлөгдөх нь шалтгаан гэсэн үг биш (гадаад тоглогч илүү олон минут тоглодог). Гэрийн талбайн "
            "давуу тал батлагдаагүй (H2) — ихэнх тоглолт нэг заалд болдог."),
+        md("## Гадаад тоглогч ба солилцоо\n\nГарал үүслийг ShamSports-ийн карьерын хуудаснаас (`src/import_sources.py`) авч, "
+           "MBA-ийн профайлтай төрсөн он эсвэл өндрөөр тулгасан. Гэрээ, цалин нийтэд ил биш тул «үлдсэн» = дараа улирлын "
+           "статистикт гарсан."),
+        code('bg = pd.read_csv(ROOT / "data" / "raw" / "import_background_raw.csv")\n'
+             'display(bg.status.value_counts())\n'
+             'from src import imports as IM\n'
+             'im = IM.import_table(pd.read_csv(P / "players_season.csv"), pd.read_csv(P / "player_games.csv"), bg)\n'
+             'IM.hypotheses(pd.read_csv(P / "players_season.csv"), im).round(3)'),
+        *figs(["U12_import_hypotheses", "F26_import_pipeline", "F27_import_retention", "F28_import_position", "F29_import_age"],
+              "Гадаад тоглогчдыг хэрхэн сонгож байгаа талаарх дүгнэлтээ (батлагдсан ба батлагдаагүй таамаглал) өөрийн үгээр бичнэ."),
         md("## 5. Практик санал"),
         md(f"{DRAFT} Жишээ: (1) дунд зайн шидэлтийг багасгаж сагсны доор ба булангийн 3 оноо руу шилжүүлэх (F15); "
            "(2) дотоод тоглогчийн минутыг нэмэх; (3) цөөн тоглогчоос хамаарал өндөр багуудад (P2) гүнийг нэмэх."),

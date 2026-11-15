@@ -113,6 +113,25 @@ def _pbp_tables(p: Path, r: Path, games: pd.DataFrame, pg: pd.DataFrame, metrics
         "ins_usage": I.usage_table(pg),
         "ins_stability": I.season_stability(ps_all),
     }
+    from src import imports as IM
+
+    bg_path = ROOT / "data" / "raw" / "import_background_raw.csv"
+    if bg_path.exists():
+        bg = pd.read_csv(bg_path)
+        im = IM.import_table(ps_all, pg, bg)
+        ret = IM.retention(ps_all, im)
+        insight.update({
+            "imp_players": im[["player_id", "season", "player_name", "team", "position", "GP", "MIN", "PPG", "RPG", "APG",
+                               "ts_pct", "usage", "pts36", "reb36", "ast36", "tpa_rate", "height_cm", "age", "level",
+                               "nationality", "last_league", "nba_games", "source_url"]],
+            "imp_background": bg[["player_id", "mba_name", "status", "nationality", "level", "last_league", "last_year",
+                                  "pre_draft", "source_url"]],
+            "imp_retention": ret[["player_id", "player_name", "team", "PPG", "MIN", "usage", "ts_pct", "age", "stayed",
+                                  "next_team", "same_team"]],
+            "imp_ret_cmp": IM.compare_groups(ret, ret.stayed, IM.RET_METRICS),
+            "imp_position": IM.position_minutes(ps_all), "imp_conc": IM.position_concentration(ps_all),
+            "imp_hypotheses": IM.hypotheses(ps_all, im),
+        })
     return {
         **insight,
         "shots": shots, "assists": assists, "game_flow": flow, "game_list": game_list,

@@ -7,7 +7,7 @@ import requests
 
 UA = "Mozilla/5.0 (student project)"
 
-BLOCKED_HOSTS = {"asia-basket.com"}
+BLOCKED_HOSTS = {"asia-basket.com", "proballers.com", "realgm.com", "eurobasket.com"}  # robots.txt нь AI хэрэгслийг хориглодог
 BLOCKED_PATH_PREFIXES = {"mongolia.basketball": ("/api", "/admin")}
 
 

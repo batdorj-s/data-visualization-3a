@@ -33,3 +33,12 @@ def test_match_names_returns_pairs():
     assert list(out.columns) == ["left_id", "right_id", "score"]
     assert out[["left_id", "right_id"]].values.tolist() == [["a", "x"]]
     assert 0 < out.score.iloc[0] <= 1
+
+
+def test_same_person_any_order():
+    from src.names import same_person_any_order
+    assert same_person_any_order("MILLER Ian", "IAN Miller")
+    assert same_person_any_order("MCKENZIE Moore", "MOORE Mckenzie Zachary")
+    assert same_person_any_order("EMMANUEL Ejesu", "EJESU Emmanuel Chinedu")
+    assert not same_person_any_order("SMITH Kendall", "SMITH Donovan")
+    assert not same_person_any_order("MILLER", "IAN Miller")  # нэг үгтэй нэрийг холбохгүй

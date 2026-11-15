@@ -495,3 +495,106 @@ def px_stability(df: pd.DataFrame, show_ci: bool) -> go.Figure:
     fig.add_vline(x=0, line_color="black")
     fig.update_xaxes(title="Өмнөх ба энэ улирлын хамаарлын хүч (0 = холбоогүй, 1 = ижил)", range=[-0.5, 1.02])
     return _layout(fig, "Юу улирлаас улиралд хадгалагддаг вэ", height=400, showlegend=False)
+
+
+# ---------- Гадаад тоглогч ба солилцоо ----------
+VERDICT_HEX = {"Батлагдсан": PALETTE["green"], "Няцаагдсан": PALETTE["vermillion"], "Баттай биш": NEUTRAL}
+LEVEL_ORDER = ["NBA", "EuroLeague / EuroCup", "G League", "Бусад мэргэжлийн лиг", "Мэргэжлийн туршлагагүй", "Тодорхойгүй"]
+LEVEL_HEX = dict(zip(LEVEL_ORDER, ["#08306B", A_COLOR, "#56B4E9", "#9ECAE1", "#BDBDBD", "#F0F0F0"]))
+
+
+def px_import_hypotheses(h: pd.DataFrame, show_ci: bool) -> go.Figure:
+    fig = make_subplots(rows=len(h), cols=1, vertical_spacing=0.11,
+                        subplot_titles=[f"{r.hid}: {r.statement} — <b>{r.verdict}</b>" for r in h.itertuples()])
+    for k, r in enumerate(h.itertuples(), 1):
+        color = VERDICT_HEX[r.verdict]
+        pct = r.hid == "H8"
+        if show_ci:
+            fig.add_trace(go.Scatter(x=[r.lo, r.hi], y=[0, 0], mode="lines", line=dict(color=color, width=8),
+                                     opacity=0.45, hoverinfo="skip", showlegend=False), row=k, col=1)
+        fmt = ".0%" if pct else ".2f"
+        fig.add_trace(go.Scatter(x=[r.estimate], y=[0], mode="markers", marker=dict(color=color, size=13), showlegend=False,
+                                 hovertemplate=f"{r.measure}<br>утга %{{x:{fmt}}}<br>хүрээ {r.lo:{fmt}} … {r.hi:{fmt}}<br>"
+                                               f"{r.n}<extra>{r.hid}</extra>"), row=k, col=1)
+        span = max(abs(r.lo), abs(r.hi)) * 1.25
+        fig.add_vline(x=0, line_dash="dash", line_color="black", row=k, col=1)
+        fig.update_xaxes(range=[-span, span], tickformat="+.0%" if pct else None, row=k, col=1)
+        fig.update_yaxes(visible=False, row=k, col=1)
+    fig.update_annotations(font=dict(size=13), x=0, xanchor="left")
+    return _layout(fig, "Гадаад тоглогчийн 4 таамаглал: датаар шалгасан дүн", height=110 * len(h) + 90)
+
+
+def px_import_pipeline(bg: pd.DataFrame) -> go.Figure:
+    f = bg[bg.status == "олдсон"]
+    lv = f.level.value_counts().reindex(LEVEL_ORDER[:-1], fill_value=0)
+    last = f.last_league.dropna().value_counts().head(8)
+    fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.22,
+                        subplot_titles=["Өмнө тоглосон хамгийн өндөр түвшин", "Ирэхийн өмнөх сүүлийн лиг"])
+    fig.add_trace(go.Bar(x=lv.to_numpy(), y=lv.index, orientation="h", marker_color=[LEVEL_HEX[l] for l in lv.index],
+                         text=lv.to_numpy(), textposition="outside", showlegend=False,
+                         hovertemplate="%{y}: %{x} тоглогч<extra></extra>"), row=1, col=1)
+    fig.add_trace(go.Bar(x=last.to_numpy(), y=last.index, orientation="h",
+                         marker_color=[B_COLOR] + [NEUTRAL] * (len(last) - 1), text=last.to_numpy(), textposition="outside",
+                         showlegend=False, hovertemplate="%{y}: %{x} тоглогч<extra></extra>"), row=1, col=2)
+    fig.update_yaxes(autorange="reversed")
+    fig.update_xaxes(title="Тоглогчийн тоо")
+    return _layout(fig, "Гадаад тоглогчид хаанаас ирж байна", height=400)
+
+
+def px_import_retention(cmp: pd.DataFrame, show_ci: bool) -> go.Figure:
+    fig = make_subplots(rows=1, cols=len(cmp), subplot_titles=list(cmp.label), horizontal_spacing=0.06)
+    for k, r in enumerate(cmp.itertuples(), 1):
+        pct = r.metric in ("usage", "ts_pct")
+        fmt = ".0%" if pct else ".1f"
+        for name, med, lo, hi, color in (("Явсан", r.med_no, r.lo_no, r.hi_no, NEUTRAL),
+                                         ("Үлдсэн", r.med_yes, r.lo_yes, r.hi_yes, B_COLOR)):
+            err = dict(type="data", symmetric=False, array=[hi - med], arrayminus=[med - lo], thickness=3, color=color) if show_ci else None
+            fig.add_trace(go.Scatter(x=[med], y=[name], mode="markers", marker=dict(color=color, size=12), error_x=err,
+                                     showlegend=False, hovertemplate=f"{name}: голч %{{x:{fmt}}}<extra>{r.label}</extra>"),
+                          row=1, col=k)
+        fig.update_xaxes(tickformat=".0%" if pct else None, row=1, col=k,
+                         title=dict(text="баттай ялгаатай" if r.clear else "ялгаа баттай биш", font=dict(size=11)))
+        if k > 1:
+            fig.update_yaxes(showticklabels=False, row=1, col=k)
+    fig.update_annotations(font=dict(size=12))
+    return _layout(fig, "Дараа улиралд үлдсэн ба явсан гадаад тоглогч", height=300)
+
+
+def px_import_position(pm: pd.DataFrame, conc: pd.DataFrame) -> go.Figure:
+    order = ["PG", "SG", "SF", "PF", "C"]
+    names = {"PG": "Тоглуулагч (PG)", "SG": "Шидэгч хамг. (SG)", "SF": "Жижиг довт. (SF)", "PF": "Хүчит довт. (PF)", "C": "Төвийн (C)"}
+    fig = go.Figure()
+    colors = ["#FDCC8A", B_COLOR]
+    for k, season in enumerate(sorted(pm.season.unique())):
+        d = pm[pm.season == season].set_index("position").reindex(order)
+        lab = season.replace("-20", "–")
+        fig.add_trace(go.Bar(x=[names[p] for p in order], y=d.share, name=lab, marker_color=colors[k],
+                             text=[f"{v:.0%}" for v in d.share], textposition="outside",
+                             hovertemplate="%{x}: минутын %{y:.0%} нь гадаад<extra>" + lab + "</extra>"))
+        ov = conc.set_index("season").loc[season, "overall_share"]
+        fig.add_hline(y=ov, line_dash="dash", line_color=colors[k], annotation_text=f"{lab} нийт {ov:.0%}",
+                      annotation_position="right")
+    fig.update_yaxes(title="Минутын гадаад хувь", tickformat=".0%", range=[0, 0.85])
+    return _layout(fig, "Аль байрлалд гадаад тоглогч түлхүү тоглодог вэ", height=420, barmode="group")
+
+
+def px_import_age(im: pd.DataFrame) -> go.Figure:
+    d = im.dropna(subset=["age", "PPG"])
+    fig = go.Figure()
+    for lvl in LEVEL_ORDER:
+        part = d[d.level == lvl]
+        if part.empty:
+            continue
+        fig.add_trace(go.Scatter(x=part.age, y=part.PPG, mode="markers", name=f"{lvl} ({len(part)})",
+                                 marker=dict(color=LEVEL_HEX[lvl], size=(8 + part.MIN / 3).tolist(),
+                                             line=dict(color="#475569", width=1)),
+                                 customdata=np.c_[part.player_name, part.team, part.season, part.last_league.fillna("—")],
+                                 hovertemplate="<b>%{customdata[0]}</b> (%{customdata[1]}, %{customdata[2]})<br>нас %{x:.0f} · "
+                                               "%{y:.1f} оноо<br>өмнөх лиг: %{customdata[3]}<extra></extra>"))
+    slope, icpt = np.polyfit(d.age, d.PPG, 1)
+    xs = np.array([d.age.min(), d.age.max()])
+    fig.add_trace(go.Scatter(x=xs, y=icpt + slope * xs, mode="lines", line=dict(color="black"), name="Чиг хандлага",
+                             hoverinfo="skip"))
+    fig.update_xaxes(title="Нас (тухайн улирал эхлэхэд)")
+    fig.update_yaxes(title="Оноо / тоглолт (MBA)")
+    return _layout(fig, "Нас ба MBA дахь оноо (өнгө = өмнөх хамгийн өндөр түвшин)", height=460)

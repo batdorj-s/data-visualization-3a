@@ -113,3 +113,10 @@ def test_insights_page_ci_toggle_and_empty_usage():
     assert error_bars(run("views/insights.py", show_ci=True)) > error_bars(run("views/insights.py", show_ci=False)) == 0
     at = run("views/insights.py", teams=["Erdenet Miners"], import_status="Гадаад", season="2026-2027")
     assert not at.exception, [e.value for e in at.exception]
+
+
+def test_players_import_tab_runs_and_finds_replacements():
+    at = run("views/players.py")
+    assert not at.exception, [e.value for e in at.exception]
+    assert any(s.label.startswith("2025–26 улирлын дараа явсан") for s in at.selectbox)
+    assert any("Батлагдсан" in str(spec) for spec in _plot_specs(at))
