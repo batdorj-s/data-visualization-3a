@@ -11,7 +11,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "docx": "^9.15.3",
-    "pptxgenjs": "^4.0.1"
+    "docx": "9.15.3",
+    "pptxgenjs": "4.0.1"
+  },
+  "overrides": {
+    "image-size": "^2.0.3"
   }
 }

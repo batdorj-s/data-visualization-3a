@@ -29,7 +29,7 @@ def inject_css() -> None:
 
 def page_header(title: str, lead: str) -> None:
     st.title(title)
-    st.html(f'<p class="mba-lead">{lead}</p>')
+    st.html(f'<p class="mba-lead">{html.escape(lead)}</p>')
 
 
 def findings(items: list[str], title: str = "Гол дүгнэлт") -> None:

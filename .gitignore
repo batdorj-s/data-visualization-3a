@@ -28,3 +28,6 @@ mba_analysis/.venv/
 .superpowers/
 mba_analysis/figures/_preview/
 node_modules/
+
+# Сургасан загвар (pickle): pipeline дахин үүсгэнэ, dashboard ашигладаггүй. Pickle файл ачаалахад код ажиллах эрсдэлтэй тул нийтийн repo-д оруулахгүй
+mba_analysis/dashboard/models/*.joblib

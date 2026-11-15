@@ -36,3 +36,10 @@ def test_parse_profile_minimal_html():
     p = parse_profile(html)
     assert p["birth_year"] == 1991 and p["nationality"] == "USA" and p["height_cm"] == 191
     assert [r["league"] for r in p["career"]] == ["NCAA", "Lithuania"] and p["career"][1]["ppg"] == 11.0
+
+
+def test_background_does_not_store_agents():
+    from pathlib import Path
+    import pandas as pd
+    bg = pd.read_csv(Path(__file__).resolve().parents[1] / "data" / "raw" / "import_background_raw.csv")
+    assert "agent" not in bg.columns

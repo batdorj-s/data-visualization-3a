@@ -75,7 +75,7 @@ def parse_profile(html: str) -> dict:
     return {"birth_year": int(m.group(1)) if m else None, "nationality": nat,
             "height_cm": int(hm_el["data-unit-metric"][:-2]) if hm_el else None,
             "draft": _field(soup, "NBA Draft"), "pre_draft": _field(soup, "Pre-draft team"),
-            "agent": _field(soup, "Agent"), "career": rows}
+            "career": rows}  # төлөөлөгчийн нэрийг хадгалахгүй: шинжилгээнд хэрэггүй хувийн мэдээлэл (нийтийн repo)
 
 
 def identity_ok(prof: dict, mba_birth, mba_height: float | None) -> bool:

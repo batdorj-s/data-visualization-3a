@@ -120,3 +120,19 @@ def test_players_import_tab_runs_and_finds_replacements():
     assert not at.exception, [e.value for e in at.exception]
     assert any(s.label.startswith("2025–26 улирлын дараа явсан") for s in at.selectbox)
     assert any("Батлагдсан" in str(spec) for spec in _plot_specs(at))
+
+
+def test_dashboard_requirements_cover_imported_libraries():
+    """Streamlit Cloud зөвхөн dashboard/requirements.txt-г суулгана: dashboard-ийн ачаалдаг бүх гуравдагч сан тэнд байх ёстой."""
+    import sysconfig
+    for p in PAGES:
+        run(p)
+    site = sysconfig.get_paths()["purelib"]
+    loaded = {n.split(".")[0] for n, m in list(sys.modules.items()) if (getattr(m, "__file__", None) or "").startswith(site)}
+    needed = {"sklearn": "scikit-learn", "bs4": "beautifulsoup4", "lxml": "lxml", "requests": "requests",
+              "matplotlib": "matplotlib", "joblib": "joblib", "scipy": "scipy", "plotly": "plotly", "pyarrow": "pyarrow",
+              "pandas": "pandas", "numpy": "numpy", "streamlit": "streamlit"}
+    req = {l.split("==")[0].strip().lower() for l in (DASH / "requirements.txt").read_text().splitlines() if "==" in l}
+    missing = [pkg for mod, pkg in needed.items() if mod in loaded and pkg not in req]
+    assert missing == [], missing
+    assert all("==" in l for l in (DASH / "requirements.txt").read_text().splitlines() if l and not l.startswith("#"))
