@@ -3,7 +3,7 @@ import streamlit as st
 
 from data_access import load, snapshot
 from src.charts.summary import VERDICT_PLAIN, verdict
-from ui import page_header
+from ui import chart_note, page_header
 
 page_header("Тухай", "Дата хаанаас ирсэн, тодорхой бус байдлыг хэрхэн тооцсон, dashboard-ийг ямар зарчмаар зохиосон.")
 
@@ -30,6 +30,8 @@ hyp["Дүгнэлт"] = [VERDICT_PLAIN[verdict(r)] for _, r in hyp.iterrows()]
 st.dataframe(pd.DataFrame({"": hyp.hid, "Таамаглал": hyp.statement, "Датаас гарсан утга": hyp.estimate.round(2),
                            "Магадлалтай хүрээ": [f"{a:.2f} – {b:.2f}" for a, b in zip(hyp.ci_lo, hyp.ci_hi)],
                            "Дүгнэлт": hyp["Дүгнэлт"]}), hide_index=True, width="stretch")
+chart_note("Мөр бүр 1 таамаглал. Хүрээ 0-ийг (эсвэл «ялгаагүй» утгыг) агуулахгүй бол дата таамаглалыг баттай дэмжинэ.",
+           "MBA статистикаар шалгасан таамаглалууд.", kind="Хүснэгт", files=["hypotheses"])
 with st.expander("Статистик арга (мэргэжлийн хүнд)"):
     st.dataframe(hyp[["hid", "method", "n"]].rename(columns={"hid": "", "method": "Арга", "n": "Ажиглалт"}),
                  hide_index=True, width="stretch")

@@ -15,6 +15,7 @@ page_header("Шидэлт ба тоглолтын явц",
 filter_summary(f)
 
 ALL = "Бүгд"
+MIN_SHOTS = 20  # тоглогчийн жагсаалтад орох доод шидэлтийн тоо
 shots_all = load("shots")
 shots_season = shots_all[shots_all.season == f.season]
 if f.import_status != "Бүгд":
@@ -51,9 +52,13 @@ def shot_section():
     team = c1.selectbox("Баг", [ALL] + teams, index=([ALL] + teams).index(default_team),
                         key=f"shot_team::{f.highlight_team}")
     s = shots_season if team == ALL else shots_season[shots_season.team == team]
-    counts = s.player_name.value_counts()
-    players = [ALL] + sorted(counts[counts >= 20].index)
-    player = c2.selectbox("Тоглогч (20+ шидэлттэй)", players, key=f"shot_player::{team}")
+    counts = s[s.location_ok].player_name.value_counts()
+    players = [ALL] + sorted(counts[counts >= MIN_SHOTS].index)
+    player = c2.selectbox(f"Тоглогч (энэ улиралд {MIN_SHOTS} ба түүнээс олон шидэлт хийсэн)", players, key=f"shot_player::{team}",
+                          format_func=lambda n: n if n == ALL else f"{n} — {counts[n]} шидэлт",
+                          help=f"Жагсаалтад байршил нь бүртгэгдсэн {MIN_SHOTS} ба түүнээс олон шидэлт хийсэн тоглогч л "
+                               "орно. Цөөн шидэлттэй тоглогчийн зураг санамсаргүй тохиолдлоор өндөр эсвэл бага харагддаг "
+                               "тул хассан.")
     if player != ALL:
         s = s[s.player_name == player]
     who = player if player != ALL else (team if team != ALL else "Бүх лиг")
@@ -65,7 +70,8 @@ def shot_section():
     chart_note("Дөрвөлжин бүр 1 × 1 м талбай: том = олон шидэлт, улаан = шидэлт бүрт лигийн дунджаас их оноо, цэнхэр = бага. "
                "Сагс доод талд. Баруун талд нь 5 бүсээр нэгтгэсэн.",
                f"MBA тоглолтын хуудасны шидэлтийн байршил, {season_txt}, {int(s.location_ok.sum()):,} шидэлт "
-               f"(байршил бүртгэгдээгүй эсвэл 2/3 онооны шошготой зөрсөн {1 - s.location_ok.mean():.0%}-ийг хассан).")
+               f"(байршил бүртгэгдээгүй эсвэл 2/3 онооны шошготой зөрсөн {1 - s.location_ok.mean():.0%}-ийг хассан).",
+               kind="Шидэлтийн газрын зураг (талбай дээрх 1×1 м торон цэгэн зураг) + хэвтээ багана график", files=["shots"])
 
 
 @st.fragment
@@ -91,7 +97,8 @@ def assist_section():
                     width="stretch")
     chart_note("Цэг = тоглогч (том = олон дамжуулалтад оролцсон; улаан-улбар = гадаад, цэнхэр = дотоод), "
                "шугам = нэг нь нөгөөдөө дамжуулж, тэр нь оносон (зузаан = олон удаа). Шугам дээр хулганаа аваачвал тоог харуулна.",
-               f"MBA тоглолтын явцын бичлэг, {season_txt}; дамжуулалтын 87%-ийг шидэлттэй нь холбож чадсан.")
+               f"MBA тоглолтын явцын бичлэг, {season_txt}; дамжуулалтын 87%-ийг шидэлттэй нь холбож чадсан.",
+               kind="Сүлжээний граф (network graph)", files=["assists", "shots"])
 
 
 @st.fragment
@@ -104,23 +111,35 @@ def flow_section():
     if gl.empty:
         st.info("Энэ шүүлтүүрт тоглолт алга.")
         return
-    labels = {r.game_id: f"{r.date}: {r.home_team} {r.home_pts}–{r.away_pts} {r.away_team} ({r.lead_changes} удаа солигдсон)"
-              for r in gl.itertuples()}
+    st.markdown("Нэг тоглолтыг сонгоод, оноо тоглолтын явцад минут тутам хэрхэн өөрчлөгдсөнийг харна. Жагсаалтын "
+                "«тэргүүлэгч N удаа солигдсон» = нэг баг тэргүүлж байгаад нөгөө баг нь гүйцэж түрүүлсэн тоо — их байх тусам "
+                "ширүүн, ойролцоо тоглолт.")
+    labels = {r.game_id: f"{r.date}: {r.home_team} {r.home_pts}–{r.away_pts} {r.away_team} · тэргүүлэгч "
+                         f"{r.lead_changes} удаа солигдсон" for r in gl.itertuples()}
     default = int(gl.loc[gl.lead_changes.idxmax(), "game_id"])
-    gid = st.selectbox("Тоглолт", list(labels), index=list(labels).index(default), format_func=labels.get,
-                       key=f"flow_game::{f.season}::{f.highlight_team}",
-                       help="Анхдагчаар тэргүүлэгч хамгийн олон солигдсон тоглолт сонгогдоно")
+    gid = st.selectbox("Тоглолт (огноо: гэрийн баг оноо–оноо зочин баг)", list(labels), index=list(labels).index(default),
+                       format_func=labels.get, key=f"flow_game::{f.season}::{f.highlight_team}",
+                       help="Анхдагчаар тэргүүлэгч хамгийн олон солигдсон тоглолт сонгогдоно. Эхэнд нь бичсэн баг = гэрийн "
+                            "баг.")
     g = gl.set_index("game_id").loc[gid]
     flow = load("game_flow")
     flow = flow[flow.game_id == gid].sort_values("elapsed")
+    with st.container(border=True):
+        st.markdown(f"**Эцсийн оноо:** {g.home_team} (гэрийн баг) **{g.home_pts}–{g.away_pts}** {g.away_team} (зочин баг)  \n"
+                    f"**Тэргүүлэгч {g.lead_changes} удаа солигдсон** · {g.home_team} хамгийн ихдээ "
+                    f"**{max(int(flow.margin.max()), 0)}**, {g.away_team} **{max(-int(flow.margin.min()), 0)}** оноогоор "
+                    "тэргүүлсэн")
     p = load("inplay_params").iloc[0]
     params = {"intercept": p.intercept, "coef": {k: p[k] for k in ("margin", "margin_scaled", "elo_diff", "elo_x_time")}}
     wp = finalize(win_prob(params, flow.margin, np.clip(REG_SEC - flow.elapsed, 0, None), g.elo_pre_home - g.elo_pre_away),
                   flow.margin.iloc[-1])
     st.plotly_chart(px_game_flow(flow, wp, g.home_team, g.away_team), width="stretch")
-    chart_note("Дээр: онооны зөрүү (улаан-улбар = гэрийн баг тэргүүлсэн, цэнхэр = зочин баг). Доор: тухайн мөчид загварын "
-               "тооцсон гэрийн баг ялах магадлал — зөрүү том, хугацаа бага байх тусам 0% эсвэл 100% руу ойртоно.",
-               "MBA тоглолтын явцын бичлэг; магадлалын загварыг 252 тоглолтын 10,080 мөчөөр сургасан.")
+    chart_note(f"Дээд хэсэг: тухайн минутад хэн хэдэн оноогоор тэргүүлж байсан — 0-ээс дээш улаан-улбар = {g.home_team} "
+               f"тэргүүлсэн, доош цэнхэр = {g.away_team} тэргүүлсэн; хар ромб = тэргүүлэгч солигдсон мөч. Хулганаа аваачвал "
+               f"тэр мөчийн оноо ба хэн тэргүүлж байгааг бичнэ. Доод хэсэг: тэр мөчид загварын тооцсон {g.home_team} ялах "
+               "магадлал (50% = тэнцүү боломж) — зөрүү том, үлдсэн хугацаа бага байх тусам 0% эсвэл 100% руу ойртоно.",
+               "MBA тоглолтын явцын бичлэг; магадлалын загварыг 252 тоглолтын 10,080 мөчөөр сургасан.",
+               kind="Шатлалт талбайн график (онооны зөрүү) + шугаман график (ялах магадлал)", files=["pbp", "games", "metrics"])
 
 
 shot_section()
@@ -130,4 +149,5 @@ st.subheader("Ялагчийг хэзээнээс таамаглаж болох 
 st.plotly_chart(px_inplay_accuracy(load("inplay_minute").reset_index(drop=True), f.show_ci), width="stretch")
 chart_note("Тоглолтын минут бүрд «одоо хэн ялах вэ» гэж таамаглахад хэдэн хувь нь зөв байсан. Загвар энгийн «тэргүүлж буй нь "
            "ялна» дүрмээс зөв хувиар илүү биш ч магадлалаар (жишээ нь 78%) хэр итгэлтэйг хэлж өгдөг.",
-           "252 тоглолт; тоглолтоор нь бүлэглэн 5 хэсэгт хувааж шалгасан (нэг тоглолт сургалт, тест хоёрт зэрэг ордоггүй).")
+           "252 тоглолт; тоглолтоор нь бүлэглэн 5 хэсэгт хувааж шалгасан (нэг тоглолт сургалт, тест хоёрт зэрэг ордоггүй).",
+           kind="Шугаман график, 95% хүрээтэй (line chart)", files=["inplay"])

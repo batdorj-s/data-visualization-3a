@@ -174,19 +174,29 @@ STABILITY_STATS = {"reb36": "Самбар (36 минутад)", "ast36": "Дам
                    "ts_pct": "Шидэлтийн оновч", "tp_pct": "3 онооны оновч"}
 
 
-def season_stability(players_season: pd.DataFrame, min_tsa: float = 50, min_tpa: float = 30) -> pd.DataFrame:
-    """Хоёр улиралд хоёуланд нь тоглосон тоглогчийн үзүүлэлт улирал хооронд хэр хадгалагддаг вэ (хамаарал, Fisher 95%)."""
+def stability_pairs(players_season: pd.DataFrame, col: str, min_tsa: float = 50, min_tpa: float = 30) -> pd.DataFrame:
+    """Хоёр улиралд хоёуланд нь тоглосон тоглогч бүрийн тухайн үзүүлэлтийн өмнөх (prev) ба сүүлийн (now) улирлын утга.
+    Цөөн шидэлттэй тоглогчийг хасна (3 онооны оновчид 30+ гурвын шидэлт, бусдад 50+ шидэлтийн оролдлого)."""
     ps = players_season[players_season.eligible.astype(bool)].copy()
     ps["tsa"] = ps.FGA + 0.44 * ps.FTA
     ps["tp_pct"] = ps.TPM / ps.TPA.where(ps.TPA > 0)
     seasons = sorted(ps.season.unique())[-2:]
+    d = ps[(ps.TPA >= min_tpa) if col == "tp_pct" else (ps.tsa >= min_tsa)]
+    w = d.pivot_table(index="player_id", columns="season", values=col, aggfunc="first").reindex(columns=seasons).dropna()
+    info = ps.sort_values("season").drop_duplicates("player_id", keep="last").set_index("player_id")
+    return pd.DataFrame({"player_id": w.index, "player_name": info.player_name.reindex(w.index).to_numpy(),
+                         "team": info.team.reindex(w.index).to_numpy(), "prev": w[seasons[0]].to_numpy(),
+                         "now": w[seasons[1]].to_numpy(), "prev_season": seasons[0], "season": seasons[1]})
+
+
+def season_stability(players_season: pd.DataFrame, min_tsa: float = 50, min_tpa: float = 30) -> pd.DataFrame:
+    """Хоёр улиралд хоёуланд нь тоглосон тоглогчийн үзүүлэлт улирал хооронд хэр хадгалагддаг вэ (хамаарал, Fisher 95%)."""
     rows = []
     for col, label in STABILITY_STATS.items():
-        d = ps[(ps.TPA >= min_tpa) if col == "tp_pct" else (ps.tsa >= min_tsa)]
-        w = d.pivot_table(index="player_id", columns="season", values=col, aggfunc="first").reindex(columns=seasons).dropna()
+        w = stability_pairs(players_season, col, min_tsa, min_tpa)
         if len(w) < 5:
             continue
-        r = float(w[seasons[0]].corr(w[seasons[1]]))
+        r = float(w.prev.corr(w.now))
         ci = fisher_ci(r, len(w))
         rows.append({"stat": col, "label": label, "n": len(w), "r": r, "lo": ci.lo, "hi": ci.hi})
     return pd.DataFrame(rows).sort_values("r", ascending=False).reset_index(drop=True)
