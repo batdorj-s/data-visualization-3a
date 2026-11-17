@@ -3,7 +3,7 @@ import streamlit as st
 
 from data_access import DATA, current_filters, import_share_ci, latest_elo, load, snapshot, team_key_of
 from plots import px_fan, px_map, px_pareto
-from ui import chart_note, filter_summary, findings, page_header
+from ui import chart_note, filter_summary, findings, page_header, pareto_who
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–") + (" (явагдаж буй)" if f.season == "2026-2027" else "")
@@ -22,7 +22,8 @@ elo = latest_elo(f.season)
 findings([
     f"Гадаад тоглогчид лигийн нийт онооны **{share:.0%}**-ийг авдаг"
     + (f" (бодит хувь {lo:.0%}–{hi:.0%} хооронд байх магадлалтай)." if f.show_ci else "."),
-    f"Тоглогчдын **{k80 / max(len(pareto_df), 1):.0%}** буюу {k80} тоглогч л лигийн онооны 80%-ийг авдаг."
+    f"Хамгийн их оноо авсан **{k80}** тоглогч (нийт тоглогчдын {k80 / max(len(pareto_df), 1):.0%}) л лигийн онооны "
+    "80%-ийг авдаг."
     if k80 else "Онооны хуваарийг тооцох дата алга.",
     f"Одоогийн хамгийн хүчтэй баг: **{elo.idxmax()}** (хүчний оноо {elo.max():.0f}; 1500 = дундаж)."
     if len(elo) else "Багийн хүчний оноо алга.",
@@ -47,8 +48,14 @@ def kpis():
 def pareto():
     st.plotly_chart(px_pareto(pareto_df, f.show_ci, "Цөөн тоглогч лигийн онооны ихэнхийг авдаг"), width="stretch")
     chart_note("Багана бүр 1 тоглогчийн улирлын нийт оноо, ихээс нь эрэмбэлсэн (улаан-улбар = гадаад, цэнхэр = дотоод). "
-               "Хар шугам эхний N тоглогчийн нийлбэр хувийг заана; тасархай 80%-ийн шугамтай огтлолцох цэгийг хараарай.",
-               f"тоглолт бүрийн хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(pareto_df)} тоглогч.")
+               "Хар шугам = 1-р байрын тоглогчоос тухайн байр хүртэлх тоглогчдын оноог нэмээд лигийн нийт онооны хэдэн хувь "
+               "болохыг заана. Жишээ нь шугам 10 дээр 30% бол хамгийн их оноотой 10 тоглогч лигийн онооны 30%-ийг авсан. "
+               "Хар шугам тасархай 80%-ийн шугамыг огтлох газар = онооны 80%-ийг авсан тоглогчдын тоо.",
+               f"тоглолт бүрийн хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(pareto_df)} тоглогч.",
+               kind="Парето график (оноогоор эрэмбэлсэн багана + нийлбэр хувийн шугам)", files=["player_games"])
+    ps = load("players")
+    pareto_who(pareto_df, ps[ps.season == f.season].drop_duplicates("player_id", keep="last")
+               .set_index("player_id").team.to_dict())
 
 
 @st.fragment
@@ -63,7 +70,8 @@ def fan():
     st.plotly_chart(px_fan(tg, team_key_of(team), f.show_ci), width="stretch")
     chart_note("Улаан-улбар шугам = сонгосон багийн тухайн өдөр хүртэлх ялалтын хувь, саарал = бусад баг. "
                "Сүүдэр нь багийн жинхэнэ хүч байж болох хүрээ: цөөн тоглолтын дараа өргөн, улирлын эцэст нарийсна.",
-               f"тоглолтын үр дүн, {season_txt} улирлын үндсэн шат, {tg.team.nunique()} баг.")
+               f"тоглолтын үр дүн, {season_txt} улирлын үндсэн шат, {tg.team.nunique()} баг.",
+               kind="Шугаман график, тодорхой бус байдлын сүүдэртэй (fan chart)", files=["team_games"])
 
 
 kpis()
@@ -74,6 +82,7 @@ with right:
     st.plotly_chart(px_map(load("team_meta"), load("standings"), DATA / "mng_adm1.geojson", f.season),
                     width="stretch")
     chart_note("Тойрог бүр 1 баг; том тойрог = өндөр ялалтын хувь. Улаан-улбар = Улаанбаатар, цэнхэр = орон нутаг.",
-               "багийн хот — Wikipedia; ялалт — MBA статистик; аймгийн хил — geoBoundaries.")
+               "багийн хот — Wikipedia; ялалт — MBA статистик; аймгийн хил — geoBoundaries.",
+               kind="Тойргон газрын зураг (bubble map)", files=["team_meta", "standings", "geo"])
 fan()
 st.caption(f"Дата татсан огноо: {snapshot()}. Нэр томьёоны тайлбарыг «Нэр томьёо» хуудаснаас үзнэ үү.")

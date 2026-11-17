@@ -95,3 +95,12 @@ def test_season_stability_style_beats_efficiency():
     assert st.loc["reb36", "r"] > 0.6 and st.loc["tpa_rate", "r"] > 0.6
     assert st.loc["ts_pct", "hi"] < st.loc["reb36", "lo"]  # оновчийн хүрээ хэв маягийнхаас бүхэлдээ доогуур
     assert (st.n >= 5).all() and np.isfinite(st.r).all()
+
+
+def test_stability_pairs_reproduce_season_correlation():
+    ps = pd.read_csv(P / "players_season.csv")
+    st = I.season_stability(ps).set_index("stat")
+    for stat in ["PPG", "ts_pct", "tp_pct"]:
+        w = I.stability_pairs(ps, stat)
+        assert len(w) == st.loc[stat, "n"] and w.player_id.is_unique
+        assert abs(w.prev.corr(w.now) - st.loc[stat, "r"]) < 1e-12

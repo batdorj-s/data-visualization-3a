@@ -23,14 +23,19 @@ fig = go.Figure(go.Bar(x=missing.pct_missing, y=missing.column.map(lambda c: NAM
                        marker_color=A_COLOR, hovertemplate="%{y}: %{x:.1f}%<extra></extra>"))
 fig.update_xaxes(title="Дутуу утга, %")
 st.plotly_chart(_layout(fig, "Үзүүлэлт бүрийн дутуу утгын хувь", height=320), width="stretch")
-chart_note("Багана урт байх тусам тухайн үзүүлэлт олон тоглогчид дутуу.", "MBA тоглогчийн профайл ба улирлын статистик.")
+chart_note("Багана урт байх тусам тухайн үзүүлэлт олон тоглогчид дутуу.", "MBA тоглогчийн профайл ба улирлын статистик.",
+           kind="Хэвтээ багана график (bar chart)", files=["missing"])
 st.subheader(f"Нэрээр холбосон тоглогчид ({len(relinked)})")
 st.dataframe(relinked.rename(columns={"left_name": "Нэр (нэг улирал)", "right_name": "Нэр (нөгөө улирал)",
                                       "score": "Төстэй байдал (1 = ижил)", "same_team": "Ижил баг",
                                       "n_candidates": "Сонголтын тоо"})
              [["Нэр (нэг улирал)", "Нэр (нөгөө улирал)", "Төстэй байдал (1 = ижил)", "Ижил баг", "Сонголтын тоо"]],
              hide_index=True, width="stretch")
+chart_note("Мөр бүр = өөр улиралд нэр нь өөрөөр бичигдсэн ч нэг хүн гэж холбосон тоглогч.",
+           "MBA тоглогчийн нэр, баг, улирал; нэрийн төстэй байдлыг тооцсон.", kind="Хүснэгт", files=["name_matches"])
 with st.expander("Цэвэрлэгээний бүрэн бүртгэл"):
     st.dataframe(log.rename(columns={"step": "Алхам", "description": "Юу хийсэн", "rows_before": "Өмнө (мөр)",
                                      "rows_after": "Дараа (мөр)", "note": "Тэмдэглэл"}),
                  hide_index=True, width="stretch")
+    chart_note("Мөр бүр = цэвэрлэгээний нэг алхам: юу хийсэн, өмнө ба дараа хэдэн мөр байсан.",
+               "цэвэрлэгээний алхам бүрийн бүртгэл.", kind="Хүснэгт", files=["cleaning_log"])

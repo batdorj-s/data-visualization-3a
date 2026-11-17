@@ -35,11 +35,15 @@ def explorer():
     x = c1.selectbox("Хэвтээ тэнхлэг", AXES, index=AXES.index("MIN"), format_func=lambda c: LABELS.get(c, c), key="px")
     y = c2.selectbox("Босоо тэнхлэг", AXES, index=AXES.index("PPG"), format_func=lambda c: LABELS.get(c, c), key="py")
     color = st.radio("Өнгөөр ялгах", list(COLOR_BY), horizontal=True, key="pcolor")
-    event = st.plotly_chart(px_scatter(players, x, y, COLOR_BY[color], f.highlight_team), width="stretch",
+    card = st.session_state.get("card_player")
+    st.session_state["_scatter_marked"] = card  # карт өөр тоглогч руу шилжвэл апп-ыг дахин зурж одыг шилжүүлнэ
+    event = st.plotly_chart(px_scatter(players, x, y, COLOR_BY[color], f.highlight_team, card), width="stretch",
                             on_select="rerun", selection_mode=("points", "box", "lasso"), key="scatter")
     chart_note("Цэг бүр 1 тоглогч. Цэг дээр дарвал баруун талын карт тэр тоглогч руу шилжинэ; хулганаар хүрээ татаж "
-               "олон тоглогч сонговол доор нь жагсаалт гарна. Хар хүрээтэй цэг = онцолсон багийн тоглогч.",
-               f"MBA тоглогчийн улирлын статистик, {season_txt}, шүүлтүүрт тохирох {len(players)} тоглогч.")
+               "олон тоглогч сонговол доор нь жагсаалт гарна. Шар од = баруун талын картад нээлттэй тоглогч; "
+               "хар хүрээтэй цэг = онцолсон багийн тоглогч.",
+               f"MBA тоглогчийн улирлын статистик, {season_txt}, шүүлтүүрт тохирох {len(players)} тоглогч.",
+               kind="Цэгэн график (scatter plot)", files=["players"])
     selected = [p["customdata"][0] for p in (event.selection.points if event and event.selection else [])
                 if p.get("customdata")]
     if apply_selection(st.session_state, selected):
@@ -68,7 +72,10 @@ def player_card():
     names = options.drop_duplicates("player_id").set_index("player_id").player_name
     with st.container(border=True):
         pid = st.selectbox("Тоглогчийн карт", ids, key="card_player", format_func=lambda i: names.get(i, i),
-                           help="Зүүн талын графикаас цэг дарж эсвэл энд нэрээр нь хайж сонгоно")
+                           help="Зүүн талын графикаас цэг дарж эсвэл энд нэрээр нь хайж сонгоно. Сонгосон тоглогч "
+                                "графикт шар одоор тодорно")
+        if st.session_state.get("_scatter_marked") != pid:
+            st.rerun(scope="app")
         row = options[options.player_id == pid].iloc[0]
         ci = load("player_ci")
         ci = ci[(ci.player_id == pid) & (ci.season == f.season)].set_index("metric")
@@ -95,6 +102,9 @@ def player_card():
         else:
             st.dataframe(row[["GP", "MIN", "PPG", "RPG", "APG", "SPG", "BPG", "FG_pct", "TP_pct", "FT_pct", "EFF",
                               "height_cm", "age"]].rename(COLS).to_frame("Утга"), width="stretch", height=260)
+        chart_note("Улирлын дундаж эсвэл тоглолт бүрийн мөр; «Хүрээ» = бодит түвшин байж болох хязгаар.",
+                   f"{row.player_name}, {season_txt} улирал.", kind="Хүснэгт (тоглогчийн карт)",
+                   files=["players", "player_games"])
 
 
 @st.fragment
@@ -107,7 +117,8 @@ def uncertainty():
         st.plotly_chart(px_funnel(players, f.show_ci), width="stretch")
         chart_note("Цэг бүр 1 тоглогч. Цэнхэр юүлүүр = санамсаргүй хэлбэлзлийн хүрээ; ногоон цэг юүлүүрээс дээш "
                    "(онцгой сайн), улаан доош. Баруун тийш (олон шидэлт) явах тусам юүлүүр нарийсна.",
-                   f"MBA тоглогчийн шидэлтийн статистик, {season_txt}, {len(players)} тоглогч.")
+                   f"MBA тоглогчийн шидэлтийн статистик, {season_txt}, {len(players)} тоглогч.",
+                   kind="Юүлүүр график (funnel plot)", files=["players"])
     with right:
         n = st.slider("Хэдэн тоглогч харуулах", 5, 25, 15, key="topn")
         ci = load("player_ci")
@@ -117,7 +128,8 @@ def uncertainty():
         st.plotly_chart(px_dot_ci(top_n, f.show_ci, "Тоглолтын дундаж оноо"), width="stretch")
         chart_note("Цэг = тоглолтын дундаж оноо, шугам = бодит түвшин байж болох хүрээ. Хоёр тоглогчийн шугам давхцаж "
                    "байвал хэн нь илүү гэдгийг дата баттай хэлж чадахгүй.",
-                   f"тоглолт бүрийн оноо, {season_txt}; хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцсон.")
+                   f"тоглолт бүрийн оноо, {season_txt}; хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцсон.",
+                   kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["player_games"])
 
 
 tab_explore, tab_imports = st.tabs(["Тоглогч судлах", "Гадаад тоглогч ба солилцоо"])

@@ -30,7 +30,9 @@ def _layout(fig: go.Figure, title: str, height: int = 420, **kw) -> go.Figure:
     return fig
 
 
-def px_scatter(df: pd.DataFrame, x: str, y: str, color_by: str, highlight_team: str | None = None) -> go.Figure:
+def px_scatter(df: pd.DataFrame, x: str, y: str, color_by: str, highlight_team: str | None = None,
+               selected: str | None = None) -> go.Figure:
+    """selected = тоглогчийн картад нээлттэй тоглогчийн id: бусад цэгийн дээр том од тэмдэг, нэрийн шошготой зурна."""
     fig = go.Figure()
     if color_by == "position":
         groups = [(p, POS_COLORS[p], df.position == p) for p in POS_COLORS]
@@ -49,6 +51,18 @@ def px_scatter(df: pd.DataFrame, x: str, y: str, color_by: str, highlight_team: 
             marker=dict(color=color, size=9, opacity=0.8, line=dict(width=line, color="black")),
             hovertemplate="<b>%{customdata[1]}</b><br>%{customdata[2]}<br>" + f"{LABELS.get(x, x)}: " + "%{x:.2f}<br>"
                           + f"{LABELS.get(y, y)}: " + "%{y:.2f}<extra></extra>"))
+    me = df[df.player_id == selected].dropna(subset=[x, y]).head(1)
+    if len(me):
+        r = me.iloc[0]
+        fig.add_trace(go.Scatter(
+            x=[r[x]], y=[r[y]], mode="markers", name=f"Картын тоглогч: {r.player_name}",
+            customdata=me[["player_id", "player_name", "team"]],
+            marker=dict(symbol="star", size=22, color="#FACC15", line=dict(width=2, color="#0F172A")),
+            hovertemplate="<b>%{customdata[1]}</b> (картад нээлттэй)<br>%{customdata[2]}<br>" + f"{LABELS.get(x, x)}: "
+                          + "%{x:.2f}<br>" + f"{LABELS.get(y, y)}: " + "%{y:.2f}<extra></extra>"))
+        fig.add_annotation(x=r[x], y=r[y], text=f"<b>{r.player_name}</b>", showarrow=True, arrowhead=0, ax=0, ay=-30,
+                           font=dict(size=13, color="#0F172A"), bgcolor="rgba(255,255,255,0.9)", bordercolor="#0F172A",
+                           borderwidth=1, borderpad=3)
     fig.update_xaxes(title=LABELS.get(x, x))
     fig.update_yaxes(title=LABELS.get(y, y))
     return _layout(fig, f"{LABELS.get(y, y)} ба {LABELS.get(x, x)} — цэг бүр 1 тоглогч", dragmode="select")
@@ -101,12 +115,14 @@ def px_pareto(df: pd.DataFrame, show_ci: bool, title: str) -> go.Figure:
                                  fillcolor="rgba(0,0,0,0.15)", line=dict(width=0), name="Нийлбэр хувийн 95% хүрээ",
                                  hoverinfo="skip"), secondary_y=True)
     fig.add_trace(go.Scatter(x=df["rank"], y=df.cum_share, mode="lines", line=dict(color="black"),
-                             name="Нийлбэр хувь", hovertemplate="Эхний %{x} тоглогч: %{y:.0%}<extra></extra>"),
+                             name="Нийлбэр хувь", customdata=df.player_name,
+                             hovertemplate="Хамгийн их оноотой %{x} тоглогч нийлээд онооны <b>%{y:.0%}</b>-ийг авсан"
+                                           "<br>(%{x}-р байрт: %{customdata})<extra></extra>"),
                   secondary_y=True)
     k = int(np.argmax(df.cum_share.to_numpy() >= 0.8)) + 1
     fig.add_hline(y=0.8, line_dash="dash", line_color=B_COLOR, secondary_y=True)
-    fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Эхний {k} ({k / len(df):.0%}) = 80%", showarrow=True,
-                       font=dict(color=B_COLOR), ax=45, ay=35, bgcolor="rgba(255,255,255,0.9)")
+    fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Хамгийн их оноотой {k} тоглогч<br>({k / len(df):.0%}) = онооны 80%",
+                       showarrow=True, font=dict(color=B_COLOR), ax=60, ay=40, bgcolor="rgba(255,255,255,0.9)")
     fig.update_yaxes(title="Оноо", rangemode="tozero", secondary_y=False)
     fig.update_yaxes(title="Нийлбэр хувь", tickformat=".0%", range=[0, 1.02], dtick=0.2, secondary_y=True, showgrid=False)
     fig.update_xaxes(title="Тоглогч (оноогоор эрэмбэлсэн)")
@@ -325,27 +341,61 @@ def px_assist_network(edges: pd.DataFrame, involvement: pd.Series, is_import: di
     return _layout(fig, title, height=520)
 
 
+def lead_change_index(margin: np.ndarray) -> np.ndarray:
+    """Тэргүүлэгч баг солигдсон мөрүүдийн индекс (тэнцүү оноог алгасаж, өмнөх тэргүүлэгчтэй харьцуулна)."""
+    nz = np.flatnonzero(margin != 0)
+    sign = np.sign(margin[nz])
+    return nz[1:][sign[1:] != sign[:-1]]
+
+
+def _period_name(p: int) -> str:
+    return f"{p}-р үе" if p <= 4 else f"нэмэлт цаг {p - 4}"
+
+
 def px_game_flow(flow: pd.DataFrame, wp: np.ndarray, home: str, away: str, show_ci_line: bool = True) -> go.Figure:
     t = flow.elapsed / 60
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.55, 0.45], vertical_spacing=0.08)
+    m = flow.margin.to_numpy()
+    clock = [f"{int(e // 60)}:{int(e % 60):02d}" for e in flow.elapsed]
+    lead = [f"<b>{home}</b> {v} оноогоор тэргүүлж байна" if v > 0 else
+            (f"<b>{away}</b> {-v} оноогоор тэргүүлж байна" if v < 0 else "Тэнцүү") for v in m]
+    period = [_period_name(int(p)) for p in flow.period]
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.55, 0.45], vertical_spacing=0.1)
     pos, neg = flow.margin.clip(lower=0), flow.margin.clip(upper=0)
     fig.add_trace(go.Scatter(x=t, y=pos, line=dict(shape="hv", width=0), fill="tozeroy", fillcolor="rgba(213,94,0,0.75)",
-                             name=f"{home} тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
+                             name=f"{home} (гэрийн баг) тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
     fig.add_trace(go.Scatter(x=t, y=neg, line=dict(shape="hv", width=0), fill="tozeroy", fillcolor="rgba(0,114,178,0.75)",
-                             name=f"{away} тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
+                             name=f"{away} (зочин баг) тэргүүлсэн", hoverinfo="skip"), row=1, col=1)
     fig.add_trace(go.Scatter(x=t, y=flow.margin, mode="lines", line=dict(shape="hv", color="rgba(0,0,0,0)"),
-                             showlegend=False, customdata=np.c_[flow.home, flow.away],
-                             hovertemplate="%{x:.1f} мин: %{customdata[0]}–%{customdata[1]}<extra></extra>"), row=1, col=1)
+                             showlegend=False, customdata=np.c_[flow.home, flow.away, lead, clock, period],
+                             hovertemplate="<b>%{customdata[3]}</b> (%{customdata[4]})<br>"
+                                           + f"{home}: " + "%{customdata[0]} оноо · " + f"{away}: " + "%{customdata[1]} оноо"
+                                           "<br>%{customdata[2]}<extra></extra>"), row=1, col=1)
+    lc = lead_change_index(m)
+    if len(lc):
+        who = [home if m[i] > 0 else away for i in lc]
+        fig.add_trace(go.Scatter(x=t.iloc[lc], y=np.zeros(len(lc)), mode="markers", name="Тэргүүлэгч солигдсон мөч",
+                                 marker=dict(symbol="diamond", size=8, color="#0F172A", line=dict(width=1, color="white")),
+                                 customdata=np.c_[who, np.array(clock)[lc], flow.home.iloc[lc], flow.away.iloc[lc]],
+                                 hovertemplate="<b>%{customdata[1]}</b>: тэргүүлэгч солигдов —<br><b>%{customdata[0]}</b> "
+                                               "түрүүллээ (" + home + " %{customdata[2]} – %{customdata[3]} " + away + ")"
+                                               "<extra></extra>"), row=1, col=1)
     fig.add_trace(go.Scatter(x=t, y=wp, mode="lines", line=dict(shape="hv", color="black", width=2),
-                             name=f"{home} ялах магадлал", hovertemplate="%{x:.1f} мин: %{y:.0%}<extra></extra>"),
+                             name=f"{home} ялах магадлал", customdata=np.c_[1 - np.asarray(wp, float), clock],
+                             hovertemplate="<b>%{customdata[1]}</b><br>" + f"{home} ялах магадлал: " + "%{y:.0%}<br>"
+                                           + f"{away} ялах магадлал: " + "%{customdata[0]:.0%}<extra></extra>"),
                   row=2, col=1)
     fig.add_hline(y=0.5, line_dash="dot", line_color=NEUTRAL, row=2, col=1)
-    for q in (10, 20, 30):
+    end = float(t.max())
+    for q in [10, 20, 30] + ([40] if end > 40 else []):
         fig.add_vline(x=q, line_color="#E2E8F0")
+    for i, (a, b) in enumerate([(0, 10), (10, 20), (20, 30), (30, 40)] + ([(40, end)] if end > 40 else [])):
+        fig.add_annotation(x=(a + b) / 2, y=1.0, xref="x", yref="y domain", yanchor="bottom", showarrow=False,
+                           text=_period_name(i + 1) if i < 4 else "нэмэлт цаг", font=dict(size=11, color="#64748B"))
     fig.update_yaxes(title="Онооны зөрүү", row=1, col=1)
     fig.update_yaxes(title="Ялах магадлал", tickformat=".0%", range=[0, 1], row=2, col=1)
     fig.update_xaxes(title="Тоглолтын минут", row=2, col=1)
-    return _layout(fig, f"{home} – {away}: тоглолтын явц", height=520)
+    final = f"{int(flow.home.iloc[-1])}–{int(flow.away.iloc[-1])}"
+    return _layout(fig, f"{home} {final} {away}: оноо минут тутам", height=540)
 
 
 def px_inplay_accuracy(minute: pd.DataFrame, show_ci: bool) -> go.Figure:
@@ -500,8 +550,32 @@ def px_stability(df: pd.DataFrame, show_ci: bool) -> go.Figure:
                                hovertemplate="%{y}<br>хамаарлын хүч %{x:.2f} (хүрээ %{customdata[0]:.2f}–%{customdata[1]:.2f})"
                                              "<extra></extra>"))
     fig.add_vline(x=0, line_color="black")
-    fig.update_xaxes(title="Өмнөх ба энэ улирлын хамаарлын хүч (0 = холбоогүй, 1 = ижил)", range=[-0.5, 1.02])
-    return _layout(fig, "Юу улирлаас улиралд хадгалагддаг вэ", height=400, showlegend=False)
+    fig.update_xaxes(title="Хоёр улирлын хамаарал (0 = холбоогүй, 1 = бүрэн давтагдана)", range=[-0.5, 1.02])
+    return _layout(fig, "Аль үзүүлэлт дараа улиралд давтагддаг вэ", height=420, showlegend=False)
+
+
+PCT_STATS = {"ts_pct", "tp_pct", "tpa_rate"}
+
+
+def px_stability_pairs(d: pd.DataFrame, stat: str, label: str, r: float, highlight_team: str | None = None) -> go.Figure:
+    """Тоглогч бүрийн өмнөх улирлын (x) ба энэ улирлын (y) утга; тасархай шугам = яг ижил үлдсэн."""
+    fmt = ".0%" if stat in PCT_STATS else ".1f"
+    lo, hi = float(min(d.prev.min(), d.now.min())), float(max(d.prev.max(), d.now.max()))
+    pad = (hi - lo) * 0.05
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=[lo - pad, hi + pad], y=[lo - pad, hi + pad], mode="lines", hoverinfo="skip",
+                             line=dict(color=NEUTRAL, dash="dash"), name="Хоёр улиралд яг ижил"))
+    line = [2 if t == highlight_team else 0 for t in d.team]
+    prev_s, now_s = d.prev_season.iloc[0].replace("-20", "–"), d.season.iloc[0].replace("-20", "–")
+    fig.add_trace(go.Scatter(x=d.prev, y=d.now, mode="markers", name="Тоглогч",
+                             marker=dict(color=B_COLOR if stat in {"ts_pct", "tp_pct"} else A_COLOR, size=10, opacity=0.8,
+                                         line=dict(width=line, color="black")),
+                             customdata=np.c_[d.player_name, d.team],
+                             hovertemplate="<b>%{customdata[0]}</b> (%{customdata[1]})<br>" + f"{prev_s}: " + "%{x:" + fmt
+                                           + "}<br>" + f"{now_s}: " + "%{y:" + fmt + "}<extra></extra>"))
+    fig.update_xaxes(title=f"{label}, {prev_s}", tickformat=fmt, range=[lo - pad, hi + pad])
+    fig.update_yaxes(title=f"{label}, {now_s}", tickformat=fmt, range=[lo - pad, hi + pad])
+    return _layout(fig, f"{label}: хамаарал {r:.2f} ({len(d)} тоглогч)", height=420, showlegend=False)
 
 
 # ---------- Гадаад тоглогч ба солилцоо ----------
