@@ -2,16 +2,17 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+import coach
 from data_access import current_filters, load, team_logos
 from plots import px_assist_network, px_game_flow, px_inplay_accuracy, px_shot_map, px_zone_bars
 from src.inplay import REG_SEC, finalize, win_prob
 from src.pbp import ZONES
-from ui import chart_note, filter_summary, findings, page_header, scoreboard, section, show_chart
+from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, scoreboard, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Шидэлт ба тоглолтын явц",
-            "Хаанаас шидэх нь хамгийн үр ашигтай вэ, хэн хэнд дамжуулдаг вэ, тоглолт минут тутам хэрхэн өрнөсөн бэ.",
+            "Хаанаас шидэх нь хамгийн үр ашигтай вэ? Хэн хэнд дамжуулдаг вэ? Тоглолт минут тутам хэрхэн өрнөсөн бэ?",
             eyebrow=f"Шидэлт ба тоглолтын явц · {season_txt}")
 filter_summary(f)
 
@@ -37,16 +38,17 @@ minute = load("inplay_minute").set_index("minute")
 findings([
     f"Хамгийн үр ашигтай бүс: **{best.zone}** — шидэлт бүрт {best.pps:.2f} оноо (лигийн дундаж {league_pps:.2f})."
     if best is not None else "Шидэлтийн дата алга.",
-    (f"Хамгийн бага үр ашигтай: **{worst.zone}** — {worst.pps:.2f} оноо, гэвч нийт шидэлтийн {worst.share:.0%}-ийг эзэлдэг."
+    (f"Хамгийн бага үр ашигтай бүс: **{worst.zone}** — шидэлт бүрт {worst.pps:.2f} оноо, гэсэн ч нийт шидэлтийн {worst.share:.0%} "
+     "нь эндээс."
      if worst is not None else "Шидэлтийн дата алга."),
     f"Хагас дуусахад ялагчийг **{minute.loc[20, 'acc_model']:.0%}**, 35-р минутад **{minute.loc[35, 'acc_model']:.0%}** "
-    "зөв таамаглах боломжтой.",
+    "зөв таамагладаг.",
 ])
 
 
 @st.fragment
 def shot_section():
-    section("Хаанаас шиддэг вэ", "Талбайн аль хэсгээс шидэх нь хамгийн их оноо авчирдаг вэ?")
+    section("Хаанаас шиддэг вэ?", "Талбайн аль хэсгээс шидэх нь хамгийн их оноо авчирдаг вэ?")
     teams = sorted(shots_season.team.dropna().unique())
     c1, c2 = st.columns(2)
     default_team = f.highlight_team if f.highlight_team in teams else ALL
@@ -73,11 +75,12 @@ def shot_section():
                f"MBA тоглолтын хуудасны шидэлтийн байршил, {season_txt}, {int(s.location_ok.sum()):,} шидэлт "
                f"(байршил бүртгэгдээгүй эсвэл 2/3 онооны шошготой зөрсөн {1 - s.location_ok.mean():.0%}-ийг хассан).",
                kind="Шидэлтийн газрын зураг (талбай дээрх 1×1 м торон цэгэн зураг) + хэвтээ багана график", files=["shots"])
+    coach_box(coach.shot_zones(zone_summary(s), s, league_pps, who))
 
 
 @st.fragment
 def assist_section():
-    section("Хэн хэнд дамжуулдаг вэ", "Багийн доторх оновчтой дамжуулалтын сүлжээ.")
+    section("Хэн хэнд дамжуулдаг вэ?", "Оноо болсон дамжуулалтаар зурсан багийн доторх сүлжээ.")
     a = load("assists")
     a = a[(a.season == f.season) & a.passer.notna() & a.scorer.notna()]
     teams = sorted(a.team.dropna().unique())
@@ -97,9 +100,10 @@ def assist_section():
     show_chart(px_assist_network(e, inv, imp, f"{team}: {top.passer} → {top.scorer} хамгийн олон ({top.n})"),
                     width="stretch")
     chart_note("Цэг = тоглогч (том = олон дамжуулалтад оролцсон; улаан-улбар = гадаад, цэнхэр = дотоод), "
-               "шугам = нэг нь нөгөөдөө дамжуулж, тэр нь оносон (зузаан = олон удаа). Шугам дээр хулганаа аваачвал тоог харуулна.",
+               "шугам = нэг нь нөгөөдөө дамжуулж, нөгөө нь оносон (зузаан = олон удаа). Шугам дээр хулганаа аваачвал тоог харуулна.",
                f"MBA тоглолтын явцын бичлэг, {season_txt}; дамжуулалтын 87%-ийг шидэлттэй нь холбож чадсан.",
                kind="Сүлжээний граф (network graph)", files=["assists", "shots"])
+    coach_box(coach.assists(at, team))
 
 
 @st.fragment
@@ -112,9 +116,9 @@ def flow_section():
     if gl.empty:
         st.info("Энэ шүүлтүүрт тоглолт алга.")
         return
-    st.markdown("Нэг тоглолтыг сонгоод, оноо тоглолтын явцад минут тутам хэрхэн өөрчлөгдсөнийг харна. Жагсаалтын "
-                "«тэргүүлэгч N удаа солигдсон» = нэг баг тэргүүлж байгаад нөгөө баг нь гүйцэж түрүүлсэн тоо — их байх тусам "
-                "ширүүн, ойролцоо тоглолт.")
+    st.markdown("Нэг тоглолтыг сонгоод, оноо тоглолтын явцад минут тутам хэрхэн өөрчлөгдсөнийг харна. Жагсаалт дахь "
+                "«тэргүүлэгч N удаа солигдсон» = нэг баг тэргүүлж байхад нөгөө баг гүйцэж түрүүлсэн тоо; энэ тоо их байх "
+                "тусам тоглолт ширүүн, ойролцоо өрнөсөн.")
     labels = {r.game_id: f"{r.date}: {r.home_team} {r.home_pts}–{r.away_pts} {r.away_team} · тэргүүлэгч "
                          f"{r.lead_changes} удаа солигдсон" for r in gl.itertuples()}
     default = int(gl.loc[gl.lead_changes.idxmax(), "game_id"])
@@ -139,6 +143,7 @@ def flow_section():
                "магадлал (50% = тэнцүү боломж) — зөрүү том, үлдсэн хугацаа бага байх тусам 0% эсвэл 100% руу ойртоно.",
                "MBA тоглолтын явцын бичлэг; магадлалын загварыг 252 тоглолтын 10,080 мөчөөр сургасан.",
                kind="Шатлалт талбайн график (онооны зөрүү) + шугаман график (ялах магадлал)", files=["pbp", "games", "metrics"])
+    coach_box(coach.game_flow(flow, g.home_team, g.away_team))
 
 
 shot_section()
@@ -146,7 +151,10 @@ assist_section()
 flow_section()
 section("Ялагчийг хэзээнээс таамаглаж болох вэ", "Тоглолтын минут бүрд одоогийн байдлаар ялагчийг хэр зөв хэлж чадах вэ?")
 show_chart(px_inplay_accuracy(load("inplay_minute").reset_index(drop=True), f.show_ci), width="stretch")
-chart_note("Тоглолтын минут бүрд «одоо хэн ялах вэ» гэж таамаглахад хэдэн хувь нь зөв байсан. Загвар энгийн «тэргүүлж буй нь "
-           "ялна» дүрмээс зөв хувиар илүү биш ч магадлалаар (жишээ нь 78%) хэр итгэлтэйг хэлж өгдөг.",
-           "252 тоглолт; тоглолтоор нь бүлэглэн 5 хэсэгт хувааж шалгасан (нэг тоглолт сургалт, тест хоёрт зэрэг ордоггүй).",
+chart_note("Тоглолтын минут бүрд «одоо хэн ялах вэ?» гэж таамаглахад хэдэн хувь нь зөв байсныг харуулна. Зөв таамагласан "
+           "хувиар загвар «тэргүүлж буй баг ялна» гэсэн энгийн дүрмээс илүүгүй ч хэр итгэлтэй байгаагаа магадлалаар (жишээ нь "
+           "78%) илэрхийлдэг.",
+           "252 тоглолт; тоглолтоор нь бүлэглэн 5 хэсэгт хувааж шалгасан (нэг тоглолт сургалтын ба шалгалтын хэсэгт зэрэг "
+           "ордоггүй).",
            kind="Шугаман график, 95% хүрээтэй (line chart)", files=["inplay"])
+coach_box(coach.inplay_accuracy(load("inplay_minute").reset_index(drop=True)))

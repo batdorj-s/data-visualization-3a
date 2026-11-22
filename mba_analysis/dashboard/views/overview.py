@@ -1,16 +1,18 @@
 import numpy as np
 import streamlit as st
 
+import coach
+
 from data_access import DATA, current_filters, import_share_ci, latest_elo, load, team_key_of, team_logos
 from plots import px_fan, px_map, px_pareto
-from ui import (chart_note, filter_summary, findings, page_header, pareto_who,
+from ui import (chart_note, coach as coach_box, filter_summary, findings, page_header, pareto_who,
                 section, show_chart, standings_board, stat_cards)
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–") + (" (явагдаж буй)" if f.season == "2026-2027" else "")
 page_header("Лигийн тойм",
-            f"Монголын сагсан бөмбөгийн дээд лигийн {season_txt} улирлыг нэг дороос: хэн оноо авдаг, "
-            "аль баг хүчтэй, үр дүн хэр найдвартай вэ.", eyebrow=f"Тойм · {season_txt}")
+            f"Монголын сагсан бөмбөгийн дээд лигийн {season_txt} улирлын тойм: хэн оноо авдаг, "
+            "аль баг хүчтэй, үр дүн хэр найдвартай вэ?", eyebrow=f"Тойм · {season_txt}")
 filter_summary(f)
 
 logos = team_logos()
@@ -44,8 +46,8 @@ stat_cards([
 findings([
     f"Гадаад тоглогчид лигийн нийт онооны **{share:.0%}**-ийг авдаг"
     + (f" (бодит хувь {lo:.0%}–{hi:.0%} хооронд байх магадлалтай)." if f.show_ci else "."),
-    f"Хамгийн их оноо авсан **{k80}** тоглогч (нийт тоглогчдын {k80 / max(len(pareto_df), 1):.0%}) л лигийн онооны "
-    "80%-ийг авдаг." if k80 else "Онооны хуваарийг тооцох дата алга.",
+    f"Лигийн онооны 80%-ийг хамгийн их оноо авсан **{k80}** тоглогч (нийт тоглогчдын {k80 / max(len(pareto_df), 1):.0%}) "
+    "авдаг." if k80 else "Онооны хуваарийг тооцох дата алга.",
     f"Одоогийн хамгийн хүчтэй баг: **{elo.idxmax()}** (хүчний оноо {elo.max():.0f}; 1500 = дундаж)."
     if len(elo) else "Багийн хүчний оноо алга.",
 ])
@@ -57,9 +59,10 @@ def pareto():
     chart_note("Багана бүр 1 тоглогчийн улирлын нийт оноо, ихээс нь эрэмбэлсэн (улаан-улбар = гадаад, цэнхэр = дотоод). "
                "Хар шугам = 1-р байрын тоглогчоос тухайн байр хүртэлх тоглогчдын оноог нэмээд лигийн нийт онооны хэдэн хувь "
                "болохыг заана. Жишээ нь шугам 10 дээр 30% бол хамгийн их оноотой 10 тоглогч лигийн онооны 30%-ийг авсан. "
-               "Хар шугам тасархай 80%-ийн шугамыг огтлох газар = онооны 80%-ийг авсан тоглогчдын тоо.",
+               "Хар шугам 80%-ийн тасархай шугамтай огтлолцох цэг = онооны 80%-ийг авсан тоглогчдын тоо.",
                f"тоглолт бүрийн хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(pareto_df)} тоглогч.",
                kind="Парето график (оноогоор эрэмбэлсэн багана + нийлбэр хувийн шугам)", files=["player_games"])
+    coach_box(coach.pareto_league(pareto_df))
     pareto_who(pareto_df, ps[ps.season == f.season].drop_duplicates("player_id", keep="last")
                .set_index("player_id").team.to_dict())
 
@@ -76,6 +79,7 @@ def fan():
                "Сүүдэр нь багийн жинхэнэ хүч байж болох хүрээ: цөөн тоглолтын дараа өргөн, улирлын эцэст нарийсна.",
                f"тоглолтын үр дүн, {season_txt} улирлын үндсэн шат, {tg.team.nunique()} баг.",
                kind="Шугаман график, тодорхой бус байдлын сүүдэртэй (fan chart)", files=["team_games"])
+    coach_box(coach.fan(tg[tg.phase == "regular"], team))
 
 
 left, right = st.columns([5, 7], gap="large")
@@ -86,18 +90,20 @@ with left:
     chart_note("Ялалтын хувиар, тэнцвэл онооны зөрүүгээр эрэмбэлсэн. Шар мөр = онцолсон баг.",
                f"{season_txt} улирлын үндсэн шатны тоглолтын үр дүн; лого — MBA-ийн албан ёсны сайт.",
                kind="Эрэмбэлсэн жагсаалт", files=["team_games", "team_logos"])
+    coach_box(coach.standings(table))
 with right:
     section("Онооны хуваарь", "Лигийн онооны ихэнхийг хэдэн тоглогч авдаг вэ?")
     pareto()
 
 left, right = st.columns([5, 7], gap="large")
 with left:
-    section("Багуудын газар зүй", "Хаана төвлөрсөн, аль бүс амжилттай вэ?")
+    section("Багуудын газар зүй", "Багууд хаана төвлөрсөн, аль бүс амжилттай вэ?")
     show_chart(px_map(load("team_meta"), load("standings"), DATA / "mng_adm1.geojson", f.season),
                     width="stretch")
     chart_note("Тойрог бүр 1 баг; том тойрог = өндөр ялалтын хувь. Улаан-улбар = Улаанбаатар, цэнхэр = орон нутаг.",
                "багийн хот — Wikipedia; ялалт — MBA статистик; аймгийн хил — geoBoundaries.",
                kind="Тойргон газрын зураг (bubble map)", files=["team_meta", "standings", "geo"])
+    coach_box(coach.region_map(load("team_meta"), load("standings"), f.season))
 with right:
     section("Улирлын явц", "Багийн ялалтын хувь тоглолт бүрийн дараа хэрхэн өөрчлөгдсөн бэ?")
     fan()

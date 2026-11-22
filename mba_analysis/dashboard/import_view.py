@@ -2,10 +2,12 @@
 import pandas as pd
 import streamlit as st
 
+import coach
+
 from data_access import load
 from plots import (px_import_age, px_import_hypotheses, px_import_pipeline, px_import_position, px_import_retention)
 from src.imports import SIM_FEATURES, similar_players
-from ui import chart_note, findings, section, show_chart
+from ui import chart_note, coach as coach_box, findings, section, show_chart
 
 SHAM = "ShamSports-ийн тоглогчийн карьерын хуудас (тоглогч бүрийг MBA-ийн профайлтай төрсөн он эсвэл өндрөөр тулгасан)"
 
@@ -20,7 +22,7 @@ def import_section(f) -> None:
         f"72 гадаад тоглогчийн **{len(found)}**-ийн гарал үүслийг эх сурвалжаар баталгаажуулсан; тэдний "
         f"{int(found.nationality.fillna('').str.contains('USA').sum())} нь АНУ-ын иргэн.",
         f"2025–26 улирлын {len(ret)} гадаад тоглогчоос дараа улиралд MBA-д **{int(ret.stayed.sum())}** нь л үлдсэн "
-        f"(тэдний {int(ret.same_team.sum())} нь ижил багтаа) — бараг бүх гадаад тоглогч жил бүр солигддог.",
+        f"(тэдний {int(ret.same_team.sum())} нь өмнөх багтаа) — бараг бүх гадаад тоглогч жил бүр солигддог.",
         "Датаар батлагдсан: **" + "; ".join(r.statement for r in hyp[hyp.verdict == "Батлагдсан"].itertuples())
         + "**. Бусад нь баттай биш (дата цөөн).",
     ])
@@ -33,12 +35,14 @@ def import_section(f) -> None:
                "баруун тийш байвал таамаглал батлагдана; 0-ийг дайрвал баттай хэлж чадахгүй.",
                "MBA статистик (2025–26, 2026–27) + " + SHAM + ".",
                kind="Цэгэн график, 95% хүрээтэй (forest plot)", files=["players", "import_bg"])
+    coach_box(coach.import_hypotheses(hyp))
 
     section("Хаанаас ирж байна вэ?")
     show_chart(px_import_pipeline(bg), width="stretch")
     chart_note("Зүүн: ирэхээсээ өмнө тоглож байсан хамгийн өндөр лиг. Баруун: Монголд ирэхийн өмнөх сүүлийн мэргэжлийн лиг.",
                f"{SHAM}; {len(found)}/72 тоглогч. Олдоогүй нь ихэвчлэн Азийн квотын тоглогчид тул дүр зураг АНУ руу хазайсан байж болно.",
                kind="Хэвтээ багана график (2 хэсэгтэй)", files=["import_bg"])
+    coach_box(coach.import_pipeline(bg))
 
     section("Хэн дараа улиралд үлддэг вэ?")
     show_chart(px_import_retention(load("imp_ret_cmp"), f.show_ci), width="stretch")
@@ -46,13 +50,15 @@ def import_section(f) -> None:
                "Үлдсэн тоглогч илүү их оноо авч, илүү олон минут тоглож байсан ч үлдсэн нь ердөө 8 тул ялгаа баттай биш.",
                "MBA статистик; «үлдсэн» = дараа улирлын статистикт аль нэг багийн нэрээр гарсан.",
                kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["players", "player_games", "import_bg"])
+    coach_box(coach.import_retention(load("imp_ret_cmp"), ret))
 
     section("Аль байрлалд гадаад тоглогч түлхүү тоглодог вэ?")
     show_chart(px_import_position(load("imp_position"), load("imp_conc")), width="stretch")
     chart_note("Багана = тухайн байрлалын нийт минутын хэдэн хувийг гадаад тоглогч тоглосон; тасархай шугам = бүх байрлалын "
-               "дундаж. 2026–27-д төвийн байрлалын минутын гуравны хоёрыг гадаад тоглогч тоглож байна.",
+               "дундаж.",
                "MBA статистик; байрлал MBA-ийн профайлаас.",
                kind="Бүлэглэсэн багана график + дундаж шугам", files=["players"])
+    coach_box(coach.import_position(load("imp_position"), f.season))
 
     section("Нас, туршлага, гүйцэтгэл")
     show_chart(px_import_age(im), width="stretch")
@@ -60,6 +66,7 @@ def import_section(f) -> None:
                "авдаг ч илүү олон минут тоглодог тул шалтгаан нь туршлага, багийн өгсөн үүрэг хоёр холилдсон байж болно.",
                "MBA статистик; нас ба лигийн түвшин — " + SHAM + ".",
                kind="Тойргон цэгэн график (bubble chart)", files=["players", "player_games", "import_bg"])
+    coach_box(coach.import_age(im))
 
     section("Явсан тоглогчийг орлох төстэй тоглогч")
     gone = ret[~ret.stayed].sort_values("PPG", ascending=False)
@@ -86,3 +93,4 @@ def import_section(f) -> None:
                "гэрээний боломж, цалинг тусгаагүй.",
                "MBA статистик (2025–26, 2026–27), 5+ тоглолт тоглосон гадаад тоглогчид; үзүүлэлт бүрийг стандартчилсан.",
                kind="Хүснэгт (төстэй тоглогчид)", files=["players", "player_games", "import_bg"])
+    coach_box(coach.replacement(sim, me.player_name.iloc[0]))
