@@ -28,7 +28,10 @@ def _layout(fig: go.Figure, title: str, height: int = 420, **kw) -> go.Figure:
                                    activecolor="#1B3A6B"),
                       hovermode="closest",
                       hoverlabel=dict(bgcolor="white", bordercolor=AXIS, font=dict(family=FONT["family"], size=13, color=INK)),
-                      legend=dict(orientation="h", y=-0.22, font=dict(size=12, color="#334155"), bgcolor="rgba(0,0,0,0)"),
+                      legend=dict(orientation="h", y=-0.22, font=dict(size=12, color="#334155"), bgcolor="rgba(0,0,0,0)",
+                                  itemsizing="constant"),
+                      colorway=[PALETTE["blue"], PALETTE["vermillion"], PALETTE["green"], PALETTE["orange"],
+                                PALETTE["purple"], "#56B4E9"],
                       **kw)
     fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False, showline=True, linecolor=AXIS, ticks="outside",
                      tickcolor=AXIS, ticklen=4, title_font=dict(size=13, color=MUTED), tickfont=dict(size=12, color=MUTED))
@@ -142,8 +145,12 @@ def px_pareto(df: pd.DataFrame, show_ci: bool, title: str) -> go.Figure:
                   secondary_y=True)
     k = int(np.argmax(df.cum_share.to_numpy() >= 0.8)) + 1
     fig.add_hline(y=0.8, line_dash="dash", line_color=B_COLOR, secondary_y=True)
-    fig.add_annotation(x=k, y=0.8, yref="y2", text=f"Хамгийн их оноотой {k} тоглогч<br>({k / len(df):.0%}) = онооны 80%",
-                       showarrow=True, font=dict(color=B_COLOR), ax=60, ay=40, bgcolor="rgba(255,255,255,0.9)")
+    fig.add_trace(go.Scatter(x=[k], y=[0.8], mode="markers", marker=dict(size=9, color=B_COLOR, line=dict(color="white", width=2)),
+                             showlegend=False, hoverinfo="skip"), secondary_y=True)
+    # шошгыг хоосон баруун дээд талд (багана нам, шугам өндөр хэсэгт) — баганатай давхцахгүй
+    fig.add_annotation(x=1, xref="paper", xanchor="right", y=0.62, yref="y2", align="right", showarrow=False,
+                       text=f"<b>{k} тоглогч</b> ({k / len(df):.0%})<br>= онооны 80%", font=dict(color=B_COLOR, size=12),
+                       bgcolor="rgba(255,255,255,0.92)", borderpad=3)
     fig.update_yaxes(title="Оноо", rangemode="tozero", secondary_y=False)
     fig.update_yaxes(title="Нийлбэр хувь", tickformat=".0%", range=[0, 1.02], dtick=0.2, secondary_y=True, showgrid=False)
     fig.update_xaxes(title="Тоглогч (оноогоор эрэмбэлсэн)")
@@ -234,16 +241,22 @@ def px_four_factors(tg: pd.DataFrame, highlight: str | None = None) -> go.Figure
 def px_elo(games: pd.DataFrame, highlight: str | None = None) -> go.Figure:
     rows = pd.concat([games[["date", "season", "home_team", "elo_post_home"]].set_axis(["date", "season", "team", "elo"], axis=1),
                       games[["date", "season", "away_team", "elo_post_away"]].set_axis(["date", "season", "team", "elo"], axis=1)])
-    rows = rows.sort_values("date")
+    rows = rows.assign(date=pd.to_datetime(rows.date)).sort_values("date")
     fig = go.Figure()
-    for (team, season), part in rows.groupby(["team", "season"]):
+    groups = sorted(rows.groupby(["team", "season"]), key=lambda kv: kv[0][0] == highlight)  # онцолсон баг хамгийн дээр
+    for (team, season), part in groups:
         hl = team == highlight
         fig.add_trace(go.Scatter(x=part.date, y=part.elo, mode="lines", name=team, showlegend=False,
                                  line=dict(color=B_COLOR if hl else LIGHTEST, width=3 if hl else 1),
-                                 hovertemplate=f"{team}: " + "%{y:.0f}<extra></extra>"))
-    fig.add_hline(y=1500, line_dash="dot")
+                                 hovertemplate=f"<b>{team}</b><br>" + "%{x|%Y-%m-%d}: %{y:.0f}<extra></extra>"))
+        if hl:
+            last = part.iloc[-1]
+            fig.add_annotation(x=last.date, y=last.elo, text=f"<b>{last.elo:.0f}</b>", showarrow=False, xanchor="left",
+                               xshift=6, font=dict(color=B_COLOR, size=12))
+    fig.add_hline(y=1500, line_dash="dot", line_color=NEUTRAL, annotation_text="1500 = дундаж",
+                  annotation_position="bottom left", annotation_font=dict(size=11, color=NEUTRAL))
     fig.update_yaxes(title="Багийн хүчний оноо (Elo)")
-    fig.update_xaxes(title="Огноо")
+    fig.update_xaxes(title=None, tickformat="%Y.%m", nticks=6, tickangle=0)
     return _layout(fig, "Багийн хүчний онооны явц" + (f" — {highlight}" if highlight else ""))
 
 

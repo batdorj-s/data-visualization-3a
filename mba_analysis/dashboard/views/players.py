@@ -4,7 +4,7 @@ from data_access import apply, apply_selection, current_filters, empty_notice, l
 from plots import LABELS, px_dot_ci, px_funnel, px_scatter
 from src.palette import IMPORT_LABELS
 from import_view import import_section
-from ui import chart_note, filter_summary, findings, page_header, player_header, player_stats, section
+from ui import chart_note, filter_summary, findings, page_header, player_header, player_stats, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -39,7 +39,7 @@ def explorer():
     color = st.radio("Өнгөөр ялгах", list(COLOR_BY), horizontal=True, key="pcolor")
     card = st.session_state.get("card_player")
     st.session_state["_scatter_marked"] = card  # карт өөр тоглогч руу шилжвэл апп-ыг дахин зурж одыг шилжүүлнэ
-    event = st.plotly_chart(px_scatter(players, x, y, COLOR_BY[color], f.highlight_team, card), width="stretch",
+    event = show_chart(px_scatter(players, x, y, COLOR_BY[color], f.highlight_team, card), select=True,
                             on_select="rerun", selection_mode=("points", "box", "lasso"), key="scatter")
     chart_note("Цэг бүр 1 тоглогч. Цэг дээр дарвал баруун талын карт тэр тоглогч руу шилжинэ; хулганаар хүрээ татаж "
                "олон тоглогч сонговол доор нь жагсаалт гарна. Шар од = баруун талын картад нээлттэй тоглогч; "
@@ -114,7 +114,7 @@ def uncertainty():
                 "Доорх хоёр график «үнэхээр сайн» ба «азаар сайн харагдаж байгаа»-г ялгахад тусална.")
     left, right = st.columns(2, gap="large")
     with left:
-        st.plotly_chart(px_funnel(players, f.show_ci), width="stretch")
+        show_chart(px_funnel(players, f.show_ci), width="stretch")
         chart_note("Цэг бүр 1 тоглогч. Цэнхэр юүлүүр = санамсаргүй хэлбэлзлийн хүрээ; ногоон цэг юүлүүрээс дээш "
                    "(онцгой сайн), улаан доош. Баруун тийш (олон шидэлт) явах тусам юүлүүр нарийсна.",
                    f"MBA тоглогчийн шидэлтийн статистик, {season_txt}, {len(players)} тоглогч.",
@@ -125,7 +125,7 @@ def uncertainty():
         ci = ci[(ci.season == f.season) & (ci.metric == "ppg") & ci.player_id.isin(players.player_id)]
         names = players.drop_duplicates(["player_id", "season"])[["player_id", "player_name", "is_import"]]
         top_n = ci.merge(names, on="player_id", validate="many_to_one").nlargest(n, "est")
-        st.plotly_chart(px_dot_ci(top_n, f.show_ci, "Тоглолтын дундаж оноо"), width="stretch")
+        show_chart(px_dot_ci(top_n, f.show_ci, "Тоглолтын дундаж оноо"), width="stretch")
         chart_note("Цэг = тоглолтын дундаж оноо, шугам = бодит түвшин байж болох хүрээ. Хоёр тоглогчийн шугам давхцаж "
                    "байвал хэн нь илүү гэдгийг дата баттай хэлж чадахгүй.",
                    f"тоглолт бүрийн оноо, {season_txt}; хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцсон.",

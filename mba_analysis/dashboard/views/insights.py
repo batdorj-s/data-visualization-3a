@@ -4,7 +4,7 @@ from data_access import current_filters, load, team_logos
 from src.insights import stability_pairs
 from plots import (px_assisted, px_comebacks, px_distance, px_imports_on_court, px_lead_safety, px_off_def, px_stability,
                    px_stability_pairs, px_usage)
-from ui import chart_note, filter_summary, findings, page_header, section
+from ui import chart_note, filter_summary, findings, page_header, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -40,7 +40,7 @@ tab_game, tab_shot, tab_team, tab_import = st.tabs(["Тоглолтын явц",
 
 with tab_game:
     section("Тэргүүлж байгаа баг хэр найдвартай ялдаг вэ?")
-    st.plotly_chart(px_lead_safety(lead, f.show_ci), width="stretch")
+    show_chart(px_lead_safety(lead, f.show_ci), width="stretch")
     chart_note("Хэвтээ тэнхлэг = тухайн мөчид хэдэн оноогоор тэргүүлж байсан, босоо = тэр баг эцэст нь ялсан хувь. Бараан "
                "шугам = тоглолтын хожуу үе. Босоо зураас = 95% магадлалтай хүрээ: цөөн тоглолттой бүлэгт өргөн.",
                "MBA тоглолтын явцын бичлэг, 2025–26 ба 2026–27 улирлын 252 тоглолт.",
@@ -48,7 +48,7 @@ with tab_game:
     section("Хоцорч байгаад ялах нь хэр их тохиолддог вэ?")
     left, right = st.columns([3, 2], gap="large")
     with left:
-        st.plotly_chart(px_comebacks(cb), width="stretch")
+        show_chart(px_comebacks(cb), width="stretch")
     with right:
         st.markdown("**Хамгийн том 5 эргэлт**")
         top = cb.sort_values("deficit", ascending=False).head(5)
@@ -63,14 +63,14 @@ with tab_game:
 with tab_shot:
     section("Хэр холоос шидэх нь ашигтай вэ?")
     league_pps = float((dist.pps * dist.n).sum() / dist.n.sum())
-    st.plotly_chart(px_distance(dist, league_pps, f.show_ci), width="stretch")
+    show_chart(px_distance(dist, league_pps, f.show_ci), width="stretch")
     chart_note("Дээр: тэр зайнаас шидэхэд дунджаар хэдэн оноо авсан (цэнхэр = 2 оноо, улаан-улбар = 3 оноо). Доор: хэдэн удаа "
                "шидсэн. 3 оноо нь 2 онооноос бага онодог ч 1.5 дахин үнэтэй тул дунд зайн шидэлтээс ашигтай.",
                f"MBA тоглолтын хуудасны шидэлтийн байршил, байршил бүртгэгдсэн тоглолтуудын {int(dist.n.sum()):,} шидэлт "
                "(2025 оны 10-р сарын 29 тоглолтод байршил бүртгэгдээгүй тул хассан).",
                kind="Шугаман график (дээр) + багана график (доор)", files=["shots"])
     section("Оноо хамтын тоглолтоос гардаг уу, бие даасан тоглолтоос уу?")
-    st.plotly_chart(px_assisted(assisted, f.show_ci), width="stretch")
+    show_chart(px_assisted(assisted, f.show_ci), width="stretch")
     chart_note("Цэг = тухайн бүсээс оносон шидэлтийн хэдэн хувь нь багийн андын дамжуулалтаас гарсан. Баруун тийш = хамтын "
                "тоглолт, зүүн тийш = тоглогч өөрөө бүтээсэн.",
                f"шидэлтийн байршил ба тоглолтын явцын бичлэг, {int(assisted.n.sum()):,} оносон шидэлт; дамжуулалтын 87%-ийг "
@@ -80,7 +80,7 @@ with tab_shot:
 with tab_team:
     section("Аль баг довтолгоогоор, аль нь хамгаалалтаар хүчтэй вэ?")
     r = ratings[ratings.season == f.season]
-    st.plotly_chart(px_off_def(r, f.highlight_team, team_logos()), width="stretch")
+    show_chart(px_off_def(r, f.highlight_team, team_logos()), width="stretch")
     chart_note("Тойрог бүр 1 баг (дотор нь багийн лого): баруун тийш = сайн довтолгоо, дээшээ = сайн хамгаалалт; тойргийн өнгө цэнхэр = өндөр ялалтын хувь, улаан = бага. "
                "Тасархай шугам = лигийн дундаж. «Онцлох баг» сонговол зузаан хүрээтэй харагдана.",
                f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(r)} баг; довтолгооны тоог хайрцаг онооноос тооцоолсон; "
@@ -95,7 +95,7 @@ with tab_team:
     if u.empty:
         st.info("Энэ шүүлтүүрт 200-аас олон минут тоглосон тоглогч алга.")
     else:
-        st.plotly_chart(px_usage(u, f.highlight_team), width="stretch")
+        show_chart(px_usage(u, f.highlight_team), width="stretch")
         med = u.groupby(u.is_import.astype(bool))[["usage", "ts"]].median()
         extra = (f" Голч ачаалал: гадаад {med.loc[True, 'usage']:.0%}, дотоод {med.loc[False, 'usage']:.0%}."
                  if {True, False} <= set(med.index) else "")
@@ -109,7 +109,7 @@ with tab_team:
                 "харьцуулав. Асуулт: **өмнөх улиралд өндөр байсан тоглогч энэ улиралд ч өндөр байна уу?** Хэрэв тийм бол "
                 "тэр үзүүлэлт тоглогчийн жинхэнэ чадвар, хэв маягийг илэрхийлдэг — тоглогч сонгохдоо найдаж болно. Үгүй бол "
                 "нэг улирлын дүн нь ихэвчлэн санамсаргүй тохиолдол (аз).")
-    st.plotly_chart(px_stability(stab, f.show_ci), width="stretch")
+    show_chart(px_stability(stab, f.show_ci), width="stretch")
     chart_note("Мөр бүр = 1 үзүүлэлт. Цэг баруун тийш (1 рүү) байх тусам өмнөх улирлын утгаар энэ улирлынхыг сайн "
                "таана; 0-д ойр = таах боломжгүй. Хаалтанд = харьцуулсан тоглогчийн тоо. Шугам = 95% магадлалтай "
                "хүрээ: 0-ийг дайрч байвал холбоо батлагдаагүй. Цэнхэр = тоглогчийн хэв маяг, тоглох хэмжээ; "
@@ -121,7 +121,7 @@ with tab_team:
     stat = st.selectbox("Тоглогч бүрийг харах үзүүлэлт", list(opts.index), format_func=lambda c: opts.label[c],
                         key="stab_stat", help="Дээрх графикийн аль ч мөрийг сонгож, тоглогч бүрээр задалж харна")
     pairs = stability_pairs(load("players"), stat)
-    st.plotly_chart(px_stability_pairs(pairs, stat, opts.label[stat], opts.r[stat], f.highlight_team), width="stretch")
+    show_chart(px_stability_pairs(pairs, stat, opts.label[stat], opts.r[stat], f.highlight_team), width="stretch")
     chart_note("Цэг бүр 1 тоглогч: хэвтээ = өмнөх улирлын, босоо = энэ улирлын утга. Тасархай шугам дээр байвал "
                "хоёр улиралд яг ижил. Цэгүүд шугамын дагуу нарийн байрласан бол үзүүлэлт тогтвортой (жишээ нь самбар); "
                "тараагдсан бол тогтворгүй (жишээ нь шидэлтийн оновч). Хулганаа аваачвал тоглогчийн нэрийг харуулна.",
@@ -134,7 +134,7 @@ with tab_team:
 
 with tab_import:
     section("Гадаад тоглогч тоглолтын аль үед талбай дээр байдаг вэ?")
-    st.plotly_chart(px_imports_on_court(imports), width="stretch")
+    show_chart(px_imports_on_court(imports), width="stretch")
     m = imports.drop_duplicates(["season", "period"]).set_index(["season", "period"]).mean_k
     seasons = sorted(imports.season.unique())
     chart_note("Багана = тухайн үеийн хугацааны хэдэн хувьд нэг баг 0, 1, 2, 3 гадаад тоглогчтой тоглосон. Баганын дээр: "

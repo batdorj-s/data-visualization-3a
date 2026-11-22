@@ -2,7 +2,8 @@ import streamlit as st
 
 from data_access import current_filters, latest_elo, load, team_info, team_key_of, team_logos
 from plots import px_elo, px_four_factors, px_pareto
-from ui import (chart_note, compare_table, filter_summary, findings, page_header, pareto_who, section, team_header)
+from ui import (chart_note, compare_table, filter_summary, findings, page_header,
+                pareto_who, section, show_chart, team_header)
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -54,14 +55,14 @@ def profile():
     with left:
         pt = load("pareto_team")
         pt = pt[(pt.season == f.season) & (pt.team_key == team_key_of(team))]
-        st.plotly_chart(px_pareto(pt, False, f"{team}: онооны хуваарь"), width="stretch")
+        show_chart(px_pareto(pt, False, f"{team}: онооны хуваарь"), width="stretch")
         chart_note("Багана = тоглогчийн улирлын нийт оноо. Хар шугам = 1-р байрын тоглогчоос тухайн байр хүртэлх тоглогчдын "
                    "оноо багийн нийт онооны хэдэн хувь вэ. Хар шугам 80%-д цөөн тоглогчоор хүрвэл баг цөөн од тоглогчоос "
                    "хамааралтай — тэр тоглогч гэмтвэл эрсдэлтэй.", f"тоглолт бүрийн оноо, {season_txt}, {len(pt)} тоглогч.",
                    kind="Парето график (оноогоор эрэмбэлсэн багана + нийлбэр хувийн шугам)", files=["player_games"])
         pareto_who(pt, label="багийн")
     with right:
-        st.plotly_chart(px_elo(load("games"), team), width="stretch")
+        show_chart(px_elo(load("games"), team), width="stretch")
         chart_note("Хүчний оноо тоглолт бүрийн дараа шинэчлэгдэнэ: хүчтэй багийг ялвал их нэмэгдэнэ. 1500 = дундаж. "
                    "Сонгосон багийн шугам тодорч, бусад нь саарал.",
                    "2025–26 ба 2026–27 улирлын бүх тоглолтын үр дүн.", kind="Шугаман график (line chart)", files=["games"])
@@ -116,7 +117,7 @@ def compare():
 profile()
 standings()
 section("Ялалтын 4 хүчин зүйл", "Ялалтыг хамгийн их тайлбарладаг 4 үзүүлэлтээр баг бүрийг лигийн дундажтай харьцуулав.")
-st.plotly_chart(px_four_factors(tg, f.highlight_team), width="stretch")
+show_chart(px_four_factors(tg, f.highlight_team), width="stretch")
 chart_note("Баг бүрийг лигийн дундажтай (0) харьцуулав: цэнхэр = дунджаас сайн, улаан-улбар = сул, хар = онцолсон баг. "
            "Эдгээр 4 үзүүлэлт ялалтыг хамгийн их тайлбарладаг; оновч нь хамгийн чухал нь.",
            f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат.",

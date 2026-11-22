@@ -4,7 +4,7 @@ import streamlit as st
 from data_access import current_filters, latest_elo, load, team_logos
 from plots import px_clusters, px_quantile_dots
 from src.build_dashboard_data import win_probability
-from ui import chart_note, findings, page_header, section, team_header
+from ui import chart_note, findings, page_header, section, show_chart, team_header
 
 f = current_filters()
 page_header("Машин сургалт",
@@ -36,7 +36,7 @@ def cluster_explorer():
     near.insert(0, "rank", range(1, len(near) + 1))
     left, right = st.columns([3, 2], gap="large")
     with left:
-        st.plotly_chart(px_clusters(cl, pid), width="stretch")
+        show_chart(px_clusters(cl, pid), width="stretch")
         chart_note("Олон үзүүлэлтийг (36 минутад ногдох оноо, самбар, дамжуулалт, оновч ...) 2 тэнхлэгт шахаж зурсан: "
                    "ойр цэгүүд төстэй тоглогчид. Цайвар цэг = аль бүлэгт орох нь тодорхой бус.",
                    f"MBA тоглогчийн улирлын статистик, 150+ минут тоглосон {len(cl)} тоглогч.",
@@ -76,7 +76,7 @@ def win_calculator():
         team_header(t2, logos.get(t2), "Баг Б", [("Хүчний оноо", f"{elo[t2]:.0f}"), ("Ялах магадлал", f"{1 - p:.0%}")])
     if f.show_ci:
         st.caption(f"{t1} ялах магадлалын 95% хүрээ: {lo:.0%}–{hi:.0%} (1500 = лигийн дундаж хүчний оноо).")
-    st.plotly_chart(px_quantile_dots(p, 20, t1, t2), width="stretch")
+    show_chart(px_quantile_dots(p, 20, t1, t2), width="stretch")
     chart_note(f"20 тойрог = 20 удаа тоглосон гэж төсөөлөхөд цэнхэр нь {t1}, улаан-улбар нь {t2}-ийн ялалт. "
                "Магадлалыг «20-оос хэд» гэж харах нь хувиас илүү ойлгомжтой."
                + (f" Бодит магадлал {lo:.0%}–{hi:.0%} хооронд байх магадлалтай." if f.show_ci else ""),
