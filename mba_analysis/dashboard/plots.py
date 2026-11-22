@@ -129,6 +129,26 @@ def px_dot_ci(ci: pd.DataFrame, show_ci: bool, metric_label: str) -> go.Figure:
                    height=max(320, 26 * len(df) + 120), showlegend=False)
 
 
+def px_plus_minus(df: pd.DataFrame, show_ci: bool, selected: str | None = None) -> go.Figure:
+    """+/- (40 минутад) — хамгийн өндөр ба хамгийн бага тоглогчид, 0 = баг тэнцүү тоглосон. df: player_name, pm40, pm40_lo, pm40_hi."""
+    d = df.sort_values("pm40")
+    colors = d.is_import.astype(bool).map(IMPORT_COLORS)
+    err = dict(type="data", symmetric=False, array=d.pm40_hi - d.pm40, arrayminus=d.pm40 - d.pm40_lo, color=NEUTRAL,
+               thickness=2) if show_ci else None
+    sizes = [16 if p == selected else 10 for p in d.player_id]
+    fig = go.Figure(go.Scatter(
+        x=d.pm40, y=d.player_name + "  (" + d.team + ")", mode="markers", error_x=err, showlegend=False,
+        marker=dict(color=colors, size=sizes, line=dict(width=[2 if p == selected else 0 for p in d.player_id], color=INK)),
+        customdata=np.c_[d.pm, d.games, d.minutes, d.pm40_lo, d.pm40_hi, d.on_off40],
+        hovertemplate="<b>%{y}</b><br>40 минутад %{x:+.1f} (хүрээ %{customdata[3]:+.1f}…%{customdata[4]:+.1f})<br>"
+                      "Нийт %{customdata[0]:+d} · %{customdata[1]} тоглолт · %{customdata[2]:.0f} мин<br>"
+                      "Талбай дээр − сэлгээнд: %{customdata[5]:+.1f}<extra></extra>"))
+    fig.add_vline(x=0, line_color=INK, line_width=1)
+    fig.update_xaxes(title="Талбай дээр байхад багийн онооны зөрүү, 40 минутад (+ = баг давуу)")
+    return _layout(fig, "Талбай дээр байхад баг хамгийн их давуу ба хоцрогдсон тоглогчид",
+                   height=max(360, 24 * len(d) + 130), margin=dict(l=10, r=44, t=58, b=10))
+
+
 def px_pareto(df: pd.DataFrame, show_ci: bool, title: str) -> go.Figure:
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(go.Bar(x=df["rank"], y=df.value, marker_color=df.is_import.astype(bool).map(IMPORT_COLORS)
