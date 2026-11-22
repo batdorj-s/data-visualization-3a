@@ -3,20 +3,24 @@ import streamlit as st
 
 from data_access import load, snapshot
 from src.charts.summary import VERDICT_PLAIN, verdict
-from ui import chart_note, page_header
+from ui import chart_note, page_header, section
 
-page_header("Тухай", "Дата хаанаас ирсэн, тодорхой бус байдлыг хэрхэн тооцсон, dashboard-ийг ямар зарчмаар зохиосон.")
+page_header("Тухай", "Дата хаанаас ирсэн, тодорхой бус байдлыг хэрхэн тооцсон, dashboard-ийг ямар зарчмаар зохиосон.",
+            eyebrow="Тусламж · Тухай")
 
-st.subheader("Дата хаанаас ирсэн бэ")
+section("Дата хаанаас ирсэн бэ")
 st.markdown(f"""
 1. **MBA лигийн албан ёсны статистик** (mongolia.basketball) — тоглогч, тоглолт бүрийн хайрцаг оноо, тоглогчийн профайл.
    {snapshot()}-нд татсан; 2026–27 улирал одоо явагдаж байгаа.
 2. **Wikipedia** — 2023–24 улирлын байр, багийн хот, аваргууд.
 3. **Wikipedia / FIBA** — шигшээ багийн бүрэлдэхүүн (2026.08).
 4. **geoBoundaries** — Монголын аймгийн хил (ODbL лиценз).
+5. **ShamSports** — гадаад тоглогчдын гарал үүсэл, өмнөх карьер.
+6. **Багийн лого** — MBA-ийн албан ёсны сайтын тоглолтын хуудсан дахь багийн бичлэгээс (schema.org «SportsTeam»)
+   авсан албан ёсны URL; зургийг repo-д хуулаагүй. Лого ачаалагдахгүй бол багийн нэрийн эхний үсгийг харуулна.
 """)
 
-st.subheader("«Магадлалтай хүрээ» гэж юу вэ")
+section("«Магадлалтай хүрээ» гэж юу вэ")
 st.markdown("""
 Нэг улиралд баг 20–30 л тоглолт тоглодог тул тоо бүрт **санамсаргүй хэлбэлзэл** бий. Тиймээс бид зөвхөн нэг тоо биш,
 **бодит утга байх магадлалтай хүрээ**-г (95%) хамт харуулдаг. Хүрээг тоглолтуудаас санамсаргүйгээр 2000 удаа дахин
@@ -24,7 +28,7 @@ st.markdown("""
 Зүүн талын «Магадлалтай хүрээг харуулах» товчоор бүх хүрээг нууж болно.
 """)
 
-st.subheader("Таамаглалын үр дүн")
+section("Таамаглалын үр дүн")
 hyp = load("hypotheses").copy()
 hyp["Дүгнэлт"] = [VERDICT_PLAIN[verdict(r)] for _, r in hyp.iterrows()]
 st.dataframe(pd.DataFrame({"": hyp.hid, "Таамаглал": hyp.statement, "Датаас гарсан утга": hyp.estimate.round(2),
@@ -36,7 +40,7 @@ with st.expander("Статистик арга (мэргэжлийн хүнд)"):
     st.dataframe(hyp[["hid", "method", "n"]].rename(columns={"hid": "", "method": "Арга", "n": "Ажиглалт"}),
                  hide_index=True, width="stretch")
 
-st.subheader("Dashboard-ийг хэрхэн зохиосон (лекц 10–11)")
+section("Dashboard-ийг хэрхэн зохиосон (лекц 10–11)")
 st.markdown("""
 | Зарчим | Энд хэрхэн хэрэгжсэн |
 |---|---|

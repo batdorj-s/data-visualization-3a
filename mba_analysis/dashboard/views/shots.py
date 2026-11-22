@@ -2,16 +2,17 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from data_access import current_filters, load
+from data_access import current_filters, load, team_logos
 from plots import px_assist_network, px_game_flow, px_inplay_accuracy, px_shot_map, px_zone_bars
 from src.inplay import REG_SEC, finalize, win_prob
 from src.pbp import ZONES
-from ui import chart_note, filter_summary, findings, page_header
+from ui import chart_note, filter_summary, findings, page_header, scoreboard, section
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Шидэлт ба тоглолтын явц",
-            "Хаанаас шидэх нь хамгийн үр ашигтай вэ, хэн хэнд дамжуулдаг вэ, тоглолт минут тутам хэрхэн өрнөсөн бэ.")
+            "Хаанаас шидэх нь хамгийн үр ашигтай вэ, хэн хэнд дамжуулдаг вэ, тоглолт минут тутам хэрхэн өрнөсөн бэ.",
+            eyebrow=f"Шидэлт ба тоглолтын явц · {season_txt}")
 filter_summary(f)
 
 ALL = "Бүгд"
@@ -45,7 +46,7 @@ findings([
 
 @st.fragment
 def shot_section():
-    st.subheader("Хаанаас шиддэг вэ")
+    section("Хаанаас шиддэг вэ", "Талбайн аль хэсгээс шидэх нь хамгийн их оноо авчирдаг вэ?")
     teams = sorted(shots_season.team.dropna().unique())
     c1, c2 = st.columns(2)
     default_team = f.highlight_team if f.highlight_team in teams else ALL
@@ -76,7 +77,7 @@ def shot_section():
 
 @st.fragment
 def assist_section():
-    st.subheader("Хэн хэнд дамжуулдаг вэ")
+    section("Хэн хэнд дамжуулдаг вэ", "Багийн доторх оновчтой дамжуулалтын сүлжээ.")
     a = load("assists")
     a = a[(a.season == f.season) & a.passer.notna() & a.scorer.notna()]
     teams = sorted(a.team.dropna().unique())
@@ -103,7 +104,7 @@ def assist_section():
 
 @st.fragment
 def flow_section():
-    st.subheader("Тоглолт минут тутам")
+    section("Тоглолт минут тутам")
     gl = load("game_list")
     gl = gl[gl.season == f.season].sort_values("date", ascending=False)
     if f.highlight_team:
@@ -124,11 +125,9 @@ def flow_section():
     g = gl.set_index("game_id").loc[gid]
     flow = load("game_flow")
     flow = flow[flow.game_id == gid].sort_values("elapsed")
-    with st.container(border=True):
-        st.markdown(f"**Эцсийн оноо:** {g.home_team} (гэрийн баг) **{g.home_pts}–{g.away_pts}** {g.away_team} (зочин баг)  \n"
-                    f"**Тэргүүлэгч {g.lead_changes} удаа солигдсон** · {g.home_team} хамгийн ихдээ "
-                    f"**{max(int(flow.margin.max()), 0)}**, {g.away_team} **{max(-int(flow.margin.min()), 0)}** оноогоор "
-                    "тэргүүлсэн")
+    scoreboard(g.home_team, g.away_team, int(g.home_pts), int(g.away_pts), team_logos(),
+               f"{g.date} · тэргүүлэгч {g.lead_changes} удаа солигдсон · {g.home_team} хамгийн ихдээ "
+               f"{max(int(flow.margin.max()), 0)}, {g.away_team} {max(-int(flow.margin.min()), 0)} оноогоор тэргүүлсэн")
     p = load("inplay_params").iloc[0]
     params = {"intercept": p.intercept, "coef": {k: p[k] for k in ("margin", "margin_scaled", "elo_diff", "elo_x_time")}}
     wp = finalize(win_prob(params, flow.margin, np.clip(REG_SEC - flow.elapsed, 0, None), g.elo_pre_home - g.elo_pre_away),
@@ -145,7 +144,7 @@ def flow_section():
 shot_section()
 assist_section()
 flow_section()
-st.subheader("Ялагчийг хэзээнээс таамаглаж болох вэ")
+section("Ялагчийг хэзээнээс таамаглаж болох вэ", "Тоглолтын минут бүрд одоогийн байдлаар ялагчийг хэр зөв хэлж чадах вэ?")
 st.plotly_chart(px_inplay_accuracy(load("inplay_minute").reset_index(drop=True), f.show_ci), width="stretch")
 chart_note("Тоглолтын минут бүрд «одоо хэн ялах вэ» гэж таамаглахад хэдэн хувь нь зөв байсан. Загвар энгийн «тэргүүлж буй нь "
            "ялна» дүрмээс зөв хувиар илүү биш ч магадлалаар (жишээ нь 78%) хэр итгэлтэйг хэлж өгдөг.",

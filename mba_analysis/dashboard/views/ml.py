@@ -1,14 +1,15 @@
 import numpy as np
 import streamlit as st
 
-from data_access import current_filters, latest_elo, load
+from data_access import current_filters, latest_elo, load, team_logos
 from plots import px_clusters, px_quantile_dots
 from src.build_dashboard_data import win_probability
-from ui import chart_note, findings, page_header
+from ui import chart_note, findings, page_header, section, team_header
 
 f = current_filters()
 page_header("Машин сургалт",
-            "Компьютер тоглогчдыг хэв маягаар нь бүлэглэж, тоглолтын ялагчийг урьдчилан таамаглах оролдлого.")
+            "Компьютер тоглогчдыг хэв маягаар нь бүлэглэж, тоглолтын ялагчийг урьдчилан таамаглах оролдлого.",
+            eyebrow="Машин сургалт")
 mm = load("model_metrics").set_index("model")
 acc, elo_acc = mm.loc["logreg", "accuracy_mean"], mm.loc["baseline_elo", "accuracy_mean"]
 cl_all = load("clusters")
@@ -23,7 +24,7 @@ findings([
 
 @st.fragment
 def cluster_explorer():
-    st.subheader("Төстэй тоглогч хайх")
+    section("Төстэй тоглогч хайх")
     cl = cl_all[cl_all.season == f.season] if (cl_all.season == f.season).any() else cl_all
     names = cl.drop_duplicates("player_id").set_index("player_id").player_name
     pid = st.selectbox("Тоглогч", cl.sort_values("player_name").player_id.drop_duplicates(),
@@ -59,7 +60,7 @@ def cluster_explorer():
 
 @st.fragment
 def win_calculator():
-    st.subheader("Ялалтын магадлал тооцоолох")
+    section("Ялалтын магадлал тооцоолох")
     elo = latest_elo(f.season)
     teams = sorted(elo.index)
     a, b = st.columns(2)
@@ -67,11 +68,14 @@ def win_calculator():
     t2 = b.selectbox("Баг Б", teams, index=min(1, len(teams) - 1), key="wp_b")
     coefs = load("elo_coefs").coef.to_numpy()
     p, lo, hi = win_probability(float(elo[t1]), float(elo[t2]), coefs)
-    c1, c2, c3 = st.columns(3)
-    c1.metric(f"{t1}: хүчний оноо", f"{elo[t1]:.0f}", border=True)
-    c2.metric(f"{t2}: хүчний оноо", f"{elo[t2]:.0f}", border=True)
-    c3.metric(f"{t1} ялах магадлал", f"{p:.0%}", border=True,
-              help=f"Магадлалтай хүрээ {lo:.0%}–{hi:.0%}" if f.show_ci else None)
+    logos = team_logos()
+    c1, c2 = st.columns(2)
+    with c1:
+        team_header(t1, logos.get(t1), "Баг А", [("Хүчний оноо", f"{elo[t1]:.0f}"), ("Ялах магадлал", f"{p:.0%}")])
+    with c2:
+        team_header(t2, logos.get(t2), "Баг Б", [("Хүчний оноо", f"{elo[t2]:.0f}"), ("Ялах магадлал", f"{1 - p:.0%}")])
+    if f.show_ci:
+        st.caption(f"{t1} ялах магадлалын 95% хүрээ: {lo:.0%}–{hi:.0%} (1500 = лигийн дундаж хүчний оноо).")
     st.plotly_chart(px_quantile_dots(p, 20, t1, t2), width="stretch")
     chart_note(f"20 тойрог = 20 удаа тоглосон гэж төсөөлөхөд цэнхэр нь {t1}, улаан-улбар нь {t2}-ийн ялалт. "
                "Магадлалыг «20-оос хэд» гэж харах нь хувиас илүү ойлгомжтой."

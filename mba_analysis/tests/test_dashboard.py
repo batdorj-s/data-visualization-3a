@@ -32,7 +32,7 @@ def test_app_runs_all_pages(page):
 def test_empty_filter_shows_message():
     at = run("views/players.py", min_gp=28, teams=["Erdenet Miners"], positions=["C"], season="2026-2027")
     assert not at.exception
-    assert any(EMPTY_MSG in i.value for i in at.info)
+    assert any(EMPTY_MSG in el.proto.body for el in at.get("html"))  # ui.empty_state
 
 
 def _plot_specs(at):

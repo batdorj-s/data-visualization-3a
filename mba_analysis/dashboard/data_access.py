@@ -15,7 +15,7 @@ DEFAULTS = {"season": "2025-2026", "teams": [], "positions": [], "import_status"
             "show_ci": True}
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner="Өгөгдөл ачаалж байна…")
 def load(name: str) -> pd.DataFrame:
     return pd.read_parquet(DATA / f"{name}.parquet")
 
@@ -47,10 +47,58 @@ def reset_filters() -> None:
     st.session_state.pop("highlight_team", None)
 
 
+LOGO_PX = 128  # дэлгэцэнд 52 px хүртэл харагдана → 128 px нь retina-д хангалттай
+
+
+def _thumb(url: str) -> str:
+    """Албан ёсны логог (0.1–3 MB) серверийн талд нэг удаа татаж, 128 px PNG data URI болгоно.
+    Зургийг repo-д хадгалахгүй. Татаж чадахгүй бол эх URL-ийг буцаана (хөтөч өөрөө ачаална)."""
+    import base64
+    import io
+
+    import requests
+    from PIL import Image
+
+    try:
+        r = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0 (MBA Analytics student dashboard)"})
+        r.raise_for_status()
+        im = Image.open(io.BytesIO(r.content)).convert("RGBA")
+        im.thumbnail((LOGO_PX, LOGO_PX), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, format="PNG", optimize=True)
+        return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        return url
+
+
+@st.cache_data(show_spinner="Багийн лого ачаалж байна…", ttl=7 * 24 * 3600)
+def team_logos() -> dict[str, str]:
+    """Багийн нэр → лого (жижигрүүлсэн data URI, эсвэл албан ёсны URL). Эх сурвалж: MBA сайтын schema.org SportsTeam.
+    Логогүй баг орохгүй (тэр үед UI үсгэн тэмдэг харуулна). MBA_LOGO_FETCH=0 бол татахгүй, URL-ийг шууд өгнө (тест)."""
+    import os
+    from concurrent.futures import ThreadPoolExecutor
+
+    meta = load("team_meta")
+    if "logo_url" not in meta:
+        return {}
+    m = meta.dropna(subset=["logo_url"])
+    urls = dict(zip(m.canonical_name, m.logo_url))
+    if os.environ.get("MBA_LOGO_FETCH", "1") == "0":
+        return urls
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        thumbs = dict(zip(urls, ex.map(_thumb, urls.values())))
+    return thumbs
+
+
+@st.cache_data(show_spinner=False)
+def team_info() -> pd.DataFrame:
+    return load("team_meta").set_index("canonical_name")
+
+
 def filters_sidebar() -> Filters:
     sb = st.sidebar
-    sb.markdown("### Шүүлтүүр")
-    sb.caption("Энд сонгосон зүйл бүх хуудсанд нэг дор үйлчилнэ.")
+    sb.html('<div class="mba-side-title">Шүүлтүүр</div>')
+    sb.caption("Бүх хуудсанд нэг дор үйлчилнэ.")
     season = sb.selectbox("Улирал", SEASONS, key="season",
                           format_func=lambda s: s.replace("-20", "–") + (" (явагдаж буй)" if s == "2026-2027" else ""))
     teams = team_names(season)
@@ -70,7 +118,7 @@ def filters_sidebar() -> Filters:
     show_ci = sb.toggle("Магадлалтай хүрээг харуулах", key="show_ci", value=st.session_state.get("show_ci", True),
                         help="Дата цөөн үед бодит утга хаана байж болохыг сүүдэр/шугамаар харуулна (95% магадлал)")
     sb.button("Шүүлтүүрийг цэвэрлэх", on_click=reset_filters, icon=":material/restart_alt:", width="stretch")
-    sb.markdown("---")
+    sb.divider()
     highlight = sb.selectbox("Онцлох баг", teams, key="highlight_team", index=None, placeholder="Сонгоогүй",
                              help="Сонгосон баг бүх хуудасны график дээр тодорч харагдана")
     sb.caption(f"Дата: MBA лигийн албан ёсны статистик, {snapshot()}-нд татсан")
@@ -103,7 +151,8 @@ def apply_selection(state, selected_ids: list) -> bool:
 
 def empty_notice(df: pd.DataFrame) -> bool:
     if df is None or len(df) == 0:
-        st.info(EMPTY_MSG)
+        from ui import empty_state
+        empty_state("Сонгосон шүүлтүүрт тохирох өгөгдөл алга", EMPTY_MSG.split(". ", 1)[1])
         return True
     return False
 

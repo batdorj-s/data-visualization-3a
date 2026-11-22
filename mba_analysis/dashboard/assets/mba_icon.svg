@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="MBA Analytics">
+  <circle cx="18" cy="18" r="15" fill="#F08A3C"/>
+  <g fill="none" stroke="#0F2240" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="18" cy="18" r="15"/>
+    <path d="M3 18h30M18 3v30"/>
+    <path d="M7.5 7.5c5 4.5 5 16.5 0 21M28.5 7.5c-5 4.5-5 16.5 0 21"/>
+  </g>
+</svg>

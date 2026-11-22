@@ -140,6 +140,17 @@ def _pbp_tables(p: Path, r: Path, games: pd.DataFrame, pg: pd.DataFrame, metrics
     }
 
 
+def _team_meta(p: Path) -> pd.DataFrame:
+    """Багийн мета + албан ёсны логоны URL (team_logos.csv байхгүй бол логогүй — dashboard үсгэн тэмдэг харуулна)."""
+    meta = pd.read_csv(p / "team_meta.csv")
+    logos = p / "team_logos.csv"
+    if logos.exists():
+        meta = meta.merge(pd.read_csv(logos)[["team_key", "logo_url", "team_url"]], on="team_key", how="left")
+    else:
+        meta = meta.assign(logo_url=None, team_url=None)
+    return meta
+
+
 def build(processed_dir: Path, reports_dir: Path, out_dir: Path, n_boot: int = 2000) -> dict[str, int]:
     from src.charts.comparison import pareto_ci, pareto_table
 
@@ -185,7 +196,7 @@ def build(processed_dir: Path, reports_dir: Path, out_dir: Path, n_boot: int = 2
         "pareto_league": pd.concat(pareto_rows, ignore_index=True).assign(player_name=lambda d: d.label.map(names)),
         "pareto_team": pd.concat(team_rows, ignore_index=True).assign(player_name=lambda d: d.label.map(names)),
         "clusters": clusters.assign(player_name=clusters.player_id.map(names)),
-        "team_meta": pd.read_csv(p / "team_meta.csv"),
+        "team_meta": _team_meta(p),
         "elo_coefs": pd.DataFrame({"coef": elo_coefficients(gm, n_boot=max(100, n_boot // 4))}),
         "hypotheses": pd.read_csv(r / "hypotheses.csv"),
         "quality_missing": pd.read_csv(r / "missing.csv"),

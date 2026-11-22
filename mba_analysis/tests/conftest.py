@@ -21,3 +21,9 @@ def html():
 @pytest.fixture
 def wiki():
     return lambda name: load_fixture("wiki", name)
+
+
+# Dashboard-ийн тест сүлжээнээс лого татахгүй (албан ёсны URL-ийг шууд хэрэглэнэ) — хурдан, сүлжээгүйд ч ажиллана
+import os  # noqa: E402
+
+os.environ.setdefault("MBA_LOGO_FETCH", "0")
