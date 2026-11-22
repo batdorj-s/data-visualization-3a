@@ -9,7 +9,7 @@ for p in (HERE, HERE.parent):
 import streamlit as st  # noqa: E402
 
 from data_access import filters_sidebar  # noqa: E402
-from ui import error_state, inject_css  # noqa: E402
+from ui import error_state, footer, inject_css  # noqa: E402
 
 st.set_page_config(page_title="MBA Analytics — Монголын сагсан бөмбөгийн лигийн шинжилгээ",
                    page_icon=str(HERE / "assets" / "mba_icon.svg"), layout="wide")
@@ -35,6 +35,7 @@ nav = st.navigation(pages)
 st.session_state["_filters"] = filters_sidebar()
 try:
     nav.run()
+    footer()
 except Exception as exc:  # st.stop / st.rerun нь BaseException тул энд баригдахгүй
     error_state("Энэ хэсгийг харуулах үед алдаа гарлаа",
                 "Шүүлтүүрээ өөрчлөх эсвэл хуудсыг дахин ачаалж үзнэ үү. Алдаа давтагдвал доорх дэлгэрэнгүйг хөгжүүлэгчид илгээнэ үү.")

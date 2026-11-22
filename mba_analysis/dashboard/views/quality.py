@@ -3,7 +3,7 @@ import streamlit as st
 
 from data_access import load
 from plots import A_COLOR, _layout
-from ui import chart_note, findings, page_header, section
+from ui import chart_note, findings, page_header, section, show_chart
 
 page_header("Өгөгдлийн чанар", "Дата хэр бүрэн, хэр цэвэр вэ — дүгнэлтэд итгэж болох эсэхийг шалгах хуудас.",
             eyebrow="Тусламж · Өгөгдлийн чанар")
@@ -23,7 +23,7 @@ findings([
 fig = go.Figure(go.Bar(x=missing.pct_missing, y=missing.column.map(lambda c: NAMES.get(c, c)), orientation="h",
                        marker_color=A_COLOR, hovertemplate="%{y}: %{x:.1f}%<extra></extra>"))
 fig.update_xaxes(title="Дутуу утга, %")
-st.plotly_chart(_layout(fig, "Үзүүлэлт бүрийн дутуу утгын хувь", height=320), width="stretch")
+show_chart(_layout(fig, "Үзүүлэлт бүрийн дутуу утгын хувь", height=320), width="stretch")
 chart_note("Багана урт байх тусам тухайн үзүүлэлт олон тоглогчид дутуу.", "MBA тоглогчийн профайл ба улирлын статистик.",
            kind="Хэвтээ багана график (bar chart)", files=["missing"])
 section(f"Нэрээр холбосон тоглогчид ({len(relinked)})")

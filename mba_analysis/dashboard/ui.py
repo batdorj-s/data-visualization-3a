@@ -22,11 +22,11 @@ import streamlit as st
 TOKENS = {
     # брэнд
     "primary": "#1B3A6B", "primary-hover": "#142C52", "primary-soft": "#E8EEF7",
-    "secondary": "#475569", "accent": "#F08A3C", "accent-soft": "#FDEBDD",
+    "secondary": "#475569", "accent": "#F08A3C", "accent-ink": "#B9480C", "accent-soft": "#FDEBDD",
     # гадаргуу
     "bg": "#F5F7FA", "surface": "#FFFFFF", "surface-2": "#F1F4F8", "sidebar": "#0F2240",
     # текст
-    "text": "#0F172A", "text-2": "#475569", "text-3": "#64748B", "text-inverse": "#E6ECF5",
+    "text": "#0F172A", "text-2": "#475569", "text-3": "#5B6B7F", "text-inverse": "#E6ECF5",
     # хүрээ
     "border": "#DCE3EC", "border-strong": "#C3CEDC",
     # төлөв
@@ -81,8 +81,9 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 
 /* ---- хуудасны толгой ---- */
 .mba-head {{ margin: 0 0 1.1rem 0; }}
+.mba-head__main {{ min-width: 0; flex: 1 1 420px; }}
 .mba-eyebrow {{ font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--mba-accent); margin-bottom: .35rem; }}
+  color: var(--mba-accent-ink); margin-bottom: .35rem; }}
 .mba-head h1 {{ font-size: 1.9rem; font-weight: 700; color: var(--mba-text); margin: 0; padding: 0; letter-spacing: -0.02em; }}
 .mba-lead {{ font-size: 1rem; color: var(--mba-text-2); max-width: 78ch; margin: .45rem 0 0 0; line-height: 1.55; }}
 .mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: .2rem 0 .4rem 0; }}
@@ -90,6 +91,34 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   background: var(--mba-surface); border: 1px solid var(--mba-border); color: var(--mba-text-2); font-size: .8rem; }}
 .mba-chip b {{ color: var(--mba-text); font-weight: 600; }}
 .mba-chip--active {{ background: var(--mba-primary-soft); border-color: #C9D6EA; color: var(--mba-primary); }}
+
+.mba-head {{ display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--mba-border); }}
+.mba-head__meta {{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: .8rem; color: var(--mba-text-3); }}
+.mba-pill {{ display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-weight: 600;
+  background: var(--mba-primary); color: #fff; font-size: .78rem; }}
+.mba-pill--live::before {{ content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; }}
+.mba-fresh {{ display: inline-flex; align-items: center; gap: 6px; }}
+
+/* ---- footer ---- */
+.mba-footer {{ margin-top: 3rem; padding: 22px 24px; border-radius: var(--mba-radius); background: var(--mba-sidebar);
+  color: #C9D5E6; font-size: .84rem; line-height: 1.6; }}
+.mba-footer__grid {{ display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }}
+.mba-footer__brand {{ display: flex; gap: 10px; align-items: center; color: #fff; font-weight: 800; font-size: 1rem; letter-spacing: .02em; }}
+.mba-footer__brand small {{ display: block; color: #9FB3D1; font-weight: 600; font-size: .68rem; letter-spacing: .18em; }}
+.mba-footer h5 {{ margin: 0 0 6px 0; padding: 0; color: #fff; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }}
+.mba-footer a {{ color: #C9D5E6; text-decoration: none; border-bottom: 1px solid rgba(201,213,230,.35); }}
+.mba-footer a:hover {{ color: #fff; border-bottom-color: var(--mba-accent); }}
+.mba-footer ul {{ list-style: none; margin: 0; padding: 0; }}
+.mba-footer li {{ margin: 2px 0; }}
+.mba-footer__base {{ margin-top: 16px; padding-top: 12px; border-top: 1px solid #2A4675; display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; color: #9FB3D1; font-size: .76rem; }}
+
+/* ---- expander ---- */
+[data-testid="stExpander"] details {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
+  box-shadow: var(--mba-shadow); }}
+[data-testid="stExpander"] summary {{ font-weight: 600; color: var(--mba-text); }}
+[data-testid="stExpander"] summary:hover {{ color: var(--mba-primary); }}
 
 /* ---- хэсгийн гарчиг ---- */
 .mba-section {{ margin: 1.6rem 0 .6rem 0; }}
@@ -106,7 +135,7 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 .mba-findings li::marker {{ color: var(--mba-text-3); font-weight: 600; }}
 
 /* ---- тоон карт ---- */
-.mba-stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: .2rem 0 .8rem 0; }}
+.mba-stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: .2rem 0 .8rem 0; }}
 .mba-stat {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
   padding: 14px 16px; box-shadow: var(--mba-shadow); min-width: 0; }}
 .mba-stat__label {{ font-size: .78rem; font-weight: 600; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .04em; }}
@@ -114,6 +143,8 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }}
 .mba-stat__sub {{ font-size: .8rem; color: var(--mba-text-3); margin-top: 2px; }}
 .mba-stat--accent {{ border-top: 3px solid var(--mba-accent); }}
+.mba-stat__row {{ display: flex; align-items: center; gap: 10px; margin-top: 4px; min-width: 0; }}
+.mba-stat__row .mba-stat__value {{ margin-top: 0; font-size: 1.25rem; line-height: 1.25; }}
 
 /* ---- багийн лого ---- */
 .mba-logo {{ position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 8px;
@@ -212,8 +243,11 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 @media (max-width: 640px) {{
   [data-testid="stMainBlockContainer"] {{ padding-left: 1rem; padding-right: 1rem; padding-top: 1.2rem; }}
   .mba-head h1 {{ font-size: 1.5rem; }}
+  .mba-head__meta {{ align-items: flex-start; }}
+  .mba-footer__grid {{ grid-template-columns: 1fr; gap: 16px; }}
   .mba-stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
   .mba-stat {{ padding: 10px 12px; }}
+  .mba-stat:last-child:nth-child(odd) {{ grid-column: 1 / -1; }}
   .mba-stat__value {{ font-size: 1.3rem; }}
   .mba-teamhead {{ flex-wrap: wrap; }}
   .mba-teamhead__stats {{ margin-left: 0; width: 100%; justify-content: flex-start; }}
@@ -264,8 +298,17 @@ def _md_bold(text: str) -> str:
 
 # ---------------------------------------------------------------- толгой, хэсэг
 def page_header(title: str, lead: str, eyebrow: str = "MBA Analytics") -> None:
-    st.html(f'<header class="mba-head"><div class="mba-eyebrow">{esc(eyebrow)}</div><h1>{esc(title)}</h1>'
-            f'<p class="mba-lead">{esc(lead)}</p></header>')
+    """Хуудасны толгой: зүүн талд гарчиг ба зорилго, баруун талд идэвхтэй улирал ба дата татсан огноо."""
+    from data_access import current_filters, snapshot  # data_access нь ui-г зөвхөн функц дотроос импортолдог
+
+    season = current_filters().season
+    live = season == "2026-2027"
+    pill = f'<span class="mba-pill{" mba-pill--live" if live else ""}">{esc(season.replace("-20", "–"))}' \
+           f'{" · явагдаж буй" if live else ""}</span>'
+    st.html(f'<header class="mba-head"><div class="mba-head__main"><div class="mba-eyebrow">{esc(eyebrow)}</div>'
+            f'<h1>{esc(title)}</h1><p class="mba-lead">{esc(lead)}</p></div>'
+            f'<div class="mba-head__meta">{pill}<span class="mba-fresh">Дата шинэчилсэн: {esc(snapshot())}</span></div>'
+            "</header>")
 
 
 def section(title: str, desc: str | None = None) -> None:
@@ -278,14 +321,16 @@ def findings(items: list[str], title: str = "Гол дүгнэлт") -> None:
 
 
 def stat_cards(items: Sequence[tuple], accent_first: bool = False) -> None:
-    """items: (шошго, утга, тайлбар|None, tooltip|None) — тайлбар нь утгын доорх жижиг мөр."""
+    """items: (шошго, утга, тайлбар|None, tooltip|None, (баг, лого)|None) — тайлбар нь утгын доорх жижиг мөр."""
     cards = []
     for i, it in enumerate(items):
-        label, value, sub, tip = (list(it) + [None, None])[:4]
+        label, value, sub, tip, logo = (list(it) + [None, None, None])[:5]
         cls = "mba-stat mba-stat--accent" if accent_first and i == 0 else "mba-stat"
         title = f' title="{esc(tip)}"' if tip else ""
-        cards.append(f'<div class="{cls}"{title}><div class="mba-stat__label">{esc(label)}</div>'
-                     f'<div class="mba-stat__value">{esc(str(value))}</div>'
+        val = f'<div class="mba-stat__value">{esc(str(value))}</div>'
+        if logo is not None:  # logo = (багийн нэр, URL) → утгын өмнө лого
+            val = f'<div class="mba-stat__row">{team_logo(logo[0], logo[1], 34)}{val}</div>'
+        cards.append(f'<div class="{cls}"{title}><div class="mba-stat__label">{esc(label)}</div>{val}'
                      + (f'<div class="mba-stat__sub">{esc(sub)}</div>' if sub else "") + "</div>")
     st.html(f'<div class="mba-stats">{"".join(cards)}</div>')
 
@@ -417,3 +462,55 @@ def pareto_who(df, teams: dict | None = None, label: str = "лигийн") -> No
         st.dataframe(t[list(cols)].rename(columns=cols), hide_index=True, width="stretch",
                      column_config={cols["cum_share"]: st.column_config.ProgressColumn(format="percent", min_value=0,
                                                                                          max_value=1)})
+
+
+# ---------------------------------------------------------------- график ба footer
+CHART_CONFIG = {
+    "displaylogo": False,
+    "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d", "toggleSpikelines", "hoverCompareCartesian",
+                               "hoverClosestCartesian"],
+    "toImageButtonOptions": {"format": "png", "filename": "mba_analytics_chart", "scale": 2},
+}
+
+
+def show_chart(fig, select: bool = False, **kw):
+    """Бүх графикийг нэг тохиргоогоор: Plotly лого, хэрэггүй товчгүй, PNG-ээр 2× чанартай татна.
+    select=True бол хүрээ/lasso сонголтын товчийг үлдээнэ (тоглогч сонгох график)."""
+    cfg = dict(CHART_CONFIG)
+    if select:
+        cfg["modeBarButtonsToRemove"] = [b for b in cfg["modeBarButtonsToRemove"] if b not in ("lasso2d", "select2d")]
+    kw.setdefault("width", "stretch")
+    return st.plotly_chart(fig, config=cfg, **kw)
+
+
+def _icon_img(size: int = 30) -> str:
+    """Брэнд дүрсийг <img> data URI-гаар (st.html нь inline <svg>-г цэвэрлэдэг)."""
+    import base64
+    from pathlib import Path
+
+    svg = (Path(__file__).parent / "assets" / "mba_icon.svg").read_bytes()
+    return (f'<img src="data:image/svg+xml;base64,{base64.b64encode(svg).decode()}" width="{size}" height="{size}" '
+            'alt="" aria-hidden="true">')
+
+
+SOURCES = [("MBA лигийн албан ёсны статистик", "https://mongolia.basketball/en/stats?competition=league&view=players"),
+           ("Wikipedia — The League (Mongolia)", "https://en.wikipedia.org/wiki/The_League_(Mongolia)"),
+           ("geoBoundaries — аймгийн хил (ODbL)", "https://www.geoboundaries.org/"),
+           ("ShamSports — гадаад тоглогчийн карьер", "https://www.shamsports.com/")]
+REPO = "https://github.com/batdorj-s/data-visualization-3a"
+
+
+def footer() -> None:
+    from data_access import snapshot
+
+    src = "".join(f'<li><a href="{esc(u)}" target="_blank" rel="noopener">{esc(n)}</a></li>' for n, u in SOURCES)
+    st.html(f'<footer class="mba-footer" role="contentinfo"><div class="mba-footer__grid">'
+            f'<div><div class="mba-footer__brand">{_icon_img()}<div>MBA<small>ANALYTICS</small></div></div>'
+            '<p style="margin:.6rem 0 0 0">Монголын сагсан бөмбөгийн дээд лигийн (MBA) статистикт тулгуурласан шинжилгээ. '
+            "Тоо бүрийн тодорхой бус байдлыг 95% хүрээгээр харуулдаг.</p></div>"
+            f"<div><h5>Эх сурвалж</h5><ul>{src}</ul></div>"
+            "<div><h5>Төсөл</h5><ul><li>F.ITC341 Өгөгдлийн дүрслэл — бие даалт</li>"
+            f'<li><a href="{REPO}" target="_blank" rel="noopener">Эх код (GitHub)</a></li>'
+            "<li>Аргачлал, нэр томьёо: «Тухай», «Нэр томьёо» хуудас</li></ul></div></div>"
+            f'<div class="mba-footer__base"><span>Дата шинэчилсэн: {esc(snapshot())} · 2025–26 ба 2026–27 улирал</span>'
+            "<span>Багийн лого нь тухайн багийн өмч; MBA-ийн албан ёсны сайтаас иш татав.</span></div></footer>")

@@ -6,7 +6,7 @@ from data_access import current_filters, load, team_logos
 from plots import px_assist_network, px_game_flow, px_inplay_accuracy, px_shot_map, px_zone_bars
 from src.inplay import REG_SEC, finalize, win_prob
 from src.pbp import ZONES
-from ui import chart_note, filter_summary, findings, page_header, scoreboard, section
+from ui import chart_note, filter_summary, findings, page_header, scoreboard, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -65,9 +65,9 @@ def shot_section():
     who = player if player != ALL else (team if team != ALL else "Бүх лиг")
     left, right = st.columns([3, 2], gap="large")
     with left:
-        st.plotly_chart(px_shot_map(s, league_pps, f"{who}: шидэлтийн газрын зураг"), width="stretch")
+        show_chart(px_shot_map(s, league_pps, f"{who}: шидэлтийн газрын зураг"), width="stretch")
     with right:
-        st.plotly_chart(px_zone_bars(zone_summary(s), league_pps), width="stretch")
+        show_chart(px_zone_bars(zone_summary(s), league_pps), width="stretch")
     chart_note("Дөрвөлжин бүр 1 × 1 м талбай: том = олон шидэлт, улаан = шидэлт бүрт лигийн дунджаас их оноо, цэнхэр = бага. "
                "Сагс доод талд. Баруун талд нь 5 бүсээр нэгтгэсэн.",
                f"MBA тоглолтын хуудасны шидэлтийн байршил, {season_txt}, {int(s.location_ok.sum()):,} шидэлт "
@@ -94,7 +94,7 @@ def assist_section():
     inv = pd.concat([e.groupby("passer").n.sum(), e.groupby("scorer").n.sum()]).groupby(level=0).sum()
     imp = shots_all.drop_duplicates("player_name").set_index("player_name").is_import.to_dict()
     top = e.sort_values("n", ascending=False).iloc[0]
-    st.plotly_chart(px_assist_network(e, inv, imp, f"{team}: {top.passer} → {top.scorer} хамгийн олон ({top.n})"),
+    show_chart(px_assist_network(e, inv, imp, f"{team}: {top.passer} → {top.scorer} хамгийн олон ({top.n})"),
                     width="stretch")
     chart_note("Цэг = тоглогч (том = олон дамжуулалтад оролцсон; улаан-улбар = гадаад, цэнхэр = дотоод), "
                "шугам = нэг нь нөгөөдөө дамжуулж, тэр нь оносон (зузаан = олон удаа). Шугам дээр хулганаа аваачвал тоог харуулна.",
@@ -132,7 +132,7 @@ def flow_section():
     params = {"intercept": p.intercept, "coef": {k: p[k] for k in ("margin", "margin_scaled", "elo_diff", "elo_x_time")}}
     wp = finalize(win_prob(params, flow.margin, np.clip(REG_SEC - flow.elapsed, 0, None), g.elo_pre_home - g.elo_pre_away),
                   flow.margin.iloc[-1])
-    st.plotly_chart(px_game_flow(flow, wp, g.home_team, g.away_team), width="stretch")
+    show_chart(px_game_flow(flow, wp, g.home_team, g.away_team), width="stretch")
     chart_note(f"Дээд хэсэг: тухайн минутад хэн хэдэн оноогоор тэргүүлж байсан — 0-ээс дээш улаан-улбар = {g.home_team} "
                f"тэргүүлсэн, доош цэнхэр = {g.away_team} тэргүүлсэн; хар ромб = тэргүүлэгч солигдсон мөч. Хулганаа аваачвал "
                f"тэр мөчийн оноо ба хэн тэргүүлж байгааг бичнэ. Доод хэсэг: тэр мөчид загварын тооцсон {g.home_team} ялах "
@@ -145,7 +145,7 @@ shot_section()
 assist_section()
 flow_section()
 section("Ялагчийг хэзээнээс таамаглаж болох вэ", "Тоглолтын минут бүрд одоогийн байдлаар ялагчийг хэр зөв хэлж чадах вэ?")
-st.plotly_chart(px_inplay_accuracy(load("inplay_minute").reset_index(drop=True), f.show_ci), width="stretch")
+show_chart(px_inplay_accuracy(load("inplay_minute").reset_index(drop=True), f.show_ci), width="stretch")
 chart_note("Тоглолтын минут бүрд «одоо хэн ялах вэ» гэж таамаглахад хэдэн хувь нь зөв байсан. Загвар энгийн «тэргүүлж буй нь "
            "ялна» дүрмээс зөв хувиар илүү биш ч магадлалаар (жишээ нь 78%) хэр итгэлтэйг хэлж өгдөг.",
            "252 тоглолт; тоглолтоор нь бүлэглэн 5 хэсэгт хувааж шалгасан (нэг тоглолт сургалт, тест хоёрт зэрэг ордоггүй).",

@@ -1,9 +1,10 @@
 import numpy as np
 import streamlit as st
 
-from data_access import DATA, current_filters, import_share_ci, latest_elo, load, snapshot, team_key_of, team_logos
+from data_access import DATA, current_filters, import_share_ci, latest_elo, load, team_key_of, team_logos
 from plots import px_fan, px_map, px_pareto
-from ui import chart_note, filter_summary, findings, page_header, pareto_who, section, standings_board, stat_cards
+from ui import (chart_note, filter_summary, findings, page_header, pareto_who,
+                section, show_chart, standings_board, stat_cards)
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–") + (" (явагдаж буй)" if f.season == "2026-2027" else "")
@@ -36,7 +37,8 @@ stat_cards([
      "Лигийн нийт онооны хэдэн хувийг гадаад тоглогч авсан"),
     ("Тоглолтын оноо", f"{(g.home_pts + g.away_pts).mean():.0f}", "хоёр баг нийлээд, дунджаар"),
     ("Тэргүүлэгч", table.index[0] if len(table) else "—",
-     f"{int(table.W.iloc[0])}–{int(table.L.iloc[0])}, {table.pct.iloc[0]:.0%} ялалт" if len(table) else None),
+     f"{int(table.W.iloc[0])}–{int(table.L.iloc[0])}, {table.pct.iloc[0]:.0%} ялалт" if len(table) else None, None,
+     (table.index[0], logos.get(table.index[0])) if len(table) else None),
 ], accent_first=False)
 
 findings([
@@ -51,7 +53,7 @@ findings([
 
 @st.fragment
 def pareto():
-    st.plotly_chart(px_pareto(pareto_df, f.show_ci, "Цөөн тоглогч лигийн онооны ихэнхийг авдаг"), width="stretch")
+    show_chart(px_pareto(pareto_df, f.show_ci, "Цөөн тоглогч лигийн онооны ихэнхийг авдаг"), width="stretch")
     chart_note("Багана бүр 1 тоглогчийн улирлын нийт оноо, ихээс нь эрэмбэлсэн (улаан-улбар = гадаад, цэнхэр = дотоод). "
                "Хар шугам = 1-р байрын тоглогчоос тухайн байр хүртэлх тоглогчдын оноог нэмээд лигийн нийт онооны хэдэн хувь "
                "болохыг заана. Жишээ нь шугам 10 дээр 30% бол хамгийн их оноотой 10 тоглогч лигийн онооны 30%-ийг авсан. "
@@ -69,7 +71,7 @@ def fan():
     team = st.selectbox("Ялалтын явцыг харах баг", teams, index=teams.index(default),
                         key=f"overview_fan_team::{f.highlight_team}",
                         help="Зүүн талын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
-    st.plotly_chart(px_fan(tg, team_key_of(team), f.show_ci), width="stretch")
+    show_chart(px_fan(tg, team_key_of(team), f.show_ci), width="stretch")
     chart_note("Улаан-улбар шугам = сонгосон багийн тухайн өдөр хүртэлх ялалтын хувь, саарал = бусад баг. "
                "Сүүдэр нь багийн жинхэнэ хүч байж болох хүрээ: цөөн тоглолтын дараа өргөн, улирлын эцэст нарийсна.",
                f"тоглолтын үр дүн, {season_txt} улирлын үндсэн шат, {tg.team.nunique()} баг.",
@@ -91,7 +93,7 @@ with right:
 left, right = st.columns([5, 7], gap="large")
 with left:
     section("Багуудын газар зүй", "Хаана төвлөрсөн, аль бүс амжилттай вэ?")
-    st.plotly_chart(px_map(load("team_meta"), load("standings"), DATA / "mng_adm1.geojson", f.season),
+    show_chart(px_map(load("team_meta"), load("standings"), DATA / "mng_adm1.geojson", f.season),
                     width="stretch")
     chart_note("Тойрог бүр 1 баг; том тойрог = өндөр ялалтын хувь. Улаан-улбар = Улаанбаатар, цэнхэр = орон нутаг.",
                "багийн хот — Wikipedia; ялалт — MBA статистик; аймгийн хил — geoBoundaries.",
@@ -99,4 +101,3 @@ with left:
 with right:
     section("Улирлын явц", "Багийн ялалтын хувь тоглолт бүрийн дараа хэрхэн өөрчлөгдсөн бэ?")
     fan()
-st.html(f'<p class="mba-source">Дата татсан огноо: {snapshot()}. Нэр томьёоны тайлбарыг «Нэр томьёо» хуудаснаас үзнэ үү.</p>')

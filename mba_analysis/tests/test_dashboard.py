@@ -160,7 +160,7 @@ def test_every_plotly_chart_is_followed_by_chart_note():
     for fn in [*PAGES, "import_view.py"]:
         lines = (DASH / fn).read_text(encoding="utf-8").splitlines()
         for i, line in enumerate(lines):
-            if "st.plotly_chart(" in line:
+            if "show_chart(" in line or "st.plotly_chart(" in line:
                 assert any("chart_note(" in x for x in lines[i + 1:i + 8]), f"{fn}:{i + 1}"
 
 
