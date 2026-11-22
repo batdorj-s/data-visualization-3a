@@ -33,20 +33,26 @@ TOKENS = {
     "success": "#15803D", "success-soft": "#E7F5EC", "warning": "#B45309", "warning-soft": "#FDF3E2",
     "error": "#B91C1C", "error-soft": "#FCECEC", "info": "#1D4ED8", "info-soft": "#E8F0FE",
     # хэмжээ
-    "radius": "10px", "radius-sm": "6px", "shadow": "0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04)",
+    "muted": "#F1F4F8", "ring": "rgba(27,58,107,.30)",
+    # хэмжээ (shadcn: --radius 0.625rem → xl ×1.4, md ×0.8, sm ×0.6; shadow-sm, shadow-xs)
+    "radius-xl": "14px", "radius": "10px", "radius-md": "8px", "radius-sm": "6px",
+    "shadow": "0 1px 3px 0 rgba(15,23,42,.08), 0 1px 2px -1px rgba(15,23,42,.08)", "shadow-xs": "0 1px 2px 0 rgba(15,23,42,.05)",
 }
 FONT_STACK = "Inter, 'Segoe UI', Arial, sans-serif"
 
 _VARS = "\n".join(f"  --mba-{k}: {v};" for k, v in TOKENS.items())
 CSS = f"""
 <style>
+/* Бүрэлдэхүүний хэмжээ shadcn/ui (new-york-v4)-ийн Tailwind классаас: Card rounded-xl border shadow-sm, Badge rounded-full
+   px-2 py-0.5 text-xs, Table text-sm h-10/p-2, TabsList bg-muted rounded-lg p-[3px] h-9, Button/Input h-9 rounded-md shadow-xs,
+   focus ring 3px. Өнгө нь MBA Analytics-ийн брэнд токен. */
 :root {{
 {_VARS}
   --mba-font: {FONT_STACK};
 }}
 /* ---- суурь ---- */
 [data-testid="stDecoration"] {{ display: none; }}
-[data-testid="stMainBlockContainer"] {{ padding-top: 2.2rem; padding-bottom: 4rem; max-width: 1440px; }}
+[data-testid="stMainBlockContainer"] {{ padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1440px; }}
 [data-testid="stMetricValue"], [data-testid="stDataFrame"], .mba-num {{ font-variant-numeric: tabular-nums; }}
 [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {{ line-height: 1.6; }}
 [data-testid="stCaptionContainer"] {{ line-height: 1.5; color: var(--mba-text-3); }}
@@ -55,23 +61,48 @@ h2, h3 {{ letter-spacing: -0.01em; }}
 a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   outline: 2px solid var(--mba-info); outline-offset: 2px; border-radius: 4px; }}
 
-/* ---- карт: хүрээтэй container, график, хүснэгт ---- */
-[data-testid="stVerticalBlockBorderWrapper"], div[class*="st-key-mba-card"] {{
-  background: var(--mba-surface); border-radius: var(--mba-radius); }}
-[data-testid="stPlotlyChart"] {{
-  background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
-  padding: 6px 4px 2px 4px; box-shadow: var(--mba-shadow); }}
-[data-testid="stDataFrame"] {{ border-radius: var(--mba-radius-sm); }}
+/* ---- карт (shadcn Card) ---- */
+.mba-card {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius-xl);
+  box-shadow: var(--mba-shadow); }}
+[data-testid="stPlotlyChart"] {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius-xl);
+  box-shadow: var(--mba-shadow); padding: 8px 6px 4px 6px; overflow: hidden; }}
+[data-testid="stDataFrame"] {{ border-radius: var(--mba-radius-md); }}
+[data-testid="stVerticalBlockBorderWrapper"] {{ background: var(--mba-surface); border-radius: var(--mba-radius-xl); }}
 
-/* ---- табууд ---- */
-[data-baseweb="tab-list"] {{ gap: 4px; border-bottom: 1px solid var(--mba-border); }}
-[data-baseweb="tab"] {{ padding: 8px 14px; border-radius: 8px 8px 0 0; font-weight: 500; color: var(--mba-text-2); }}
-[data-baseweb="tab"]:hover {{ background: var(--mba-surface-2); color: var(--mba-text); }}
-[data-baseweb="tab"][aria-selected="true"] {{ color: var(--mba-primary); font-weight: 600; }}
-[data-baseweb="tab-highlight"] {{ background-color: var(--mba-primary) !important; height: 3px; }}
+/* ---- товч (shadcn Button: outline / default) ---- */
+[data-testid="stBaseButton-secondary"], [data-testid="stBaseButton-primary"] {{
+  min-height: 36px; border-radius: var(--mba-radius-md); font-size: .875rem; font-weight: 500; box-shadow: var(--mba-shadow-xs);
+  transition: background-color .15s, box-shadow .15s; }}
+[data-testid="stMain"] [data-testid="stBaseButton-secondary"]:hover {{ background: var(--mba-muted); border-color: var(--mba-border); color: var(--mba-text); }}
+[data-testid="stBaseButton-secondary"]:focus-visible, [data-testid="stBaseButton-primary"]:focus-visible {{
+  box-shadow: 0 0 0 3px var(--mba-ring); outline: none; }}
+
+/* ---- оролт, сонгогч (shadcn Input / SelectTrigger) ---- */
+[data-testid="stMain"] [data-baseweb="select"] > div, [data-testid="stMain"] [data-baseweb="input"] {{
+  border-radius: var(--mba-radius-md); box-shadow: var(--mba-shadow-xs); min-height: 36px; }}
+[data-testid="stMain"] [data-baseweb="select"] > div:focus-within, [data-testid="stMain"] [data-baseweb="input"]:focus-within {{
+  box-shadow: 0 0 0 3px var(--mba-ring); }}
+[data-testid="stWidgetLabel"] p {{ font-size: .875rem; font-weight: 500; }}
+
+/* ---- табууд (shadcn TabsList / TabsTrigger; Streamlit 1.67 = react-aria: role=tablist, data-testid=stTab) ---- */
+[data-testid="stTabs"] [role="tablist"] {{ display: inline-flex; width: fit-content; max-width: 100%; gap: 0; padding: 3px;
+  border-radius: var(--mba-radius); background: var(--mba-muted); border: 0; overflow-x: auto; }}
+[data-testid="stTab"] {{ height: 30px; padding: 4px 12px; margin: 0; border-radius: var(--mba-radius-md);
+  border: 1px solid transparent !important; color: var(--mba-text-2); background: transparent; transition: all .15s; white-space: nowrap; }}
+[data-testid="stTab"]::after, [data-testid="stTab"]::before {{ display: none !important; }}
+[data-testid="stTab"] .react-aria-SelectionIndicator {{ display: none !important; }}
+[data-testid="stTab"] p {{ font-size: .875rem; font-weight: 500; }}
+[data-testid="stTab"]:hover {{ color: var(--mba-text); }}
+[data-testid="stTab"][aria-selected="true"] {{ background: var(--mba-surface); color: var(--mba-text); box-shadow: var(--mba-shadow); }}
+[data-testid="stTab"]:focus-visible {{ box-shadow: 0 0 0 3px var(--mba-ring); outline: none; }}
+[data-testid="stTabPanel"] {{ padding-top: 1rem; }}
+
+/* ---- segmented control ---- */
+[data-testid="stButtonGroup"] button {{ font-size: .875rem; }}
 
 /* ---- sidebar ---- */
 [data-testid="stSidebar"] {{ border-right: 1px solid #0B1A33; }}
+[data-testid="stSidebarNav"] a {{ border-radius: var(--mba-radius-md); }}
 [data-testid="stSidebarNav"] a[aria-current="page"] {{ box-shadow: inset 3px 0 0 var(--mba-accent); }}
 [data-testid="stSidebarNavSeparator"] {{ border-color: #2A4675; }}
 [data-testid="stSidebar"] [data-testid="stCaptionContainer"], [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{ color: #9FB3D1; }}
@@ -80,175 +111,155 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   color: #9FB3D1; margin: .4rem 0 .2rem 0; }}
 
 /* ---- хуудасны толгой ---- */
-.mba-head {{ margin: 0 0 1.1rem 0; }}
+.mba-head {{ display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
+  margin: 0 0 1rem 0; padding-bottom: 1rem; border-bottom: 1px solid var(--mba-border); }}
 .mba-head__main {{ min-width: 0; flex: 1 1 420px; }}
+.mba-head__meta {{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: .8rem; color: var(--mba-text-3); }}
 .mba-eyebrow {{ font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   color: var(--mba-accent-ink); margin-bottom: .35rem; }}
 .mba-head h1 {{ font-size: 1.9rem; font-weight: 700; color: var(--mba-text); margin: 0; padding: 0; letter-spacing: -0.02em; }}
 .mba-lead {{ font-size: 1rem; color: var(--mba-text-2); max-width: 78ch; margin: .45rem 0 0 0; line-height: 1.55; }}
-.mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: .2rem 0 .4rem 0; }}
-.mba-chip {{ display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
-  background: var(--mba-surface); border: 1px solid var(--mba-border); color: var(--mba-text-2); font-size: .8rem; }}
-.mba-chip b {{ color: var(--mba-text); font-weight: 600; }}
-.mba-chip--active {{ background: var(--mba-primary-soft); border-color: #C9D6EA; color: var(--mba-primary); }}
-
-.mba-head {{ display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
-  padding-bottom: 1rem; border-bottom: 1px solid var(--mba-border); }}
-.mba-head__meta {{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: .8rem; color: var(--mba-text-3); }}
-.mba-pill {{ display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-weight: 600;
-  background: var(--mba-primary); color: #fff; font-size: .78rem; }}
-.mba-pill--live::before {{ content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; }}
 .mba-fresh {{ display: inline-flex; align-items: center; gap: 6px; }}
 
-/* ---- footer ---- */
-.mba-footer {{ margin-top: 3rem; padding: 22px 24px; border-radius: var(--mba-radius); background: var(--mba-sidebar);
-  color: #C9D5E6; font-size: .84rem; line-height: 1.6; }}
-.mba-footer__grid {{ display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }}
-.mba-footer__brand {{ display: flex; gap: 10px; align-items: center; color: #fff; font-weight: 800; font-size: 1rem; letter-spacing: .02em; }}
-.mba-footer__brand small {{ display: block; color: #9FB3D1; font-weight: 600; font-size: .68rem; letter-spacing: .18em; }}
-.mba-footer h5 {{ margin: 0 0 6px 0; padding: 0; color: #fff; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }}
-.mba-footer a {{ color: #C9D5E6; text-decoration: none; border-bottom: 1px solid rgba(201,213,230,.35); }}
-.mba-footer a:hover {{ color: #fff; border-bottom-color: var(--mba-accent); }}
-.mba-footer ul {{ list-style: none; margin: 0; padding: 0; }}
-.mba-footer li {{ margin: 2px 0; }}
-.mba-footer__base {{ margin-top: 16px; padding-top: 12px; border-top: 1px solid #2A4675; display: flex; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px; color: #9FB3D1; font-size: .76rem; }}
-
-/* ---- expander ---- */
-[data-testid="stExpander"] details {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
-  box-shadow: var(--mba-shadow); }}
-[data-testid="stExpander"] summary {{ font-weight: 600; color: var(--mba-text); }}
-[data-testid="stExpander"] summary:hover {{ color: var(--mba-primary); }}
+/* ---- тэмдэг (shadcn Badge: default / secondary / outline) ---- */
+.mba-badge {{ display: inline-flex; align-items: center; gap: 4px; width: fit-content; white-space: nowrap; padding: 2px 8px;
+  border-radius: 999px; border: 1px solid transparent; font-size: .75rem; line-height: 1rem; font-weight: 500;
+  background: var(--mba-muted); color: var(--mba-text); }}
+.mba-badge--default {{ background: var(--mba-primary); color: #fff; }}
+.mba-badge--outline {{ background: var(--mba-surface); border-color: var(--mba-border); color: var(--mba-text); }}
+.mba-badge--soft {{ background: var(--mba-primary-soft); color: var(--mba-primary); }}
+.mba-badge--import {{ background: #FCEEE6; color: #9A3412; }}
+.mba-badge--domestic {{ background: #E6F1F8; color: #075985; }}
+.mba-badge--live::before {{ content: ""; width: 6px; height: 6px; border-radius: 50%; background: #4ADE80; }}
+.mba-badge b {{ font-weight: 600; }}
+.mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: .2rem 0 .6rem 0; }}
 
 /* ---- хэсгийн гарчиг ---- */
-.mba-section {{ margin: 1.6rem 0 .6rem 0; }}
-.mba-section h2 {{ font-size: 1.2rem; font-weight: 650; color: var(--mba-text); margin: 0; padding: 0; }}
-.mba-section p {{ font-size: .9rem; color: var(--mba-text-3); margin: .2rem 0 0 0; max-width: 90ch; }}
+.mba-section {{ margin: 1.8rem 0 .7rem 0; }}
+.mba-section h2 {{ font-size: 1.15rem; font-weight: 600; color: var(--mba-text); margin: 0; padding: 0; line-height: 1.3; }}
+.mba-section p {{ font-size: .875rem; color: var(--mba-text-3); margin: .25rem 0 0 0; max-width: 90ch; }}
 
-/* ---- гол дүгнэлт ---- */
-.mba-findings {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-left: 4px solid var(--mba-primary);
-  border-radius: var(--mba-radius); padding: 14px 18px; box-shadow: var(--mba-shadow); margin-bottom: .6rem; }}
-.mba-findings h4 {{ margin: 0 0 6px 0; padding: 0; font-size: .78rem; font-weight: 700; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--mba-primary); }}
-.mba-findings ol {{ margin: 0; padding-left: 1.2rem; }}
-.mba-findings li {{ margin: 4px 0; line-height: 1.55; color: var(--mba-text); }}
-.mba-findings li::marker {{ color: var(--mba-text-3); font-weight: 600; }}
+/* ---- гол дүгнэлт (shadcn Alert) ---- */
+.mba-alert {{ display: grid; grid-template-columns: 16px 1fr; column-gap: 12px; align-items: start; padding: 12px 16px;
+  border: 1px solid var(--mba-border); border-radius: var(--mba-radius); background: var(--mba-surface); margin-bottom: .6rem; }}
+.mba-alert__icon {{ width: 16px; height: 16px; margin-top: 2px; }}
+.mba-alert__title {{ font-size: .875rem; font-weight: 600; color: var(--mba-text); line-height: 1.25; letter-spacing: -0.01em; }}
+.mba-alert__desc {{ margin: 6px 0 0 0; padding-left: 1.1rem; font-size: .875rem; line-height: 1.6; color: var(--mba-text-2); }}
+.mba-alert__desc li {{ margin: 2px 0; }}
+.mba-alert__desc b {{ color: var(--mba-text); }}
 
-/* ---- тоон карт ---- */
-.mba-stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: .2rem 0 .8rem 0; }}
-.mba-stat {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
-  padding: 14px 16px; box-shadow: var(--mba-shadow); min-width: 0; }}
-.mba-stat__label {{ font-size: .78rem; font-weight: 600; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .04em; }}
-.mba-stat__value {{ font-size: 1.7rem; font-weight: 700; color: var(--mba-text); line-height: 1.2; margin-top: 4px;
+/* ---- тоон карт (shadcn dashboard «SectionCards») ---- */
+.mba-stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: .2rem 0 .9rem 0; }}
+.mba-kpi {{ display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; min-width: 0; container-type: inline-size; }}
+.mba-kpi__desc {{ font-size: .875rem; color: var(--mba-text-3); line-height: 1.25; }}
+.mba-kpi__value {{ font-size: 1.5rem; font-weight: 600; color: var(--mba-text); line-height: 1.15; letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }}
-.mba-stat__sub {{ font-size: .8rem; color: var(--mba-text-3); margin-top: 2px; }}
-.mba-stat--accent {{ border-top: 3px solid var(--mba-accent); }}
-.mba-stat__row {{ display: flex; align-items: center; gap: 10px; margin-top: 4px; min-width: 0; }}
-.mba-stat__row .mba-stat__value {{ margin-top: 0; font-size: 1.25rem; line-height: 1.25; }}
+@container (min-width: 220px) {{ .mba-kpi__value {{ font-size: 1.875rem; }} }}
+.mba-kpi__foot {{ font-size: .8rem; color: var(--mba-text-3); line-height: 1.4; }}
+.mba-kpi__row {{ display: flex; align-items: center; gap: 10px; min-width: 0; }}
+.mba-kpi__row .mba-kpi__value {{ font-size: 1.25rem; }}
 
 /* ---- багийн лого ---- */
-.mba-logo {{ position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 8px;
-  background: var(--mba-surface-2); border: 1px solid var(--mba-border); overflow: hidden; color: var(--mba-text-2);
+.mba-logo {{ position: relative; display: inline-grid; place-items: center; flex: none; border-radius: var(--mba-radius-md);
+  background: var(--mba-muted); border: 1px solid var(--mba-border); overflow: hidden; color: var(--mba-text-2);
   font-weight: 700; letter-spacing: .02em; vertical-align: middle; }}
-.mba-logo img {{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 8%;
-  background: #fff; }}
-.mba-team {{ display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--mba-text); min-width: 0; }}
+.mba-logo img {{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 8%; background: #fff; }}
+.mba-team {{ display: inline-flex; align-items: center; gap: 8px; font-weight: 500; color: var(--mba-text); min-width: 0; }}
 .mba-team span.mba-team__name {{ min-width: 0; overflow-wrap: break-word; line-height: 1.25; }}
-.mba-teamhead {{ display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: var(--mba-surface);
-  border: 1px solid var(--mba-border); border-radius: var(--mba-radius); box-shadow: var(--mba-shadow); }}
-.mba-teamhead__name {{ font-size: 1.15rem; font-weight: 700; color: var(--mba-text); line-height: 1.25; }}
-.mba-teamhead__meta {{ font-size: .85rem; color: var(--mba-text-3); margin-top: 2px; }}
-.mba-teamhead__stats {{ margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }}
+.mba-teamhead {{ display: flex; align-items: center; gap: 14px; padding: 16px 18px; }}
+.mba-teamhead__name {{ font-size: 1.125rem; font-weight: 600; color: var(--mba-text); line-height: 1.25; }}
+.mba-teamhead__meta {{ font-size: .875rem; color: var(--mba-text-3); margin-top: 2px; }}
+.mba-teamhead__stats {{ margin-left: auto; display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }}
 .mba-kv {{ text-align: right; }}
-.mba-kv b {{ display: block; font-size: 1.15rem; color: var(--mba-text); font-variant-numeric: tabular-nums; }}
-.mba-kv span {{ font-size: .72rem; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .04em; }}
+.mba-kv b {{ display: block; font-size: 1.125rem; font-weight: 600; color: var(--mba-text); font-variant-numeric: tabular-nums; }}
+.mba-kv span {{ font-size: .75rem; color: var(--mba-text-3); }}
 
 /* ---- онооны самбар ---- */
-.mba-score {{ display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 14px 18px;
-  background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius); box-shadow: var(--mba-shadow); }}
+.mba-score {{ display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 16px 20px; }}
 .mba-score__side {{ display: flex; align-items: center; gap: 10px; min-width: 0; }}
 .mba-score__side--away {{ justify-content: flex-end; text-align: right; }}
-.mba-score__team {{ font-weight: 700; color: var(--mba-text); line-height: 1.2; }}
-.mba-score__role {{ font-size: .72rem; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .05em; }}
-.mba-score__pts {{ font-size: 2rem; font-weight: 800; color: var(--mba-text); font-variant-numeric: tabular-nums; white-space: nowrap; }}
-.mba-score__pts .lose {{ color: var(--mba-text-3); font-weight: 600; }}
-.mba-score__meta {{ grid-column: 1 / -1; text-align: center; font-size: .82rem; color: var(--mba-text-3); }}
+.mba-score__team {{ font-weight: 600; color: var(--mba-text); line-height: 1.2; }}
+.mba-score__role {{ font-size: .75rem; color: var(--mba-text-3); }}
+.mba-score__pts {{ font-size: 2rem; font-weight: 700; color: var(--mba-text); font-variant-numeric: tabular-nums; white-space: nowrap;
+  letter-spacing: -0.02em; }}
+.mba-score__pts .lose {{ color: var(--mba-text-3); font-weight: 500; }}
+.mba-score__meta {{ grid-column: 1 / -1; text-align: center; font-size: .8rem; color: var(--mba-text-3); padding-top: 10px;
+  border-top: 1px solid var(--mba-border); }}
+
+/* ---- хүснэгт (shadcn Table) ---- */
+.mba-table {{ width: 100%; border-collapse: collapse; font-size: .875rem; }}
+.mba-table th {{ height: 40px; padding: 0 10px; text-align: left; vertical-align: middle; font-weight: 500; color: var(--mba-text);
+  white-space: nowrap; border-bottom: 1px solid var(--mba-border); }}
+.mba-table td {{ padding: 8px 10px; vertical-align: middle; border-bottom: 1px solid var(--mba-border); color: var(--mba-text);
+  font-variant-numeric: tabular-nums; }}
+.mba-table tbody tr {{ transition: background-color .15s; }}
+.mba-table tbody tr:hover {{ background: rgba(241,244,248,.6); }}
+.mba-table tbody tr:last-child td {{ border-bottom: 0; }}
+.mba-table .num {{ text-align: right; }}
+.mba-table .muted {{ color: var(--mba-text-3); }}
+.mba-table-wrap {{ overflow-x: auto; padding: 4px 8px; }}
 
 /* ---- лигийн байр ---- */
-.mba-board {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
-  box-shadow: var(--mba-shadow); overflow: hidden; container-type: inline-size; }}
-.mba-board__head, .mba-board__row {{ display: grid; grid-template-columns: 24px minmax(0, 1fr) auto 104px; align-items: center;
-  gap: 10px; padding: 8px 14px; }}
-.mba-board__head {{ font-size: .72rem; font-weight: 700; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .05em;
-  background: var(--mba-surface-2); border-bottom: 1px solid var(--mba-border); }}
-.mba-board__row {{ border-bottom: 1px solid #EEF2F6; font-size: .92rem; }}
-.mba-board__row:last-child {{ border-bottom: 0; }}
-.mba-board__row:hover {{ background: #F8FAFC; }}
-.mba-board__row--hl {{ background: var(--mba-accent-soft); }}
-.mba-board__rank {{ color: var(--mba-text-3); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }}
-.mba-board__rec {{ text-align: right; font-variant-numeric: tabular-nums; color: var(--mba-text-2); }}
-.mba-bar {{ position: relative; height: 8px; border-radius: 999px; background: #E9EEF5; }}
+.mba-board {{ container-type: inline-size; }}
+.mba-board tr.hl {{ background: var(--mba-accent-soft); }}
+.mba-board tr.hl:hover {{ background: var(--mba-accent-soft); }}
+.mba-board td.rank {{ width: 28px; color: var(--mba-text-3); text-align: right; font-weight: 500; }}
+.mba-progress {{ display: flex; align-items: center; gap: 8px; justify-content: flex-end; }}
+.mba-bar {{ position: relative; width: 64px; height: 8px; border-radius: 999px; background: rgba(27,58,107,.2); overflow: hidden; flex: none; }}
 .mba-bar > i {{ position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--mba-primary); }}
-@container (max-width: 380px) {{
-  .mba-board__head, .mba-board__row {{ grid-template-columns: 20px minmax(0, 1fr) auto 40px; gap: 8px; padding: 8px 10px; }}
-  .mba-board__pct .mba-bar {{ display: none; }}
-  .mba-board__pct {{ grid-template-columns: 1fr; }}
-}}
-.mba-board__pct {{ display: grid; grid-template-columns: 1fr 34px; gap: 6px; align-items: center; font-variant-numeric: tabular-nums;
-  font-size: .82rem; color: var(--mba-text-2); text-align: right; }}
+@container (max-width: 380px) {{ .mba-board .mba-bar {{ display: none; }} .mba-board th, .mba-board td {{ padding-left: 6px; padding-right: 6px; }} }}
 
 /* ---- харьцуулалт ---- */
-.mba-cmp {{ width: 100%; border-collapse: separate; border-spacing: 0; background: var(--mba-surface);
-  border: 1px solid var(--mba-border); border-radius: var(--mba-radius); overflow: hidden; box-shadow: var(--mba-shadow); }}
-.mba-cmp th, .mba-cmp td {{ padding: 9px 14px; border-bottom: 1px solid #EEF2F6; font-size: .92rem; }}
-.mba-cmp tr:last-child td {{ border-bottom: 0; }}
-.mba-cmp thead th {{ background: var(--mba-surface-2); font-weight: 600; color: var(--mba-text); text-align: center; }}
-.mba-cmp thead th:first-child {{ text-align: left; color: var(--mba-text-3); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }}
-.mba-cmp td {{ text-align: center; font-variant-numeric: tabular-nums; color: var(--mba-text-2); }}
+.mba-cmp th {{ text-align: center; }}
+.mba-cmp th:first-child {{ text-align: left; color: var(--mba-text-3); }}
+.mba-cmp td {{ text-align: center; color: var(--mba-text-2); }}
 .mba-cmp td:first-child {{ text-align: left; color: var(--mba-text); }}
-.mba-cmp td.win {{ color: var(--mba-text); font-weight: 700; background: var(--mba-success-soft); }}
+.mba-cmp td.win {{ color: var(--mba-text); font-weight: 600; background: var(--mba-success-soft); }}
 .mba-cmp small {{ display: block; color: var(--mba-text-3); font-size: .75rem; }}
 
 /* ---- графикийн тэмдэглэл ---- */
-.mba-note {{ font-size: .82rem; line-height: 1.5; color: var(--mba-text-2); margin: -.35rem 2px .9rem 2px; }}
-.mba-note__kind {{ display: inline-block; font-weight: 600; color: var(--mba-primary); background: var(--mba-primary-soft);
-  border-radius: 4px; padding: 0 6px; margin-right: 6px; font-size: .75rem; }}
+.mba-note {{ font-size: .82rem; line-height: 1.55; color: var(--mba-text-2); margin: -.2rem 2px 1rem 2px; }}
+.mba-note .mba-badge {{ margin-right: 6px; vertical-align: 1px; }}
 .mba-note__src {{ color: var(--mba-text-3); margin-top: 3px; font-size: .78rem; }}
-.mba-note code, .mba-source code {{ color: var(--mba-text-2); background: var(--mba-surface-2); padding: 0 4px; border-radius: 4px;
-  font-size: .74rem; }}
+.mba-note code, .mba-source code {{ color: var(--mba-text-2); background: var(--mba-muted); padding: 0 4px; border-radius: 4px; font-size: .74rem; }}
 .mba-source {{ color: var(--mba-text-3); font-size: .78rem; }}
 
-/* ---- төлөв ---- */
-.mba-state {{ display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: var(--mba-radius);
+/* ---- төлөв (shadcn Alert / Empty) ---- */
+.mba-state {{ display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: var(--mba-radius);
   border: 1px dashed var(--mba-border-strong); background: var(--mba-surface); }}
-.mba-state__icon {{ font-size: 1.4rem; line-height: 1; }}
-.mba-state__title {{ font-weight: 650; color: var(--mba-text); }}
-.mba-state__text {{ color: var(--mba-text-2); font-size: .92rem; margin-top: 2px; }}
+.mba-state__icon {{ font-size: 1.2rem; line-height: 1.2; color: var(--mba-text-3); }}
+.mba-state__title {{ font-weight: 600; font-size: .925rem; color: var(--mba-text); }}
+.mba-state__text {{ color: var(--mba-text-2); font-size: .875rem; margin-top: 2px; }}
 .mba-state--error {{ border-style: solid; border-color: #F3C7C7; background: var(--mba-error-soft); }}
+.mba-state--error .mba-state__title, .mba-state--error .mba-state__icon {{ color: var(--mba-error); }}
 
 /* ---- тоглогчийн карт ---- */
 .mba-player {{ display: flex; gap: 12px; align-items: flex-start; }}
-.mba-player__name {{ font-size: 1.15rem; font-weight: 700; color: var(--mba-text); line-height: 1.25; }}
+.mba-player__name {{ font-size: 1.125rem; font-weight: 600; color: var(--mba-text); line-height: 1.25; }}
 .mba-player__meta {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }}
-.mba-badge {{ display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600;
-  background: var(--mba-surface-2); color: var(--mba-text-2); border: 1px solid var(--mba-border); }}
-.mba-badge--import {{ background: #FCEEE6; color: #9A3412; border-color: #F6D3BF; }}
-.mba-badge--domestic {{ background: #E6F1F8; color: #075985; border-color: #C5DDEC; }}
 .mba-pstats {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }}
-.mba-pstat {{ background: var(--mba-surface-2); border-radius: 8px; padding: 8px 10px; }}
-.mba-pstat span {{ display: block; font-size: .72rem; color: var(--mba-text-3); text-transform: uppercase; letter-spacing: .04em; }}
-.mba-pstat b {{ font-size: 1.35rem; color: var(--mba-text); font-variant-numeric: tabular-nums; }}
+.mba-pstat {{ border: 1px solid var(--mba-border); border-radius: var(--mba-radius-md); padding: 8px 10px; }}
+.mba-pstat span {{ display: block; font-size: .78rem; color: var(--mba-text-3); }}
+.mba-pstat b {{ font-size: 1.35rem; font-weight: 600; color: var(--mba-text); font-variant-numeric: tabular-nums; }}
 .mba-pstat small {{ display: block; color: var(--mba-text-3); font-size: .74rem; }}
+
+/* ---- expander (shadcn Accordion/Card) ---- */
+[data-testid="stExpander"] details {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
+  box-shadow: var(--mba-shadow-xs); }}
+[data-testid="stExpander"] summary {{ font-size: .875rem; font-weight: 500; color: var(--mba-text); }}
+[data-testid="stExpander"] summary:hover {{ color: var(--mba-primary); }}
+
+/* ---- footer ---- */
+.mba-footer {{ margin-top: 3rem; padding: 14px 0 6px 0; border-top: 1px solid var(--mba-border); color: var(--mba-text-3);
+  font-size: .8rem; text-align: center; }}
 
 @media (max-width: 640px) {{
   [data-testid="stMainBlockContainer"] {{ padding-left: 1rem; padding-right: 1rem; padding-top: 1.2rem; }}
   .mba-head h1 {{ font-size: 1.5rem; }}
   .mba-head__meta {{ align-items: flex-start; }}
-  .mba-footer__grid {{ grid-template-columns: 1fr; gap: 16px; }}
   .mba-stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
-  .mba-stat {{ padding: 10px 12px; }}
-  .mba-stat:last-child:nth-child(odd) {{ grid-column: 1 / -1; }}
-  .mba-stat__value {{ font-size: 1.3rem; }}
+  .mba-kpi {{ padding: 12px 14px; }}
+  .mba-stats > :last-child:nth-child(odd) {{ grid-column: 1 / -1; }}
   .mba-teamhead {{ flex-wrap: wrap; }}
   .mba-teamhead__stats {{ margin-left: 0; width: 100%; justify-content: flex-start; }}
   .mba-kv {{ text-align: left; }}
@@ -303,7 +314,7 @@ def page_header(title: str, lead: str, eyebrow: str = "MBA Analytics") -> None:
 
     season = current_filters().season
     live = season == "2026-2027"
-    pill = f'<span class="mba-pill{" mba-pill--live" if live else ""}">{esc(season.replace("-20", "–"))}' \
+    pill = f'<span class="mba-badge mba-badge--default{" mba-badge--live" if live else ""}">{esc(season.replace("-20", "–"))}' \
            f'{" · явагдаж буй" if live else ""}</span>'
     st.html(f'<header class="mba-head"><div class="mba-head__main"><div class="mba-eyebrow">{esc(eyebrow)}</div>'
             f'<h1>{esc(title)}</h1><p class="mba-lead">{esc(lead)}</p></div>'
@@ -315,23 +326,28 @@ def section(title: str, desc: str | None = None) -> None:
     st.html(f'<div class="mba-section"><h2>{esc(title)}</h2>' + (f"<p>{esc(desc)}</p>" if desc else "") + "</div>")
 
 
+_INFO_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxQjNBNkIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjxwYXRoIGQ9Ik0xMiAxNnYtNCIvPjxwYXRoIGQ9Ik0xMiA4aC4wMSIvPjwvc3ZnPg=="  # lucide «info» (ISC), брэндийн цэнхэр
+
+
 def findings(items: list[str], title: str = "Гол дүгнэлт") -> None:
+    """shadcn Alert хэлбэрийн дүгнэлт: дүрс, гарчиг, дугаарласан жагсаалт."""
     lis = "".join(f"<li>{_md_bold(t)}</li>" for t in items)
-    st.html(f'<section class="mba-findings" aria-label="{esc(title)}"><h4>{esc(title)}</h4><ol>{lis}</ol></section>')
+    st.html(f'<section class="mba-alert" role="note" aria-label="{esc(title)}"><img class="mba-alert__icon" src="{_INFO_ICON}" alt="">'
+            f'<div><div class="mba-alert__title">{esc(title)}</div><ol class="mba-alert__desc">{lis}</ol></div></section>')
 
 
 def stat_cards(items: Sequence[tuple], accent_first: bool = False) -> None:
-    """items: (шошго, утга, тайлбар|None, tooltip|None, (баг, лого)|None) — тайлбар нь утгын доорх жижиг мөр."""
+    """shadcn dashboard-ийн KPI карт: тайлбар, том утга, доод мөр.
+    items: (шошго, утга, тайлбар|None, tooltip|None, (баг, лого)|None). accent_first: хуучин API (одоо ашиглахгүй)."""
     cards = []
-    for i, it in enumerate(items):
+    for it in items:
         label, value, sub, tip, logo = (list(it) + [None, None, None])[:5]
-        cls = "mba-stat mba-stat--accent" if accent_first and i == 0 else "mba-stat"
         title = f' title="{esc(tip)}"' if tip else ""
-        val = f'<div class="mba-stat__value">{esc(str(value))}</div>'
+        val = f'<div class="mba-kpi__value">{esc(str(value))}</div>'
         if logo is not None:  # logo = (багийн нэр, URL) → утгын өмнө лого
-            val = f'<div class="mba-stat__row">{team_logo(logo[0], logo[1], 34)}{val}</div>'
-        cards.append(f'<div class="{cls}"{title}><div class="mba-stat__label">{esc(label)}</div>{val}'
-                     + (f'<div class="mba-stat__sub">{esc(sub)}</div>' if sub else "") + "</div>")
+            val = f'<div class="mba-kpi__row">{team_logo(logo[0], logo[1], 34)}{val}</div>'
+        cards.append(f'<div class="mba-card mba-kpi"{title}><div class="mba-kpi__desc">{esc(label)}</div>{val}'
+                     + (f'<div class="mba-kpi__foot">{esc(sub)}</div>' if sub else "") + "</div>")
     st.html(f'<div class="mba-stats">{"".join(cards)}</div>')
 
 
@@ -358,7 +374,7 @@ def team_label(team: str, url: str | None, size: int = 22) -> str:
 
 def team_header(team: str, url: str | None, meta: str = "", stats: Sequence[tuple[str, str]] = ()) -> None:
     kv = "".join(f'<div class="mba-kv"><b>{esc(v)}</b><span>{esc(k)}</span></div>' for k, v in stats)
-    st.html(f'<div class="mba-teamhead">{team_logo(team, url, 52)}<div style="min-width:0">'
+    st.html(f'<div class="mba-card mba-teamhead">{team_logo(team, url, 52)}<div style="min-width:0">'
             f'<div class="mba-teamhead__name">{esc(team)}</div><div class="mba-teamhead__meta">{esc(meta)}</div></div>'
             + (f'<div class="mba-teamhead__stats">{kv}</div>' if kv else "") + "</div>")
 
@@ -370,21 +386,21 @@ def scoreboard(home: str, away: str, home_pts: int, away_pts: int, logos: dict, 
                 + (team_logo(team, logos.get(team), 44) if cls else "") + "</div>")
     hp, ap = (f"{home_pts}", f'<span class="lose">{away_pts}</span>') if home_pts > away_pts else \
         (f'<span class="lose">{home_pts}</span>', f"{away_pts}")
-    st.html(f'<div class="mba-score">{side(home, "Гэрийн баг")}<div class="mba-score__pts">{hp} – {ap}</div>'
+    st.html(f'<div class="mba-card mba-score">{side(home, "Гэрийн баг")}<div class="mba-score__pts">{hp} – {ap}</div>'
             f'{side(away, "Зочин баг", "mba-score__side--away")}'
             + (f'<div class="mba-score__meta">{esc(meta)}</div>' if meta else "") + "</div>")
 
 
 def standings_board(rows, logos: dict, highlight: str | None = None, title: str = "Баг") -> None:
-    """rows: (байр, баг, ялалт, хожигдол, ялалтын хувь) дараалал."""
-    out = [f'<div class="mba-board__head"><span>#</span><span>{esc(title)}</span>'
-           '<span style="text-align:right">Я–Х</span><span style="text-align:right">Ялалт %</span></div>']
+    """rows: (байр, баг, ялалт, хожигдол, ялалтын хувь) дараалал. shadcn Table + Progress."""
+    body = []
     for rank, team, w, l, pct in rows:
-        hl = " mba-board__row--hl" if team == highlight else ""
-        out.append(f'<div class="mba-board__row{hl}"><span class="mba-board__rank">{rank}</span>{team_label(team, logos.get(team))}'
-                   f'<span class="mba-board__rec">{w}–{l}</span><span class="mba-board__pct"><span class="mba-bar">'
-                   f'<i style="width:{pct * 100:.0f}%"></i></span><span>{pct:.0%}</span></span></div>')
-    st.html(f'<div class="mba-board" role="table" aria-label="Лигийн байр">{"".join(out)}</div>')
+        body.append(f'<tr class="{"hl" if team == highlight else ""}"><td class="rank">{rank}</td><td>{team_label(team, logos.get(team))}</td>'
+                    f'<td class="num muted">{w}–{l}</td><td class="num"><span class="mba-progress"><span class="mba-bar">'
+                    f'<i style="width:{pct * 100:.0f}%"></i></span><span>{pct:.0%}</span></span></td></tr>')
+    st.html(f'<div class="mba-card mba-board mba-table-wrap"><table class="mba-table" aria-label="Лигийн байр"><thead><tr>'
+            f'<th class="num">#</th><th>{esc(title)}</th><th class="num">Я–Х</th><th class="num">Ялалт</th></tr></thead>'
+            f'<tbody>{"".join(body)}</tbody></table></div>')
 
 
 def compare_table(t1: str, t2: str, rows, logos: dict) -> None:
@@ -396,8 +412,9 @@ def compare_table(t1: str, t2: str, rows, logos: dict) -> None:
         body.append(f'<tr><td>{esc(label)}<small>{esc(note)}</small></td>'
                     f'<td class="{"win" if better1 else ""}">{fmt.format(v1)}</td>'
                     f'<td class="{"win" if better2 else ""}">{fmt.format(v2)}</td></tr>')
-    st.html(f'<table class="mba-cmp"><thead><tr><th>Үзүүлэлт</th><th>{team_label(t1, logos.get(t1))}</th>'
-            f'<th>{team_label(t2, logos.get(t2))}</th></tr></thead><tbody>{"".join(body)}</tbody></table>')
+    st.html(f'<div class="mba-card mba-table-wrap"><table class="mba-table mba-cmp"><thead><tr><th>Үзүүлэлт</th>'
+            f'<th>{team_label(t1, logos.get(t1))}</th><th>{team_label(t2, logos.get(t2))}</th></tr></thead>'
+            f'<tbody>{"".join(body)}</tbody></table></div>')
 
 
 def player_header(name: str, team: str, logo: str | None, position: str, is_import: bool, style: str) -> None:
@@ -405,8 +422,8 @@ def player_header(name: str, team: str, logo: str | None, position: str, is_impo
              else '<span class="mba-badge mba-badge--domestic">Дотоод</span>')
     st.html(f'<div class="mba-player">{team_logo(team, logo, 44)}<div style="min-width:0">'
             f'<div class="mba-player__name">{esc(name)}</div><div class="mba-player__meta">'
-            f'<span class="mba-badge">{esc(team)}</span><span class="mba-badge">{esc(position)}</span>{badge}'
-            f'<span class="mba-badge">Хэв маяг: {esc(style)}</span></div></div></div>')
+            f'<span class="mba-badge mba-badge--outline">{esc(team)}</span><span class="mba-badge mba-badge--outline">{esc(position)}</span>'
+            f'{badge}<span class="mba-badge">Хэв маяг: {esc(style)}</span></div></div></div>')
 
 
 def player_stats(items: Sequence[tuple[str, str, str | None]]) -> None:
@@ -419,7 +436,7 @@ def player_stats(items: Sequence[tuple[str, str, str | None]]) -> None:
 def chart_note(how: str, data: str, *, kind: str, files: list[str]) -> None:
     """kind = графикийн төрлийн нэр; files = DATASETS-ийн түлхүүрүүд (доор саарлаар файлын нэрийг бичнэ)."""
     paths = ", ".join(f"<code>{esc(DATASETS[k])}</code>" for k in files)
-    st.html(f'<div class="mba-note"><span class="mba-note__kind">{esc(kind)}</span>'
+    st.html(f'<div class="mba-note"><span class="mba-badge">{esc(kind)}</span>'
             + (f"<b>Хэрхэн унших:</b> {esc(how)}" if how else "")
             + f'<div class="mba-note__src">Дата: {esc(data)} · Файл: {paths}</div></div>')
 
@@ -443,7 +460,7 @@ def filter_summary(f) -> None:
     if f.highlight_team:
         chips.append(("Онцолсон", f.highlight_team, True))
     st.html('<div class="mba-chips" aria-label="Идэвхтэй шүүлтүүр">' + "".join(
-        f'<span class="mba-chip{" mba-chip--active" if act else ""}">{esc(k)}: <b>{esc(v)}</b></span>'
+        f'<span class="mba-badge {"mba-badge--soft" if act else "mba-badge--outline"}">{esc(k)}: <b>{esc(v)}</b></span>'
         for k, v, act in chips) + "</div>")
 
 
@@ -483,34 +500,5 @@ def show_chart(fig, select: bool = False, **kw):
     return st.plotly_chart(fig, config=cfg, **kw)
 
 
-def _icon_img(size: int = 30) -> str:
-    """Брэнд дүрсийг <img> data URI-гаар (st.html нь inline <svg>-г цэвэрлэдэг)."""
-    import base64
-    from pathlib import Path
-
-    svg = (Path(__file__).parent / "assets" / "mba_icon.svg").read_bytes()
-    return (f'<img src="data:image/svg+xml;base64,{base64.b64encode(svg).decode()}" width="{size}" height="{size}" '
-            'alt="" aria-hidden="true">')
-
-
-SOURCES = [("MBA лигийн албан ёсны статистик", "https://mongolia.basketball/en/stats?competition=league&view=players"),
-           ("Wikipedia — The League (Mongolia)", "https://en.wikipedia.org/wiki/The_League_(Mongolia)"),
-           ("geoBoundaries — аймгийн хил (ODbL)", "https://www.geoboundaries.org/"),
-           ("ShamSports — гадаад тоглогчийн карьер", "https://www.shamsports.com/")]
-REPO = "https://github.com/batdorj-s/data-visualization-3a"
-
-
 def footer() -> None:
-    from data_access import snapshot
-
-    src = "".join(f'<li><a href="{esc(u)}" target="_blank" rel="noopener">{esc(n)}</a></li>' for n, u in SOURCES)
-    st.html(f'<footer class="mba-footer" role="contentinfo"><div class="mba-footer__grid">'
-            f'<div><div class="mba-footer__brand">{_icon_img()}<div>MBA<small>ANALYTICS</small></div></div>'
-            '<p style="margin:.6rem 0 0 0">Монголын сагсан бөмбөгийн дээд лигийн (MBA) статистикт тулгуурласан шинжилгээ. '
-            "Тоо бүрийн тодорхой бус байдлыг 95% хүрээгээр харуулдаг.</p></div>"
-            f"<div><h5>Эх сурвалж</h5><ul>{src}</ul></div>"
-            "<div><h5>Төсөл</h5><ul><li>F.ITC341 Өгөгдлийн дүрслэл — бие даалт</li>"
-            f'<li><a href="{REPO}" target="_blank" rel="noopener">Эх код (GitHub)</a></li>'
-            "<li>Аргачлал, нэр томьёо: «Тухай», «Нэр томьёо» хуудас</li></ul></div></div>"
-            f'<div class="mba-footer__base"><span>Дата шинэчилсэн: {esc(snapshot())} · 2025–26 ба 2026–27 улирал</span>'
-            "<span>Багийн лого нь тухайн багийн өмч; MBA-ийн албан ёсны сайтаас иш татав.</span></div></footer>")
+    st.html('<footer class="mba-footer" role="contentinfo">© 2026 MBA Analytics</footer>')
