@@ -117,3 +117,7 @@ def test_revision_log_entries_are_complete_and_images_exist():
         if r.get("before"):
             assert (ROOT / "figures" / "revisions" / f"{r['key']}.png").exists(), r["key"]
             assert r["before"]["commit"] != r["after"]["commit"]
+    from src.revision_log import GALLERY
+    assert len({g["page"] for g in GALLERY}) >= 6  # dashboard-ийн хуудас бүрээс
+    for g in GALLERY:
+        assert g["bad"].strip() and g["good"].strip() and (ROOT / "figures" / "revisions" / f"{g['key']}.png").exists()

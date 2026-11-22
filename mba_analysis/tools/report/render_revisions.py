@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[2]  # mba_analysis/
 REPO = ROOT.parent
 sys.path.insert(0, str(ROOT))
-from src.revision_log import REVISIONS  # noqa: E402
+from src.revision_log import GALLERY, NOW, REVISIONS  # noqa: E402
 
 CHROME = os.environ.get("CHROME", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
 OUT = ROOT / "figures" / "revisions"
@@ -45,6 +45,12 @@ SEASON = "2025-2026"
 players = load("players"); P = players[(players.season == SEASON) & (players.GP >= 5)]
 fig = None
 exec(sys.argv[3])
+# headless Chrome-д WebGL байхгүй: Scattergl-ийг ижил тохиргоотой SVG Scatter болгоно (харагдац ижил)
+traces = []
+for t in fig.data:
+    j = t.to_plotly_json()
+    traces.append(go.Scatter(**{k: v for k, v in j.items() if k != "type"}) if j.get("type") == "scattergl" else t)
+fig = go.Figure(data=traces, layout=fig.layout)
 fig.update_layout(width=%(width)d)
 html = fig.to_html(include_plotlyjs=True, full_html=True, config={"staticPlot": True})
 open(sys.argv[2], "w", encoding="utf-8").write(html.replace("<head>", "<head><style>html,body{margin:0;background:#fff}</style>", 1))
@@ -53,6 +59,8 @@ print(int(fig.layout.height or 450))
 
 
 def worktree(commit: str, base: Path) -> Path:
+    if commit == NOW:  # одоогийн хувилбар = repo-ийн ажлын хавтас
+        return REPO
     path = base / commit
     if not path.exists():
         subprocess.run(["git", "-C", str(REPO), "worktree", "add", "--detach", "--quiet", str(path), commit], check=True)
@@ -82,8 +90,8 @@ def _font(size: int):
     return ImageFont.load_default()
 
 
-def side_by_side(before: Path, after: Path, out: Path) -> None:
-    """«Өмнө» ба «Дараа»-г дээш доош нь (тайлангийн өргөнд уншигдахуйц) шошготой нэгтгэнэ."""
+def side_by_side(before: Path, after: Path, out: Path, labels=("Өмнө", "Одоо")) -> None:
+    """Хоёр зургийг дээш доош нь (тайлангийн өргөнд уншигдахуйц) шошготой нэгтгэнэ."""
     a, b = Image.open(before).convert("RGB"), Image.open(after).convert("RGB")
     w = max(a.width, b.width)
     label_h, gap = 70, 30
@@ -91,7 +99,7 @@ def side_by_side(before: Path, after: Path, out: Path) -> None:
     draw = ImageDraw.Draw(canvas)
     font = _font(40)
     y = 0
-    for img, text, color in ((a, "Өмнө", (110, 110, 110)), (b, "Дараа", (27, 58, 107))):
+    for img, text, color in ((a, labels[0], (150, 40, 30)), (b, labels[1], (27, 58, 107))):
         draw.text((16, y + 14), text, fill=color, font=font)
         canvas.paste(img, (0, y + label_h))
         y += label_h + img.height + gap
@@ -109,11 +117,18 @@ def main() -> None:
             tmp_b, tmp_a = OUT / f"{r['key']}_before.png", OUT / f"{r['key']}_after.png"
             render(r["before"]["commit"], r["before"]["code"], tmp_b, base)
             render(r["after"]["commit"], r["after"]["code"], tmp_a, base)
-            side_by_side(tmp_b, tmp_a, OUT / f"{r['key']}.png")
+            side_by_side(tmp_b, tmp_a, OUT / f"{r['key']}.png", (f"Өмнө (commit {r['before']['commit']})", "Одоо"))
             tmp_b.unlink(); tmp_a.unlink()
             print("ok", r["key"])
+        for g in GALLERY:  # муу хувилбарыг ЗОРИУД зурсан жишээ — зураг дээр ч тийм гэж бичнэ
+            tmp_b, tmp_a = OUT / f"{g['key']}_bad.png", OUT / f"{g['key']}_good.png"
+            render(NOW, g["bad_code"], tmp_b, base)
+            render(NOW, g["good_code"], tmp_a, base)
+            side_by_side(tmp_b, tmp_a, OUT / f"{g['key']}.png", ("Муу жишээ (зориуд зурсан)", "Сонгосон хувилбар (dashboard)"))
+            tmp_b.unlink(); tmp_a.unlink()
+            print("ok", g["key"])
     finally:
-        for wt in base.iterdir():
+        for wt in [w for w in base.iterdir() if w.is_dir()]:
             subprocess.run(["git", "-C", str(REPO), "worktree", "remove", "--force", str(wt)], check=False)
         shutil.rmtree(base, ignore_errors=True)
 

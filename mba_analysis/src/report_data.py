@@ -45,28 +45,42 @@ def _h2(text: str) -> dict:
 
 
 def _revision_blocks(root: Path) -> list[dict]:
-    """Хэрэглэгчийн санал хүсэлтийн дараах өөрчлөлт бүр: санал хүсэлт (яг хэвээр), юу, яагаад, commit; зурагтай бол өмнө/дараа."""
-    from src.revision_log import REVISIONS
+    """11.1: хэрэглэгчийн санал хүсэлтийн дараах бодит өөрчлөлт (өмнө = тухайн commit, одоо = эцсийн хувилбар).
+    11.2: dashboard-ийн хуудас бүрийн муу (ЗОРИУД зурсан жишээ) ба сонгосон дүрслэл."""
+    from src.revision_log import GALLERY, REVISIONS
 
+    rev = root / "figures" / "revisions"
     tbl = pd.DataFrame([{"№": f"R{i:02d}", "Огноо": r["date"], "Санал хүсэлт (хэрэглэгчийн үг)": f"«{r['feedback']}»",
                          "График": r["chart"], "Өөрчлөлт": r["change"], "Шалтгаан": r["reason"], "Commit": r["commit"]}
                         for i, r in enumerate(REVISIONS, 1)])
     blocks = [
+        _h2("11.1 Санал хүсэлтийн дараах өөрчлөлт"),
         _para("Dashboard ба графикуудыг хэрэглэгчийн санал хүсэлтээр давтан сайжруулсан. Мөр бүрт санал хүсэлтийг яг бичсэнээр нь, "
-              "юу өөрчлөгдсөн, яагаад, ямар commit-оор орсныг тэмдэглэв. Зурагтай мөрийн «өмнө» ба «дараа» зургийг тухайн commit-ийн "
-              "кодоор тухайн үеийн датанаас дахин зурсан (tools/report/render_revisions.py), тиймээс хэрэглэгчийн харсантай ижил."),
+              "юу өөрчлөгдсөн, яагаад, ямар commit-оор орсныг тэмдэглэв. Зурагтай мөрийн «Өмнө» нь тухайн commit-ийн кодоор тухайн "
+              "үеийн датанаас дахин зурсан БОДИТ хуучин хувилбар, «Одоо» нь dashboard-ийн эцсийн хувилбар "
+              "(tools/report/render_revisions.py)."),
         _draft("«Шалтгаан» баганыг өөрийн үгээр, тухайн өөрчлөлт уншигчид юугаар тус болсныг тайлбарлан дахин бичнэ."),
         _table("Хүснэгт 8. Санал хүсэлт ба графикийн өөрчлөлт", tbl),
     ]
     for i, r in enumerate(REVISIONS, 1):
-        if not r.get("before") or not (root / "figures" / "revisions" / f"{r['key']}.png").exists():
+        if not r.get("before") or not (rev / f"{r['key']}.png").exists():
             continue
-        blocks += [_h2(f"R{i:02d}. {r['chart']}"),
-                   _para(f"Санал хүсэлт ({r['date']}): «{r['feedback']}»"),
-                   _para(f"Өөрчлөлт: {r['change']} Шалтгаан: {r['reason']}"),
+        blocks += [_para(f"R{i:02d}. {r['chart']} — санал хүсэлт ({r['date']}): «{r['feedback']}». {r['change']}"),
                    _fig(root, f"revisions/{r['key']}",
-                        f"Зураг 0. {r['chart']}: өмнө (commit {r['before']['commit']}) ба дараа (commit {r['after']['commit']})",
-                        width_cm=12.5)]
+                        f"Зураг 0. {r['chart']}: өмнө (commit {r['before']['commit']}) ба одоогийн хувилбар", width_cm=12.5)]
+    blocks += [
+        _h2("11.2 Муу ба сайн дүрслэл: dashboard-ийн хуудас бүрээс"),
+        _para("Энэ хэсгийн «Муу жишээ» графикуудыг дизайны сонголтыг тайлбарлахын тулд ЗОРИУД зурсан; тэдгээр нь dashboard-д хэзээ "
+              "ч байгаагүй. Ижил датаар visual mapping-ийн түгээмэл алдааг (олон хэсэгтэй дугуй диаграм, солонгын өнгө, давхцсан "
+              "бичиг, өөр хэмжүүрийг нэг тэнхлэгт, тасалсан тэнхлэг, хүрээгүй тоо) dashboard-ийн хувилбартай зэрэгцүүлэв "
+              "(Schwabish, 2021-ийн арга)."),
+    ]
+    for g in GALLERY:
+        if not (rev / f"{g['key']}.png").exists():
+            continue
+        blocks += [_para(f"{g['page']} — {g['chart']}. Муу нь: {g['bad']} Сонгосон хувилбар: {g['good']}"),
+                   _fig(root, f"revisions/{g['key']}",
+                        f"Зураг 0. {g['page']} — {g['chart']}: зориуд зурсан муу жишээ ба dashboard-ийн хувилбар", width_cm=12.5)]
     return blocks
 
 
