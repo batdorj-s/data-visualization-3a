@@ -14,6 +14,7 @@
 - filter_summary: идэвхтэй шүүлтүүр
 """
 
+import base64
 import html
 from collections.abc import Sequence
 
@@ -223,6 +224,15 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 .mba-note__src {{ color: var(--mba-text-3); margin-top: 3px; font-size: .78rem; }}
 .mba-note code, .mba-source code {{ color: var(--mba-text-2); background: var(--mba-muted); padding: 0 4px; border-radius: 4px; font-size: .74rem; }}
 .mba-source {{ color: var(--mba-text-3); font-size: .78rem; }}
+
+/* ---- дасгалжуулагчийн дүгнэлт (график бүрийн доор) ---- */
+.mba-coach {{ display: grid; grid-template-columns: 16px 1fr; column-gap: 10px; align-items: start; padding: 10px 14px;
+  margin: -.4rem 2px 1.1rem 2px; background: var(--mba-muted); border: 1px solid var(--mba-border); border-radius: var(--mba-radius-md); }}
+.mba-coach__icon {{ width: 16px; height: 16px; margin-top: 2px; }}
+.mba-coach__title {{ font-size: .8rem; font-weight: 600; color: var(--mba-accent-ink); letter-spacing: .01em; }}
+.mba-coach ul {{ margin: 4px 0 0 0; padding-left: 1.05rem; font-size: .84rem; line-height: 1.55; color: var(--mba-text-2); }}
+.mba-coach li {{ margin: 2px 0; }}
+.mba-coach b {{ color: var(--mba-text); }}
 
 /* ---- төлөв (shadcn Alert / Empty) ---- */
 .mba-state {{ display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: var(--mba-radius);
@@ -439,6 +449,23 @@ def chart_note(how: str, data: str, *, kind: str, files: list[str]) -> None:
     st.html(f'<div class="mba-note"><span class="mba-badge">{esc(kind)}</span>'
             + (f"<b>Хэрхэн унших:</b> {esc(how)}" if how else "")
             + f'<div class="mba-note__src">Дата: {esc(data)} · Файл: {paths}</div></div>')
+
+
+_COACH_ICON = "data:image/svg+xml;base64," + base64.b64encode(  # lucide «clipboard-list» (ISC), accent-ink
+    b'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9480C" '
+    b'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>'
+    b'<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/>'
+    b'<path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>').decode()
+
+
+def coach(items: list[str], title: str = "Дасгалжуулагчийн дүгнэлт") -> None:
+    """График бүрийн доорх практик дүгнэлт (dashboard/coach.py-аас датаар тооцоолсон). Хоосон бол юу ч зурахгүй."""
+    items = [t for t in items if t]
+    if not items:
+        return
+    lis = "".join(f"<li>{_md_bold(t)}</li>" for t in items)
+    st.html(f'<aside class="mba-coach" aria-label="{esc(title)}"><img class="mba-coach__icon" src="{_COACH_ICON}" alt="">'
+            f'<div><div class="mba-coach__title">{esc(title)}</div><ul>{lis}</ul></div></aside>')
 
 
 def empty_state(title: str, text: str = "") -> None:

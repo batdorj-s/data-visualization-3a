@@ -1,15 +1,17 @@
 import streamlit as st
 
+import coach
 from data_access import current_filters, load, team_logos
 from src.insights import stability_pairs
 from plots import (px_assisted, px_comebacks, px_distance, px_imports_on_court, px_lead_safety, px_off_def, px_stability,
                    px_stability_pairs, px_usage)
-from ui import chart_note, filter_summary, findings, page_header, section, show_chart
+from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Олдворууд",
-            "Датаас гарсан сагсан бөмбөгийн 8 олдвор. Таб бүр нэг сэдэв; график бүрийн дээр асуулт, доор нь хэрхэн уншихыг бичсэн.",
+            "Датаас гарсан сагсан бөмбөгийн 8 олдвор. Таб бүр нэг сэдвийг хамарна: график бүрийн дээр асуулт, доор нь унших заавар "
+            "ба дасгалжуулагчийн дүгнэлт бий.",
             eyebrow=f"Олдворууд · {season_txt}")
 filter_summary(f)
 
@@ -28,9 +30,10 @@ mid_pps = (mid.pps * mid.n).sum() / mid.n.sum()
 style = stab[~stab.stat.isin(["ts_pct", "tp_pct"])]
 eff = stab[stab.stat.isin(["ts_pct", "tp_pct"])]
 findings([
-    f"Хагаст 7–10 оноогоор тэргүүлсэн баг **{half['7–10']:.0%}** ялдаг, харин ялсан багийн **{(cb.deficit >= 10).mean():.0%}** нь "
-    "тоглолтын дундуур 10+ оноогоор хоцорч байсан.",
-    f"Сагснаас 2–6 м-ийн шидэлт хамгийн үр ашиг муутай (**{mid_pps:.2f}** оноо); сагсны доор ба 3 онооны шугамын ард илүү.",
+    f"Хагаст 7–10 оноогоор тэргүүлсэн баг **{half['7–10']:.0%}** тохиолдолд ялдаг. Гэсэн ч ялагч багуудын "
+    f"**{(cb.deficit >= 10).mean():.0%}** нь тоглолтын явцад 10 ба түүнээс олон оноогоор хоцорч байсан.",
+    f"Сагснаас 2–6 м зайнаас шидэх нь хамгийн бага үр ашигтай (шидэлт бүрт **{mid_pps:.2f}** оноо); сагсны доороос болон "
+    "3 онооны шугамын цаанаас шидэх нь илүү ашигтай.",
     f"Тоглогчийн хэв маяг улирлаас улиралд хадгалагддаг (хамаарал {style.r.min():.2f}–{style.r.max():.2f}), "
     f"харин оновч хадгалагддаггүй ({eff.r.mean():.2f}).",
 ])
@@ -45,6 +48,7 @@ with tab_game:
                "шугам = тоглолтын хожуу үе. Босоо зураас = 95% магадлалтай хүрээ: цөөн тоглолттой бүлэгт өргөн.",
                "MBA тоглолтын явцын бичлэг, 2025–26 ба 2026–27 улирлын 252 тоглолт.",
                kind="Шугаман график, цэгтэй (line chart)", files=["pbp", "games"])
+    coach_box(coach.lead_safety(lead))
     section("Хоцорч байгаад ялах нь хэр их тохиолддог вэ?")
     left, right = st.columns([3, 2], gap="large")
     with left:
@@ -55,20 +59,22 @@ with tab_game:
         st.dataframe(top.assign(Тоглолт=top.home_team + " " + top.home_pts.astype(str) + "–" + top.away_pts.astype(str)
                                 + " " + top.away_team)[["date", "Тоглолт", "deficit"]]
                      .rename(columns={"date": "Огноо", "deficit": "Хоцорсон оноо"}), hide_index=True, width="stretch")
-    chart_note("Багана = ялсан баг тоглолтын дундуур хамгийн ихдээ тэр хэмжээгээр хоцорч байсан тоглолтын тоо. "
+    chart_note("Багана = ялагч баг тоглолтын явцад хамгийн ихдээ тухайн хэмжээгээр хоцорч байсан тоглолтын тоо. "
                "0 = хэзээ ч хоцроогүй. Улаан-улбар = 10 ба түүнээс олон оноо.",
-               f"MBA тоглолтын явцын бичлэг, {len(cb)} тоглолт; ялсан багийн {cb.trailed_at_half.mean():.0%} нь хагаст хоцорч байсан.",
+               f"MBA тоглолтын явцын бичлэг, {len(cb)} тоглолт; ялагч багуудын {cb.trailed_at_half.mean():.0%} нь хагаст хоцорч байсан.",
                kind="Багана график (histogram) + хүснэгт", files=["pbp", "games"])
+    coach_box(coach.comebacks(cb))
 
 with tab_shot:
     section("Хэр холоос шидэх нь ашигтай вэ?")
     league_pps = float((dist.pps * dist.n).sum() / dist.n.sum())
     show_chart(px_distance(dist, league_pps, f.show_ci), width="stretch")
     chart_note("Дээр: тэр зайнаас шидэхэд дунджаар хэдэн оноо авсан (цэнхэр = 2 оноо, улаан-улбар = 3 оноо). Доор: хэдэн удаа "
-               "шидсэн. 3 оноо нь 2 онооноос бага онодог ч 1.5 дахин үнэтэй тул дунд зайн шидэлтээс ашигтай.",
+               "шидсэн. 3 онооны шидэлт 2 онооныхоос бага онодог ч 1.5 дахин үнэтэй тул дунд зайн шидэлтээс ашигтай.",
                f"MBA тоглолтын хуудасны шидэлтийн байршил, байршил бүртгэгдсэн тоглолтуудын {int(dist.n.sum()):,} шидэлт "
                "(2025 оны 10-р сарын 29 тоглолтод байршил бүртгэгдээгүй тул хассан).",
                kind="Шугаман график (дээр) + багана график (доор)", files=["shots"])
+    coach_box(coach.distance(dist))
     section("Оноо хамтын тоглолтоос гардаг уу, бие даасан тоглолтоос уу?")
     show_chart(px_assisted(assisted, f.show_ci), width="stretch")
     chart_note("Цэг = тухайн бүсээс оносон шидэлтийн хэдэн хувь нь багийн андын дамжуулалтаас гарсан. Баруун тийш = хамтын "
@@ -76,6 +82,7 @@ with tab_shot:
                f"шидэлтийн байршил ба тоглолтын явцын бичлэг, {int(assisted.n.sum()):,} оносон шидэлт; дамжуулалтын 87%-ийг "
                "шидэлттэй нь холбож чадсан тул бодит хувь арай өндөр байж болно.",
                kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["shots", "assists"])
+    coach_box(coach.assisted(assisted))
 
 with tab_team:
     section("Аль баг довтолгоогоор, аль нь хамгаалалтаар хүчтэй вэ?")
@@ -86,6 +93,7 @@ with tab_team:
                f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(r)} баг; довтолгооны тоог хайрцаг онооноос тооцоолсон; "
                "лого — MBA-ийн албан ёсны сайт.",
                kind="Тойргон цэгэн график, багийн логотой (bubble chart)", files=["team_games", "team_logos"])
+    coach_box(coach.off_def(r))
     section("Их ачаалалтай тоглогч оновчтой байж чаддаг уу?")
     u = usage[usage.season == f.season]
     if f.teams:
@@ -103,6 +111,7 @@ with tab_team:
                    "(хамгийн үнэ цэнтэй тоглогчид). Цэг дээр хулганаа аваачвал нэрийг харуулна." + extra,
                    f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, 200-аас олон минут тоглосон {len(u)} тоглогч.",
                    kind="Тойргон цэгэн график (bubble chart)", files=["player_games"])
+        coach_box(coach.usage(u))
     section("Тоглогчийн юу нь улирлаас улиралд хадгалагддаг вэ?")
     n_both = int(stab.n.max())
     st.markdown(f"2025–26 ба 2026–27 улиралд хоёуланд нь тоглосон **{n_both}** тоглогчийн үзүүлэлт бүрийг хоёр улирлаар "
@@ -117,6 +126,7 @@ with tab_team:
                f"хоёр улиралд хоёуланд нь тоглосон {n_both} тоглогч (оновчид улирал бүрт 50-аас олон шидэлттэй, 3 онооны "
                "оновчид 30-аас олон гурвын шидэлттэй нь); 2026–27 улирал дуусаагүй.",
                kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["players"])
+    coach_box(coach.stability(stab))
     opts = stab.set_index("stat")
     stat = st.selectbox("Тоглогч бүрийг харах үзүүлэлт", list(opts.index), format_func=lambda c: opts.label[c],
                         key="stab_stat", help="Дээрх графикийн аль ч мөрийг сонгож, тоглогч бүрээр задалж харна")
@@ -127,6 +137,7 @@ with tab_team:
                "тараагдсан бол тогтворгүй (жишээ нь шидэлтийн оновч). Хулганаа аваачвал тоглогчийн нэрийг харуулна.",
                "MBA тоглогчийн улирлын статистик, 2025–26 ба 2026–27.", kind="Цэгэн график (scatter plot)",
                files=["players"])
+    coach_box(coach.stability_pairs(pairs, opts.label[stat]))
     st.info(f"**Дүгнэлт:** {', '.join(style.label.head(3).str.lower())} зэрэг тоглогчийн хэв маяг, үүрэг дараа улиралд ч "
             f"давтагддаг (хамаарал {style.r.min():.2f}–{style.r.max():.2f}). Харин шидэлтийн оновч бараг давтагддаггүй "
             f"({eff.r.min():.2f}–{eff.r.max():.2f}): нэг улиралд оновч өндөр байсан тоглогч дараа улиралд дундаж руу "
@@ -146,3 +157,4 @@ with tab_import:
                "амжилттай). Гадаад эсэхийг MBA-ийн профайлын шошгоор тодорхойлсон; лигийн дүрмийн албан бичвэрээр "
                "баталгаажуулаагүй, зөвхөн датанд ажиглагдсан хэв маяг.",
                kind="Овоолсон багана график (stacked bar chart)", files=["pbp", "player_games", "games"])
+    coach_box(coach.imports_on_court(imports))

@@ -3,7 +3,8 @@ import streamlit as st
 
 from data_access import load
 from plots import A_COLOR, _layout
-from ui import chart_note, findings, page_header, section, show_chart
+from coach import quality as coach_quality
+from ui import chart_note, coach as coach_box, findings, page_header, section, show_chart
 
 page_header("Өгөгдлийн чанар", "Дата хэр бүрэн, хэр цэвэр вэ — дүгнэлтэд итгэж болох эсэхийг шалгах хуудас.",
             eyebrow="Тусламж · Өгөгдлийн чанар")
@@ -26,6 +27,7 @@ fig.update_xaxes(title="Дутуу утга, %")
 show_chart(_layout(fig, "Үзүүлэлт бүрийн дутуу утгын хувь", height=320), width="stretch")
 chart_note("Багана урт байх тусам тухайн үзүүлэлт олон тоглогчид дутуу.", "MBA тоглогчийн профайл ба улирлын статистик.",
            kind="Хэвтээ багана график (bar chart)", files=["missing"])
+coach_box(coach_quality(missing, NAMES))
 section(f"Нэрээр холбосон тоглогчид ({len(relinked)})")
 st.dataframe(relinked.rename(columns={"left_name": "Нэр (нэг улирал)", "right_name": "Нэр (нөгөө улирал)",
                                       "score": "Төстэй байдал (1 = ижил)", "same_team": "Ижил баг",

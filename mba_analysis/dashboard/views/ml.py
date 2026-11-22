@@ -1,14 +1,15 @@
 import numpy as np
 import streamlit as st
 
+import coach
 from data_access import current_filters, latest_elo, load, team_logos
 from plots import px_clusters, px_quantile_dots
 from src.build_dashboard_data import win_probability
-from ui import chart_note, findings, page_header, section, show_chart, team_header
+from ui import chart_note, coach as coach_box, findings, page_header, section, show_chart, team_header
 
 f = current_filters()
 page_header("Машин сургалт",
-            "Компьютер тоглогчдыг хэв маягаар нь бүлэглэж, тоглолтын ялагчийг урьдчилан таамаглах оролдлого.",
+            "Загвар тоглогчдыг хэв маягаар нь бүлэглэж, тоглолтын ялагчийг урьдчилан таамаглана.",
             eyebrow="Машин сургалт")
 mm = load("model_metrics").set_index("model")
 acc, elo_acc = mm.loc["logreg", "accuracy_mean"], mm.loc["baseline_elo", "accuracy_mean"]
@@ -17,8 +18,8 @@ findings([
     f"Тоглогчид **{cl_all.cluster_name.nunique()}** хэв маягт хуваагдав: "
     + ", ".join(f"«{n}»" for n in sorted(cl_all.cluster_name.unique())) + ".",
     f"Ялагч таамаглах загвар тоглолтын **{acc:.0%}**-ийг зөв таамагласан; «хүчний оноо өндөр нь ялна» гэсэн "
-    f"энгийн дүрэм {elo_acc:.0%}. Өөрөөр хэлбэл MBA-д ML загвар энгийн дүрмээс баттай илүү биш.",
-    "Таамаглал зөвхөн тухайн тоглолтоос **өмнөх** датаг ашигладаг (ирээдүйн мэдээлэл «хулгайлаагүй»).",
+    f"энгийн дүрэм {elo_acc:.0%}. Өөрөөр хэлбэл MBA-ийн хувьд машин сургалтын загвар энгийн дүрмээс баттай давуу биш.",
+    "Таамаглал зөвхөн тухайн тоглолтоос **өмнөх** датаг ашигладаг (ирээдүйн мэдээллийг ашиглаагүй).",
 ])
 
 
@@ -56,6 +57,7 @@ def cluster_explorer():
         chart_note("1 = хамгийн төстэй, 5 = тавдугаарт төстэй. «Ялгаа» = зүүн талын график дээрх хоёр цэгийн хоорондох "
                    "зай: бага байх тусам хэв маяг нь ойр.", f"{len(cl)} тоглогчийн хэв маягийн бүлэглэл.",
                    kind="Хүснэгт (эрэмбэлсэн)", files=["clusters"])
+        coach_box(coach.clusters(cl, me, near))
 
 
 @st.fragment
@@ -82,6 +84,7 @@ def win_calculator():
                + (f" Бодит магадлал {lo:.0%}–{hi:.0%} хооронд байх магадлалтай." if f.show_ci else ""),
                "хоёр багийн одоогийн хүчний оноо; томьёог 2025–26, 2026–27 улирлын тоглолтоор тааруулсан.",
                kind="Тоон цэгэн зураг (quantile dot plot)", files=["games", "game_matrix"])
+    coach_box(coach.win_calc(t1, t2, p))
 
 
 cluster_explorer()

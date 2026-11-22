@@ -1,13 +1,15 @@
 import streamlit as st
 
+import coach
+
 from data_access import current_filters, latest_elo, load, team_info, team_key_of, team_logos
 from plots import px_elo, px_four_factors, px_pareto
-from ui import (chart_note, compare_table, filter_summary, findings, page_header,
+from ui import (chart_note, coach as coach_box, compare_table, filter_summary, findings, page_header,
                 pareto_who, section, show_chart, team_header)
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
-page_header("Багууд", "Аль баг яагаад ялж байна вэ: багийн профайл, байр, ялалтын 4 хүчин зүйл, хүчний онооны явц, "
+page_header("Багууд", "Аль баг, яагаад ялж байна вэ? Багийн профайл, байр, ялалтын 4 хүчин зүйл, хүчний онооны явц ба "
             "хоёр багийн харьцуулалт.", eyebrow=f"Багууд · {season_txt}")
 filter_summary(f)
 logos = team_logos()
@@ -38,7 +40,7 @@ default = f.highlight_team if f.highlight_team in teams else teams[0]
 
 @st.fragment
 def profile():
-    section("Багийн профайл", "Баг сонгоход доорх онооны хуваарь ч тэр баг руу шилжинэ.")
+    section("Багийн профайл", "Баг сонгоход доорх онооны хуваарь ба хүчний онооны явц тухайн багийнх болж солигдоно.")
     team = st.selectbox("Баг сонгох", teams, index=teams.index(default), key=f"team_profile::{f.highlight_team}",
                         help="Зүүн талын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
     r = table.loc[team] if team in table.index else None
@@ -60,12 +62,14 @@ def profile():
                    "оноо багийн нийт онооны хэдэн хувь вэ. Хар шугам 80%-д цөөн тоглогчоор хүрвэл баг цөөн од тоглогчоос "
                    "хамааралтай — тэр тоглогч гэмтвэл эрсдэлтэй.", f"тоглолт бүрийн оноо, {season_txt}, {len(pt)} тоглогч.",
                    kind="Парето график (оноогоор эрэмбэлсэн багана + нийлбэр хувийн шугам)", files=["player_games"])
+        coach_box(coach.team_pareto(pt, team))
         pareto_who(pt, label="багийн")
     with right:
         show_chart(px_elo(load("games"), team), width="stretch")
-        chart_note("Хүчний оноо тоглолт бүрийн дараа шинэчлэгдэнэ: хүчтэй багийг ялвал их нэмэгдэнэ. 1500 = дундаж. "
-                   "Сонгосон багийн шугам тодорч, бусад нь саарал.",
+        chart_note("Хүчний оноо тоглолт бүрийн дараа шинэчлэгддэг: хүчтэй багийг ялбал их нэмэгдэнэ. 1500 = дундаж. "
+                   "Сонгосон багийн шугам тод, бусад нь саарал.",
                    "2025–26 ба 2026–27 улирлын бүх тоглолтын үр дүн.", kind="Шугаман график (line chart)", files=["games"])
+        coach_box(coach.elo(load("games"), team, f.season))
 
 
 def standings():
@@ -87,6 +91,7 @@ def standings():
     chart_note("Ялалтын хувиар, тэнцвэл онооны зөрүүгээр эрэмбэлсэн. Оноо/Алдсан = тоглолтын дундаж; Зөрүү эерэг бол баг "
                "ихэвчлэн давуу тоглодог.", f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(table)} баг; "
                "лого — MBA-ийн албан ёсны сайт.", kind="Хүснэгт (байрын хүснэгт)", files=["team_games", "team_logos"])
+    coach_box(coach.standings_table(table))
 
 
 @st.fragment
@@ -107,11 +112,12 @@ def compare():
             ("Торгууль авалт", "шидэлт тутамд торгууль", "ftr", "{:.2f}", True),
             ("Довтолгооны үр ашиг", "100 довтолгоонд авсан оноо", "ortg", "{:.1f}", True),
             ("Хамгаалалтын үр ашиг", "100 довтолгоонд алдсан оноо, бага нь сайн", "drtg", "{:.1f}", False)]
-    compare_table(t1, t2, [(lab, note, float(m.loc[t1, c]), float(m.loc[t2, c]), fmt, hb) for lab, note, c, fmt, hb in spec],
-                  logos)
+    rows = [(lab, note, float(m.loc[t1, c]), float(m.loc[t2, c]), fmt, hb) for lab, note, c, fmt, hb in spec]
+    compare_table(t1, t2, rows, logos)
     chart_note("Мөр бүр 1 үзүүлэлтийн тоглолтын дундаж (үндсэн шат ба плей-офф). Бөмбөг алдалт, алдсан оноо, хамгаалалтын "
                "үр ашиг бага байх нь сайн, бусад нь их байх нь сайн.", f"тоглолтын хайрцаг оноо, {season_txt}.",
                kind="Харьцуулах хүснэгт", files=["team_games", "team_logos"])
+    coach_box(coach.compare(t1, t2, rows))
 
 
 profile()
@@ -119,7 +125,8 @@ standings()
 section("Ялалтын 4 хүчин зүйл", "Ялалтыг хамгийн их тайлбарладаг 4 үзүүлэлтээр баг бүрийг лигийн дундажтай харьцуулав.")
 show_chart(px_four_factors(tg, f.highlight_team), width="stretch")
 chart_note("Баг бүрийг лигийн дундажтай (0) харьцуулав: цэнхэр = дунджаас сайн, улаан-улбар = сул, хар = онцолсон баг. "
-           "Эдгээр 4 үзүүлэлт ялалтыг хамгийн их тайлбарладаг; оновч нь хамгийн чухал нь.",
+           "Эдгээр 4 үзүүлэлт ялалтыг хамгийн их тайлбарладаг бөгөөд ерөнхийдөө оновч хамгийн чухал нь.",
            f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат.",
            kind="Хэвтээ багана график, дунджаас хазайлт (diverging bar chart)", files=["team_games"])
+coach_box(coach.four_factors(tg, f.highlight_team))
 compare()

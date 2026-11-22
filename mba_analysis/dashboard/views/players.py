@@ -1,16 +1,18 @@
 import pandas as pd
 import streamlit as st
 
+import coach
+
 from data_access import apply, apply_selection, current_filters, empty_notice, load, team_logos
 from plots import LABELS, px_dot_ci, px_funnel, px_plus_minus, px_scatter
 from src.palette import IMPORT_LABELS
 from import_view import import_section
-from ui import chart_note, filter_summary, findings, page_header, player_header, player_stats, section, show_chart
+from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, player_header, player_stats, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Тоглогчид",
-            "Тоглогчдыг хоёр үзүүлэлтээр харьцуулж, цэг дээр дарж тухайн тоглогчийн картыг баруун талд нь нээнэ.",
+            "Тоглогчдыг сонгосон хоёр үзүүлэлтээр харьцуулна. Цэг дээр дарахад тухайн тоглогчийн карт баруун талд нээгдэнэ.",
             eyebrow=f"Тоглогчид · {season_txt}")
 logos = team_logos()
 filter_summary(f)
@@ -28,7 +30,8 @@ facts = [f"Хамгийн их оноо авагч: **{top.player_name}** ({top.
 if len(imp) and len(dom):
     facts.append(f"Гадаад тоглогчийн голч оноо **{imp.PPG.median():.1f}**, дотоодынх **{dom.PPG.median():.1f}** "
                  f"({len(imp)} гадаад, {len(dom)} дотоод тоглогч).")
-facts.append("Цөөн шидэлттэй тоглогчийн оновч санамсаргүй их хэлбэлздэг тул доорх «Хэр найдвартай вэ» хэсгийг хамт хараарай.")
+facts.append("Цөөн шидэлттэй тоглогчийн оновч санамсаргүйгээр их хэлбэлздэг тул доорх «Хэр найдвартай вэ?» хэсгийг хамт "
+             "хараарай.")
 findings(facts)
 
 
@@ -47,6 +50,7 @@ def explorer():
                "хар хүрээтэй цэг = онцолсон багийн тоглогч.",
                f"MBA тоглогчийн улирлын статистик, {season_txt}, шүүлтүүрт тохирох {len(players)} тоглогч.",
                kind="Цэгэн график (scatter plot)", files=["players"])
+    coach_box(coach.scatter(players, x, y, LABELS))
     selected = [p["customdata"][0] for p in (event.selection.points if event and event.selection else [])
                 if p.get("customdata")]
     if apply_selection(st.session_state, selected):
@@ -101,6 +105,7 @@ def player_card():
                       ("Талбай дээр − сэлгээнд", f"{r.on_off40:+.1f}" if pd.notna(r.on_off40) else "—",
                        "багийн зөрүүний ялгаа, 40 минутад")]
         player_stats([i for i in items if i])
+        coach_box(coach.player_card(row, players.drop_duplicates("player_id"), pm))
         level = st.segmented_control("Харах түвшин", ["Улирлын дундаж", "Тоглолт бүр"], default="Улирлын дундаж",
                                      key="card_level")
         if level == "Тоглолт бүр":
@@ -120,14 +125,15 @@ def player_card():
 def uncertainty():
     section("Хэр найдвартай вэ?")
     st.markdown("Цөөн тоглолт, цөөн шидэлттэй тоглогчийн үзүүлэлт санамсаргүйгээр өндөр эсвэл бага гарч болно. "
-                "Доорх хоёр график «үнэхээр сайн» ба «азаар сайн харагдаж байгаа»-г ялгахад тусална.")
+                "Доорх хоёр график «үнэхээр сайн» тоглогчийг «азаар сайн харагдаж буй» тоглогчоос ялгахад тусална.")
     left, right = st.columns(2, gap="large")
     with left:
         show_chart(px_funnel(players, f.show_ci), width="stretch")
         chart_note("Цэг бүр 1 тоглогч. Цэнхэр юүлүүр = санамсаргүй хэлбэлзлийн хүрээ; ногоон цэг юүлүүрээс дээш "
-                   "(онцгой сайн), улаан доош. Баруун тийш (олон шидэлт) явах тусам юүлүүр нарийсна.",
+                   "(онцгой сайн), улаан цэг доош гарсан. Баруун тийш (олон шидэлт) явах тусам юүлүүр нарийсна.",
                    f"MBA тоглогчийн шидэлтийн статистик, {season_txt}, {len(players)} тоглогч.",
                    kind="Юүлүүр график (funnel plot)", files=["players"])
+        coach_box(coach.funnel(players))
     with right:
         n = st.slider("Хэдэн тоглогч харуулах", 5, 25, 15, key="topn")
         ci = load("player_ci")
@@ -139,12 +145,13 @@ def uncertainty():
                    "байвал хэн нь илүү гэдгийг дата баттай хэлж чадахгүй.",
                    f"тоглолт бүрийн оноо, {season_txt}; хүрээг тоглолтуудыг 2000 удаа дахин сонгож тооцсон.",
                    kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["player_games"])
+        coach_box(coach.dot_ci(top_n))
 
 
 @st.fragment
 def plus_minus():
     section("Талбай дээр байхад баг хэр сайн байсан бэ? (+/-)",
-            "MBA-ийн хайрцаг оноонд +/- байхгүй тул тоглолтын явцын бичлэгээс тооцсон.")
+            "MBA-ийн хайрцаг оноонд +/- үзүүлэлт байдаггүй тул тоглолтын явцын бичлэгээс тооцсон.")
     c1, c2 = st.columns(2)
     min_minutes = c1.slider("Хамгийн багадаа хэдэн минут тоглосон", 50, 600, 200, step=50, key="pm_min",
                             help="Цөөн минуттай тоглогчийн +/- санамсаргүй их хэлбэлздэг")
@@ -160,10 +167,11 @@ def plus_minus():
     show_chart(px_plus_minus(sel, f.show_ci, st.session_state.get("card_player")))
     chart_note("Цэг = тоглогч талбай дээр байх хугацаанд багийн авсан оноо − алдсан оноо, 40 минутад шилжүүлсэн (+ = баг давуу); "
                "шугам = 95% хүрээ; улаан-улбар = гадаад, цэнхэр = дотоод; хар хүрээтэй = картад нээлттэй тоглогч. +/- нь багийн бусад "
-               "тоглогч, өрсөлдөгчөөс хамаардаг тул ганцаараа тоглогчийн чадварыг хэмжихгүй — хүрээ 0-ийг дайрвал баттай биш.",
+               "тоглогч, өрсөлдөгчөөс хамаардаг тул дангаараа тоглогчийн чадварыг хэмжихгүй; хүрээ 0-ийг дайрвал баттай биш.",
                f"MBA тоглолтын явцын бичлэг, {season_txt}; талбай дээрх 5 тоглогчийг солилтоос сэргээсэн, солилтын бичлэг бүрэн "
                f"тоглолтууд (тоглогч-тоглолтын 90%); {min_minutes}+ минут тоглосон {len(pm)} тоглогч.",
                kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["pbp", "player_games"])
+    coach_box(coach.plus_minus(pm))
 
 
 tab_explore, tab_imports = st.tabs(["Тоглогч судлах", "Гадаад тоглогч ба солилцоо"])
