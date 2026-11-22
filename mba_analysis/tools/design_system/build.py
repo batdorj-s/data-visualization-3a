@@ -51,9 +51,11 @@ color_usage = {
  "warning": "Анхааруулга.", "warning-soft": "Анхааруулгын суурь; дээр нь warning 4.6:1.",
  "error": "Алдааны бичиг, тэмдэг.", "error-soft": "Алдааны төлөвийн суурь; дээр нь error 5.7:1.",
  "info": "Focus ring (2px, surface дээр 6.7:1), холбоос.", "info-soft": "Мэдээллийн суурь.",
+ "muted": "shadcn «muted»: TabsList-ийн суурь, тэмдгийн (secondary badge) суурь, hover мөр.",
+ "ring": "Товч, оролт, табын focus ring (3px, shadcn ring/50).",
 }
 order = ["primary","primary-hover","primary-soft","secondary","accent","accent-ink","accent-soft","bg","surface","surface-2","sidebar",
-         "text","text-2","text-3","text-inverse","border","border-strong","success","success-soft","warning","warning-soft","error","error-soft","info","info-soft"]
+         "text","text-2","text-3","text-inverse","border","border-strong","success","success-soft","warning","warning-soft","error","error-soft","info","info-soft","muted","ring"]
 assert set(order) <= set(T)
 ctok = [{"name": f"mba-{k}", "value": {"light": T[k]}, "usage": color_usage[k]} for k in order]
 extra = [
@@ -88,9 +90,9 @@ tokens = {
      {"name": "body", "fontSize": "15px", "lineHeight": 1.6, "fontWeight": 400, "sample": "Гадаад тоглогчид лигийн нийт онооны 38%-ийг авдаг.", "usage": "Үндсэн бичиг (Streamlit baseFontSize = 15)."},
      {"name": "lead", "fontSize": "1rem", "lineHeight": 1.55, "fontWeight": 400, "sample": "Аль баг яагаад ялж байна вэ.", "usage": "Хуудасны зорилгын өгүүлбэр, text-2, 78ch хүртэл."},
      {"name": "note", "fontSize": "0.82rem", "lineHeight": 1.5, "fontWeight": 400, "sample": "Хэрхэн унших: Багана бүр 1 тоглогч…", "usage": "Графикийн доорх тэмдэглэл."},
-     {"name": "label", "fontSize": "0.78rem", "lineHeight": 1.3, "fontWeight": 600, "letterSpacing": "0.04em", "sample": "ГАДААДЫН ОНОО", "usage": "Тоон картын шошго, ТОМ үсгээр, text-3."}]},
+     {"name": "label", "fontSize": "0.875rem", "lineHeight": 1.25, "fontWeight": 400, "sample": "Гадаадын оноо", "usage": "KPI картын тайлбар (shadcn CardDescription text-sm muted), mba-text-3. ТОМ үсгээр бичихгүй."}]},
    {"name": "Тоо", "family": "sans", "styles": [
-     {"name": "stat-value", "fontSize": "1.7rem", "lineHeight": 1.2, "fontWeight": 700, "sample": "38%", "usage": "Тоон картын утга; tabular-nums."},
+     {"name": "stat-value", "fontSize": "1.875rem", "lineHeight": 1.15, "fontWeight": 600, "sample": "38%", "usage": "KPI картын утга (shadcn text-3xl font-semibold); карт 220px-ээс нарийн бол 1.5rem; tabular-nums."},
      {"name": "score", "fontSize": "2rem", "lineHeight": 1.1, "fontWeight": 800, "sample": "73 – 72", "usage": "Онооны самбар; ялагдсан тал text-3, 600."},
      {"name": "tick", "fontSize": "12px", "lineHeight": 1.2, "fontWeight": 400, "sample": "2025.11", "usage": "Графикийн тэнхлэгийн тоо, text-3."}]},
    {"name": "Код", "family": "mono", "styles": [
@@ -103,18 +105,20 @@ tokens = {
    {"name": "space-5", "value": "18px", "usage": "Гол дүгнэлт, онооны самбарын дотор зай."},
    {"name": "space-6", "value": "24px", "usage": "Footer-ийн баганы зай, толгойн хэсгийн зай."}]},
  "radius": {"tokens": [
-   {"name": "mba-radius", "value": "10px", "usage": "Карт, график, хүснэгт, footer (Streamlit baseRadius medium)."},
-   {"name": "mba-radius-sm", "value": "6px", "usage": "Dataframe."},
-   {"name": "radius-logo", "value": "8px", "usage": "Багийн логоны дөрвөлжин."},
-   {"name": "radius-tag", "value": "4px", "usage": "Графикийн төрлийн шошго, файлын зам."},
-   {"name": "radius-pill", "value": "999px", "usage": "Chip, тэмдэг, улирлын шошго, баар."}]},
- "shadow": {"tokens": [{"name": "mba-shadow", "value": T["shadow"], "usage": "Бүх карт, график, хүснэгтэнд нэг л сүүдэр."}]},
+   {"name": "mba-radius-xl", "value": "14px", "usage": "Карт, график, хүснэгтийн хүрээ, KPI карт (shadcn Card rounded-xl)."},
+   {"name": "mba-radius", "value": "10px", "usage": "Alert, хоосон төлөв, TabsList, expander (shadcn rounded-lg)."},
+   {"name": "mba-radius-md", "value": "8px", "usage": "Товч, оролт, сонгогч, таб, лого, тоглогчийн үзүүлэлтийн нүд (shadcn rounded-md)."},
+   {"name": "mba-radius-sm", "value": "6px", "usage": "Жижиг элемент."},
+   {"name": "radius-tag", "value": "4px", "usage": "Файлын зам (code)."},
+   {"name": "radius-pill", "value": "999px", "usage": "Badge, chip, улирлын тэмдэг, Progress баар."}]},
+ "shadow": {"tokens": [{"name": "mba-shadow", "value": T["shadow"], "usage": "Карт, график, сонгосон таб (shadcn shadow-sm)."},
+                        {"name": "mba-shadow-xs", "value": T["shadow-xs"], "usage": "Товч, оролт, expander (shadcn shadow-xs)."}]},
 }
 w("tokens.json", json.dumps(tokens, ensure_ascii=False, indent=1))
 
 # tokens.css (анхны хувилбар; page-д хадгалахад дахин үүснэ)
 css = ["/* MBA Analytics — generated from tokens.json */", ':root, [data-theme="light"] {']
-css += [f"  --{t['name']}: {t['value']['light']};" for t in ctok] + [f"  --mba-shadow: {T['shadow']};", "}", ":root {"]
+css += [f"  --{t['name']}: {t['value']['light']};" for t in ctok] + [f"  --mba-shadow: {T['shadow']};", f"  --mba-shadow-xs: {T['shadow-xs']};", "}", ":root {"]
 css += [f"  --{t['name']}: {t['value']};" for fam in ("spacing", "radius") for t in tokens[fam]["tokens"]]
 css += [f"  --font-{k}: {v};" for k, v in tokens["type"]["families"].items()] + ["}"]
 for g in tokens["type"]["groups"]:
@@ -178,25 +182,25 @@ card("FilterChips", "Өгөгдөл", 110, grab(ui.filter_summary, types.SimpleN
 Идэвхтэй шүүлтүүрийн chip-үүд: хэрэглэгч юуг шүүснээ санах шаардлагагүй.
 
 - `filter_summary(f)` — page_header-ийн дараа.
-- Анхдагчаас өөрчилсөн шүүлтүүр `mba-chip--active` (`mba-primary-soft` суурь, `mba-primary` бичиг); бусад нь цагаан.
+- shadcn Badge: анхдагчаас өөрчилсөн шүүлтүүр `mba-badge--soft` (`mba-primary-soft` суурь, `mba-primary` бичиг); бусад нь `mba-badge--outline`.
 """)
 card("Findings", "Өгөгдөл", 170, grab(ui.findings, ["Гадаад тоглогчид лигийн нийт онооны **38%**-ийг авдаг (бодит хувь 37%–40% хооронд байх магадлалтай).",
      "Хамгийн их оноо авсан **69** тоглогч (нийт тоглогчдын 41%) л лигийн онооны 80%-ийг авдаг.",
      "Одоогийн хамгийн хүчтэй баг: **XAC Broncos** (хүчний оноо 1623; 1500 = дундаж)."]), """
-«Гол дүгнэлт» — хуудасны 2–3 гол олдвор, датагаас тооцсон тоогоор.
+«Гол дүгнэлт» — хуудасны 2–3 гол олдвор, shadcn Alert хэлбэрээр (дүрс, гарчиг, дугаарласан жагсаалт).
 
 - `findings(items)` — `**тод**` markdown-ийг дэмжинэ; бусдыг escape хийнэ.
 - 3 мөрөөс илүүгүй; мөр бүр нэг тоо, нэг дүгнэлт. Тодорхой бус байдал байвал хүрээг нь бичнэ.
-- Зүүн талын `mba-primary` зураас нь хуудсан дээрх ганц ийм тэмдэг; өөр картад давтахгүй.
+- `mba-radius` булан, `mba-border` хүрээ, сүүдэргүй; дүрс нь lucide «info» (ISC), `mba-primary`.
 """)
 card("StatCards", "Өгөгдөл", 150, grab(ui.stat_cards, [("Тоглолт", "172", "үндсэн шат ба плей-офф"), ("Тоглогч (5+ тоглолт)", "147", "34 гадаад · 113 дотоод"),
      ("Гадаадын оноо", "38%", "95% хүрээ 37%–40%"), ("Тоглолтын оноо", "164", "хоёр баг нийлээд, дунджаар"),
      ("Тэргүүлэгч", "XAC Broncos", "18–9, 67% ялалт", None, ("XAC Broncos", None))]), """
-Тоон картын эгнээ: шошго, утга, нэг мөр тайлбар; хүсвэл багийн логотой.
+KPI картын эгнээ (shadcn dashboard «SectionCards»): тайлбар, том утга, доод мөр; хүсвэл багийн логотой.
 
 - `stat_cards([(шошго, утга, тайлбар, tooltip, (баг, лого_url))])` — сүүлийн гурав заавал биш.
-- Шошго `label`, утга `stat-value` (tabular-nums), тайлбар `mba-text-3`.
-- Сүлжээ `minmax(150px, 1fr)`: компьютер дээр 5 нэг мөрөнд, утсан дээр 2 багана, ганц үлдсэн карт бүтэн өргөнөөр.
+- Тайлбар `label` (жижиг, ТОМ үсгээр биш), утга `stat-value` (tabular-nums), доод мөр `mba-text-3`.
+- Карт `mba-radius-xl`, `mba-shadow`; сүлжээ `minmax(170px, 1fr)`: компьютер дээр 5 нэг мөрөнд, утсан дээр 2 багана, ганц үлдсэн карт бүтэн өргөнөөр.
 - Хуудсын эхэнд НЭГ эгнээ; утга нь хуудасны гол асуултад хамаатай тоо байх ёстой.
 """)
 card("TeamLogo", "Багийн дүрслэл", 120, '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">'
@@ -226,16 +230,16 @@ card("Scoreboard", "Багийн дүрслэл", 150, grab(ui.scoreboard, "Sele
 """)
 card("StandingsBoard", "Өгөгдөл", 300, grab(ui.standings_board, [(1, "XAC Broncos", 18, 9, 0.667), (2, "SG Apes", 18, 9, 0.667), (3, "BCH Knights", 17, 10, 0.63),
      (4, "Erdenet Miners", 16, 11, 0.593), (5, "Selenge Bodons", 15, 12, 0.556)], {}, "SG Apes"), """
-Лигийн байрын товч жагсаалт: байр, логотой нэр, ялалт–хожигдол, ялалтын хувийн баар.
+Лигийн байрын товч жагсаалт (shadcn Table + Progress): байр, логотой нэр, ялалт–хожигдол, ялалтын хувийн баар.
 
 - `standings_board(rows, logos, highlight)` — rows = (байр, баг, ялалт, хожигдол, хувь).
-- Онцолсон баг `mba-accent-soft` мөр. Баар `mba-primary` дээр `mba-bar-track`.
+- Толгой `text-sm font-medium`, ТОМ үсгээр биш; мөр hover-т `mba-muted`. Онцолсон баг `mba-accent-soft` мөр. Баар `mba-primary`, зам нь primary-ийн 20%.
 - Container query: 380 px-ээс нарийн бол баар нуугдаж зөвхөн хувь үлдэнэ.
 """)
 card("CompareTable", "Өгөгдөл", 260, grab(ui.compare_table, "XAC Broncos", "SG Apes", [
      ("Авсан оноо", "тоглолтын дундаж", 82.7, 81.7, "{:.1f}", True), ("Алдсан оноо", "бага нь сайн", 78.6, 82.1, "{:.1f}", False),
      ("Оновч", "3 оноог 1.5 дахин тооцсон", 0.524, 0.515, "{:.1%}", True), ("Бөмбөг алдалт", "довтолгооны хэдэн хувьд, бага нь сайн", 0.193, 0.199, "{:.1%}", False)], {}), """
-Хоёр багийн харьцуулалт: үзүүлэлт бүрт давуу талыг `mba-success-soft` нүд, тод бичгээр.
+Хоёр багийн харьцуулалт (shadcn Table, карт дотор): үзүүлэлт бүрт давуу талыг `mba-success-soft` нүд, тод бичгээр.
 
 - `compare_table(t1, t2, rows, logos)` — rows = (үзүүлэлт, тайлбар, утга1, утга2, формат, их_нь_сайн).
 - «Бага нь сайн» үзүүлэлтэд (алдсан оноо, бөмбөг алдалт) `их_нь_сайн=False`; тайлбарт заавал бичнэ.
