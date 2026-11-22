@@ -112,6 +112,8 @@ def _pbp_tables(p: Path, r: Path, games: pd.DataFrame, pg: pd.DataFrame, metrics
         "ins_ratings": I.team_ratings(pd.read_csv(p / "team_games.csv")),
         "ins_usage": I.usage_table(pg),
         "ins_stability": I.season_stability(ps_all),
+        "plus_minus": I.plus_minus_season(I.plus_minus_games(pbp), pg).assign(
+            player_name=lambda d: d.player_id.map(names)),
     }
     from src import imports as IM
 

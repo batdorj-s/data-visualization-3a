@@ -200,3 +200,62 @@ def season_stability(players_season: pd.DataFrame, min_tsa: float = 50, min_tpa:
         ci = fisher_ci(r, len(w))
         rows.append({"stat": col, "label": label, "n": len(w), "r": r, "lo": ci.lo, "hi": ci.hi})
     return pd.DataFrame(rows).sort_values("r", ascending=False).reset_index(drop=True)
+
+
+# ---------------------------------------------------------------- +/- (Plus/Minus) ба on/off
+GAME_SEC = 2400  # FIBA: 4 × 10 минут
+
+
+def plus_minus_games(pbp: pd.DataFrame) -> pd.DataFrame:
+    """Тоглогч-тоглолт бүрийн талбай дээр байсан хугацаа (sec) ба тэр хугацаанд багийн онооны зөрүү (pm, +/-).
+
+    MBA-ийн хайрцаг оноонд +/- байхгүй тул тоглолтын явцын бичлэгээс тооцно: солилтын бичлэгээр талбай дээрх тоглогчдыг
+    сэргээж, хоёр бичлэгийн хоорондох онооны өөрчлөлтийг тэр үед талбай дээр байсан тоглогч бүрт өгнө (нэмэлт цаг орно).
+    valid = тухайн тал дээр 5 тоглогчийн +/--ийн нийлбэр 5 × эцсийн онооны зөрүүтэй яг тэнцүү (солилтын бичлэг бүрэн).
+    """
+    rows = []
+    for gid, d in pbp.sort_values(["game_id", "seq"]).groupby("game_id", sort=False):
+        on = {"home": set(), "away": set()}
+        pt = pp = ph = pa = None
+        for typ, text, side, pid, per, t, h, a in zip(d.type, d.text, d.side, d.player_id, d.period, d.elapsed, d.home, d.away):
+            if pt is not None and per == pp and t >= pt:
+                diff = (h - ph) - (a - pa)
+                for s, sign in (("home", 1), ("away", -1)):
+                    for p in on[s]:
+                        rows.append((gid, s, p, t - pt, sign * diff))
+            if typ == "sub" and isinstance(pid, str) and side in on:
+                (on[side].add if "in" in str(text) else on[side].discard)(pid)
+            pt, pp, ph, pa = t, per, h, a
+    out = (pd.DataFrame(rows, columns=["game_id", "side", "player_id", "sec", "pm"])
+           .groupby(["game_id", "side", "player_id"], as_index=False).sum())
+    final = pbp.groupby("game_id").agg(h=("home", "last"), a=("away", "last"), game_sec=("elapsed", "max"))
+    out = out.merge(final, left_on="game_id", right_index=True)
+    out["team_margin"] = np.where(out.side == "home", out.h - out.a, out.a - out.h)
+    team_sum = out.groupby(["game_id", "side"]).pm.transform("sum")
+    out["valid"] = team_sum == 5 * out.team_margin
+    return out.drop(columns=["h", "a"])
+
+
+def plus_minus_season(pmg: pd.DataFrame, player_games: pd.DataFrame, n_boot: int = 1000, seed: int = SEED) -> pd.DataFrame:
+    """Тоглогч-улирал бүрийн +/- (зөвхөн солилтын бичлэг бүрэн тоглолтоор).
+
+    pm40     = талбай дээр байхад 40 минутад ногдох багийн онооны зөрүү (95% хүрээ: тоглолтоор дахин түүвэрлэж)
+    on_off40 = тоглогч талбай дээр байх үеийн pm40 − сэлгээнд байх үеийн багийн онооны зөрүү (40 минутад)
+    """
+    info = player_games[["game_id", "player_id", "season", "team", "is_import"]].drop_duplicates(["game_id", "player_id"])
+    d = pmg[pmg.valid & (pmg.sec > 0)].merge(info, on=["game_id", "player_id"], how="inner")
+    d = d.assign(off_sec=(d.game_sec - d.sec).clip(lower=0), off_pm=d.team_margin - d.pm)
+    rng = np.random.default_rng(seed)
+    rows = []
+    for (pid, season), g in d.groupby(["player_id", "season"]):
+        pm, sec = g.pm.to_numpy(float), g.sec.to_numpy(float)
+        idx = rng.integers(0, len(g), (n_boot, len(g)))
+        boot = pm[idx].sum(1) / np.maximum(sec[idx].sum(1), 1) * GAME_SEC
+        pm40 = pm.sum() / sec.sum() * GAME_SEC
+        off_sec = g.off_sec.sum()
+        off40 = g.off_pm.sum() / off_sec * GAME_SEC if off_sec >= 600 else np.nan  # 10-аас цөөн минут сэлгээнд бол тооцохгүй
+        rows.append({"player_id": pid, "season": season, "team": g.team.iloc[-1], "is_import": bool(g.is_import.iloc[0]),
+                     "games": len(g), "minutes": sec.sum() / 60, "pm": int(pm.sum()), "pm_per_game": pm.sum() / len(g),
+                     "pm40": pm40, "pm40_lo": float(np.percentile(boot, 2.5)), "pm40_hi": float(np.percentile(boot, 97.5)),
+                     "off40": off40, "on_off40": pm40 - off40})
+    return pd.DataFrame(rows)

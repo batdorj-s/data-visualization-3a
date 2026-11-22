@@ -1,7 +1,8 @@
+import pandas as pd
 import streamlit as st
 
 from data_access import apply, apply_selection, current_filters, empty_notice, load, team_logos
-from plots import LABELS, px_dot_ci, px_funnel, px_scatter
+from plots import LABELS, px_dot_ci, px_funnel, px_plus_minus, px_scatter
 from src.palette import IMPORT_LABELS
 from import_view import import_section
 from ui import chart_note, filter_summary, findings, page_header, player_header, player_stats, section, show_chart
@@ -91,6 +92,14 @@ def player_card():
             return (label, fmt.format(r.est), f"Хүрээ {fmt.format(r.lo)}–{fmt.format(r.hi)}" if f.show_ci else None)
         items = [ci_item("ppg", "Оноо / тоглолт", "{:.1f}"), ci_item("ts_pct", "Шидэлтийн оновч", "{:.0%}"),
                  ("Самбар / тоглолт", f"{row.RPG:.1f}", None), ("Дамжуулалт / тоглолт", f"{row.APG:.1f}", None)]
+        pm = load("plus_minus")
+        pm = pm[(pm.player_id == pid) & (pm.season == f.season)]
+        if len(pm):
+            r = pm.iloc[0]
+            items += [("+/- (40 минутад)", f"{r.pm40:+.1f}",
+                       f"Хүрээ {r.pm40_lo:+.1f}…{r.pm40_hi:+.1f} · нийт {int(r.pm):+d}" if f.show_ci else f"нийт {int(r.pm):+d}"),
+                      ("Талбай дээр − сэлгээнд", f"{r.on_off40:+.1f}" if pd.notna(r.on_off40) else "—",
+                       "багийн зөрүүний ялгаа, 40 минутад")]
         player_stats([i for i in items if i])
         level = st.segmented_control("Харах түвшин", ["Улирлын дундаж", "Тоглолт бүр"], default="Улирлын дундаж",
                                      key="card_level")
@@ -132,6 +141,31 @@ def uncertainty():
                    kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["player_games"])
 
 
+@st.fragment
+def plus_minus():
+    section("Талбай дээр байхад баг хэр сайн байсан бэ? (+/-)",
+            "MBA-ийн хайрцаг оноонд +/- байхгүй тул тоглолтын явцын бичлэгээс тооцсон.")
+    c1, c2 = st.columns(2)
+    min_minutes = c1.slider("Хамгийн багадаа хэдэн минут тоглосон", 50, 600, 200, step=50, key="pm_min",
+                            help="Цөөн минуттай тоглогчийн +/- санамсаргүй их хэлбэлздэг")
+    n = c2.slider("Дээд ба доод талаас хэдэн тоглогч", 3, 15, 8, key="pm_n")
+    pm = load("plus_minus")
+    pm = pm[(pm.season == f.season) & pm.player_id.isin(players.player_id) & (pm.minutes >= min_minutes)]
+    if pm.empty:
+        st.info("Энэ шүүлтүүрт хангалттай минут тоглосон тоглогч алга. Минутын доод хязгаарыг бууруулна уу.")
+        return
+    top = pm.nlargest(n, "pm40")
+    bottom = pm.nsmallest(n, "pm40")
+    sel = pd.concat([top, bottom]).drop_duplicates("player_id")
+    show_chart(px_plus_minus(sel, f.show_ci, st.session_state.get("card_player")))
+    chart_note("Цэг = тоглогч талбай дээр байх хугацаанд багийн авсан оноо − алдсан оноо, 40 минутад шилжүүлсэн (+ = баг давуу); "
+               "шугам = 95% хүрээ; улаан-улбар = гадаад, цэнхэр = дотоод; хар хүрээтэй = картад нээлттэй тоглогч. +/- нь багийн бусад "
+               "тоглогч, өрсөлдөгчөөс хамаардаг тул ганцаараа тоглогчийн чадварыг хэмжихгүй — хүрээ 0-ийг дайрвал баттай биш.",
+               f"MBA тоглолтын явцын бичлэг, {season_txt}; талбай дээрх 5 тоглогчийг солилтоос сэргээсэн, солилтын бичлэг бүрэн "
+               f"тоглолтууд (тоглогч-тоглолтын 90%); {min_minutes}+ минут тоглосон {len(pm)} тоглогч.",
+               kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["pbp", "player_games"])
+
+
 tab_explore, tab_imports = st.tabs(["Тоглогч судлах", "Гадаад тоглогч ба солилцоо"])
 with tab_explore:
     left, right = st.columns([3, 2], gap="large")
@@ -140,5 +174,6 @@ with tab_explore:
     with right:
         player_card()
     uncertainty()
+    plus_minus()
 with tab_imports:
     import_section(f)

@@ -104,3 +104,36 @@ def test_stability_pairs_reproduce_season_correlation():
         w = I.stability_pairs(ps, stat)
         assert len(w) == st.loc[stat, "n"] and w.player_id.is_unique
         assert abs(w.prev.corr(w.now) - st.loc[stat, "r"]) < 1e-12
+
+
+def _toy_game():
+    """Гэр: A–E эхэлнэ, 60 с-д 2 оноо, 100 с-д A гарч F орно, 200 с-д зочин 3 оноо; зочин V–Z бүтэн тоглолт."""
+    ev = [("sub", "substitution in", "home", p, 0, 0, 0) for p in "ABCDE"]
+    ev += [("sub", "substitution in", "away", p, 0, 0, 0) for p in "VWXYZ"]
+    ev += [("2pt", "", "home", "A", 60, 2, 0), ("sub", "substitution out", "home", "A", 100, 2, 0),
+           ("sub", "substitution in", "home", "F", 100, 2, 0), ("3pt", "", "away", "V", 200, 2, 3),
+           ("end", "", None, None, 2400, 2, 3)]
+    return pd.DataFrame([{"game_id": 1, "seq": i, "type": t, "text": x, "side": s, "player_id": p, "period": 1,
+                          "elapsed": e, "home": h, "away": a} for i, (t, x, s, p, e, h, a) in enumerate(ev)])
+
+
+def test_plus_minus_toy_game_exact():
+    pm = I.plus_minus_games(_toy_game()).set_index("player_id")
+    assert pm.loc["A", "pm"] == 2 and pm.loc["F", "pm"] == -3 and pm.loc["B", "pm"] == -1 and pm.loc["V", "pm"] == 1
+    assert pm.loc["A", "sec"] == 100 and pm.loc["F", "sec"] == 2300 and pm.loc["B", "sec"] == 2400
+    assert pm.valid.all()  # тал бүрт нийлбэр = 5 × эцсийн зөрүү (гэр −5, зочин +5)
+
+
+def test_plus_minus_matches_box_score_minutes_and_team_margin():
+    """MBA-д +/- байхгүй: явцын бичлэгээс тооцсон талбайн минут хайрцаг онооны минуттай, нийлбэр нь онооны зөрүүтэй таарах ёстой."""
+    pbp = pd.read_csv(P / "pbp.csv.gz")
+    pg = pd.read_csv(P / "player_games.csv")
+    pmg = I.plus_minus_games(pbp)
+    m = pmg.merge(pg[["game_id", "player_id", "MIN"]], on=["game_id", "player_id"])
+    err = (m.sec / 60 - m.MIN).abs()
+    assert err.median() < 0.5 and (err <= 1).mean() > 0.95
+    assert pmg.groupby(["game_id", "side"]).valid.first().mean() > 0.85
+    s = I.plus_minus_season(pmg, pg, n_boot=200)
+    assert not s[["player_id", "season"]].duplicated().any()
+    assert ((s.pm40_lo <= s.pm40) & (s.pm40 <= s.pm40_hi)).all()
+    assert s.games.min() >= 1 and (s.minutes > 0).all()
