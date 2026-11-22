@@ -101,18 +101,8 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 .mba-fresh {{ display: inline-flex; align-items: center; gap: 6px; }}
 
 /* ---- footer ---- */
-.mba-footer {{ margin-top: 3rem; padding: 22px 24px; border-radius: var(--mba-radius); background: var(--mba-sidebar);
-  color: #C9D5E6; font-size: .84rem; line-height: 1.6; }}
-.mba-footer__grid {{ display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }}
-.mba-footer__brand {{ display: flex; gap: 10px; align-items: center; color: #fff; font-weight: 800; font-size: 1rem; letter-spacing: .02em; }}
-.mba-footer__brand small {{ display: block; color: #9FB3D1; font-weight: 600; font-size: .68rem; letter-spacing: .18em; }}
-.mba-footer h5 {{ margin: 0 0 6px 0; padding: 0; color: #fff; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }}
-.mba-footer a {{ color: #C9D5E6; text-decoration: none; border-bottom: 1px solid rgba(201,213,230,.35); }}
-.mba-footer a:hover {{ color: #fff; border-bottom-color: var(--mba-accent); }}
-.mba-footer ul {{ list-style: none; margin: 0; padding: 0; }}
-.mba-footer li {{ margin: 2px 0; }}
-.mba-footer__base {{ margin-top: 16px; padding-top: 12px; border-top: 1px solid #2A4675; display: flex; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px; color: #9FB3D1; font-size: .76rem; }}
+.mba-footer {{ margin-top: 3rem; padding: 14px 0 6px 0; border-top: 1px solid var(--mba-border); color: var(--mba-text-3);
+  font-size: .8rem; text-align: center; }}
 
 /* ---- expander ---- */
 [data-testid="stExpander"] details {{ background: var(--mba-surface); border: 1px solid var(--mba-border); border-radius: var(--mba-radius);
@@ -244,7 +234,6 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   [data-testid="stMainBlockContainer"] {{ padding-left: 1rem; padding-right: 1rem; padding-top: 1.2rem; }}
   .mba-head h1 {{ font-size: 1.5rem; }}
   .mba-head__meta {{ align-items: flex-start; }}
-  .mba-footer__grid {{ grid-template-columns: 1fr; gap: 16px; }}
   .mba-stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
   .mba-stat {{ padding: 10px 12px; }}
   .mba-stat:last-child:nth-child(odd) {{ grid-column: 1 / -1; }}
@@ -483,34 +472,5 @@ def show_chart(fig, select: bool = False, **kw):
     return st.plotly_chart(fig, config=cfg, **kw)
 
 
-def _icon_img(size: int = 30) -> str:
-    """Брэнд дүрсийг <img> data URI-гаар (st.html нь inline <svg>-г цэвэрлэдэг)."""
-    import base64
-    from pathlib import Path
-
-    svg = (Path(__file__).parent / "assets" / "mba_icon.svg").read_bytes()
-    return (f'<img src="data:image/svg+xml;base64,{base64.b64encode(svg).decode()}" width="{size}" height="{size}" '
-            'alt="" aria-hidden="true">')
-
-
-SOURCES = [("MBA лигийн албан ёсны статистик", "https://mongolia.basketball/en/stats?competition=league&view=players"),
-           ("Wikipedia — The League (Mongolia)", "https://en.wikipedia.org/wiki/The_League_(Mongolia)"),
-           ("geoBoundaries — аймгийн хил (ODbL)", "https://www.geoboundaries.org/"),
-           ("ShamSports — гадаад тоглогчийн карьер", "https://www.shamsports.com/")]
-REPO = "https://github.com/batdorj-s/data-visualization-3a"
-
-
 def footer() -> None:
-    from data_access import snapshot
-
-    src = "".join(f'<li><a href="{esc(u)}" target="_blank" rel="noopener">{esc(n)}</a></li>' for n, u in SOURCES)
-    st.html(f'<footer class="mba-footer" role="contentinfo"><div class="mba-footer__grid">'
-            f'<div><div class="mba-footer__brand">{_icon_img()}<div>MBA<small>ANALYTICS</small></div></div>'
-            '<p style="margin:.6rem 0 0 0">Монголын сагсан бөмбөгийн дээд лигийн (MBA) статистикт тулгуурласан шинжилгээ. '
-            "Тоо бүрийн тодорхой бус байдлыг 95% хүрээгээр харуулдаг.</p></div>"
-            f"<div><h5>Эх сурвалж</h5><ul>{src}</ul></div>"
-            "<div><h5>Төсөл</h5><ul><li>F.ITC341 Өгөгдлийн дүрслэл — бие даалт</li>"
-            f'<li><a href="{REPO}" target="_blank" rel="noopener">Эх код (GitHub)</a></li>'
-            "<li>Аргачлал, нэр томьёо: «Тухай», «Нэр томьёо» хуудас</li></ul></div></div>"
-            f'<div class="mba-footer__base"><span>Дата шинэчилсэн: {esc(snapshot())} · 2025–26 ба 2026–27 улирал</span>'
-            "<span>Багийн лого нь тухайн багийн өмч; MBA-ийн албан ёсны сайтаас иш татав.</span></div></footer>")
+    st.html('<footer class="mba-footer" role="contentinfo">© 2026 MBA Analytics</footer>')
