@@ -44,6 +44,32 @@ def _h2(text: str) -> dict:
     return {"type": "h2", "text": text}
 
 
+def _revision_blocks(root: Path) -> list[dict]:
+    """Хэрэглэгчийн санал хүсэлтийн дараах өөрчлөлт бүр: санал хүсэлт (яг хэвээр), юу, яагаад, commit; зурагтай бол өмнө/дараа."""
+    from src.revision_log import REVISIONS
+
+    tbl = pd.DataFrame([{"№": f"R{i:02d}", "Огноо": r["date"], "Санал хүсэлт (хэрэглэгчийн үг)": f"«{r['feedback']}»",
+                         "График": r["chart"], "Өөрчлөлт": r["change"], "Шалтгаан": r["reason"], "Commit": r["commit"]}
+                        for i, r in enumerate(REVISIONS, 1)])
+    blocks = [
+        _para("Dashboard ба графикуудыг хэрэглэгчийн санал хүсэлтээр давтан сайжруулсан. Мөр бүрт санал хүсэлтийг яг бичсэнээр нь, "
+              "юу өөрчлөгдсөн, яагаад, ямар commit-оор орсныг тэмдэглэв. Зурагтай мөрийн «өмнө» ба «дараа» зургийг тухайн commit-ийн "
+              "кодоор тухайн үеийн датанаас дахин зурсан (tools/report/render_revisions.py), тиймээс хэрэглэгчийн харсантай ижил."),
+        _draft("«Шалтгаан» баганыг өөрийн үгээр, тухайн өөрчлөлт уншигчид юугаар тус болсныг тайлбарлан дахин бичнэ."),
+        _table("Хүснэгт 8. Санал хүсэлт ба графикийн өөрчлөлт", tbl),
+    ]
+    for i, r in enumerate(REVISIONS, 1):
+        if not r.get("before") or not (root / "figures" / "revisions" / f"{r['key']}.png").exists():
+            continue
+        blocks += [_h2(f"R{i:02d}. {r['chart']}"),
+                   _para(f"Санал хүсэлт ({r['date']}): «{r['feedback']}»"),
+                   _para(f"Өөрчлөлт: {r['change']} Шалтгаан: {r['reason']}"),
+                   _fig(root, f"revisions/{r['key']}",
+                        f"Зураг 0. {r['chart']}: өмнө (commit {r['before']['commit']}) ба дараа (commit {r['after']['commit']})",
+                        width_cm=12.5)]
+    return blocks
+
+
 def build_report_data(root: Path) -> dict:
     root = Path(root)
     P, R = root / "data" / "processed", root / "reports"
@@ -264,6 +290,7 @@ def build_report_data(root: Path) -> dict:
             _h2("Нэр томьёоны тайлбар"),
             _table("Хүснэгт 7. Тайланд хэрэглэсэн нэр томьёо", gloss_tbl),
         ]},
+        {"title": "11. Хавсралт: графикийн өөрчлөлтийн бүртгэл", "blocks": _revision_blocks(root)},
     ]
 
     slides = [

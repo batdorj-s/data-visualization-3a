@@ -17,7 +17,8 @@ def data():
 
 
 def test_report_data_sections(data):
-    assert len(data["sections"]) == 10
+    assert len(data["sections"]) == 11
+    assert data["sections"][-1]["title"].startswith("11. Хавсралт")
     assert data["sections"][0]["title"].startswith("1.")
     figs = [f for s in data["sections"] for b in s["blocks"] if b["type"] == "figure" for f in [b]]
     assert len(figs) >= 12
@@ -50,7 +51,7 @@ def test_docx_structure(tmp_path, data):
     _node("build_docx.js", out)
     doc = Document(out)
     h1 = [p for p in doc.paragraphs if p.style.name == "Heading 1"]
-    assert len(h1) == 10
+    assert len(h1) == 11  # 10 бүлэг + хавсралт (графикийн өөрчлөлтийн бүртгэл)
     assert len(doc.inline_shapes) >= 12
     assert len(doc.tables) >= 5
     assert sum(DRAFT_LABEL in p.text for p in doc.paragraphs) >= 5
@@ -103,3 +104,16 @@ def test_pptx_builds_without_skill_theme_script(tmp_path, data):
     subprocess.run(["node", str(TOOLS / "build_pptx.js"), str(ROOT / "report" / "report_data.json"), str(out)],
                    check=True, cwd=TOOLS, capture_output=True, env=env)
     assert out.exists() and out.stat().st_size > 10_000
+
+
+def test_revision_log_entries_are_complete_and_images_exist():
+    import re
+    from src.revision_log import REVISIONS
+    keys = [r["key"] for r in REVISIONS]
+    assert len(keys) == len(set(keys)) >= 10
+    for r in REVISIONS:
+        assert r["feedback"].strip() and r["change"].strip() and r["reason"].strip()
+        assert re.fullmatch(r"[0-9a-f]{7}", r["commit"]) and re.fullmatch(r"2026-\d\d-\d\d", r["date"])
+        if r.get("before"):
+            assert (ROOT / "figures" / "revisions" / f"{r['key']}.png").exists(), r["key"]
+            assert r["before"]["commit"] != r["after"]["commit"]
