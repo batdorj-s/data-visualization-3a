@@ -22,11 +22,11 @@ import streamlit as st
 TOKENS = {
     # брэнд
     "primary": "#1B3A6B", "primary-hover": "#142C52", "primary-soft": "#E8EEF7",
-    "secondary": "#475569", "accent": "#F08A3C", "accent-soft": "#FDEBDD",
+    "secondary": "#475569", "accent": "#F08A3C", "accent-ink": "#B9480C", "accent-soft": "#FDEBDD",
     # гадаргуу
     "bg": "#F5F7FA", "surface": "#FFFFFF", "surface-2": "#F1F4F8", "sidebar": "#0F2240",
     # текст
-    "text": "#0F172A", "text-2": "#475569", "text-3": "#64748B", "text-inverse": "#E6ECF5",
+    "text": "#0F172A", "text-2": "#475569", "text-3": "#5B6B7F", "text-inverse": "#E6ECF5",
     # хүрээ
     "border": "#DCE3EC", "border-strong": "#C3CEDC",
     # төлөв
@@ -83,7 +83,7 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 .mba-head {{ margin: 0 0 1.1rem 0; }}
 .mba-head__main {{ min-width: 0; flex: 1 1 420px; }}
 .mba-eyebrow {{ font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--mba-accent); margin-bottom: .35rem; }}
+  color: var(--mba-accent-ink); margin-bottom: .35rem; }}
 .mba-head h1 {{ font-size: 1.9rem; font-weight: 700; color: var(--mba-text); margin: 0; padding: 0; letter-spacing: -0.02em; }}
 .mba-lead {{ font-size: 1rem; color: var(--mba-text-2); max-width: 78ch; margin: .45rem 0 0 0; line-height: 1.55; }}
 .mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: .2rem 0 .4rem 0; }}
