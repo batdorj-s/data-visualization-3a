@@ -3,9 +3,10 @@ import streamlit as st
 
 from data_access import load
 from plots import A_COLOR, _layout
-from ui import chart_note, findings, page_header
+from ui import chart_note, findings, page_header, section
 
-page_header("Өгөгдлийн чанар", "Дата хэр бүрэн, хэр цэвэр вэ — дүгнэлтэд итгэж болох эсэхийг шалгах хуудас.")
+page_header("Өгөгдлийн чанар", "Дата хэр бүрэн, хэр цэвэр вэ — дүгнэлтэд итгэж болох эсэхийг шалгах хуудас.",
+            eyebrow="Тусламж · Өгөгдлийн чанар")
 missing = load("quality_missing")
 m = load("quality_matches")
 relinked = m[m.left_id != m.right_id]
@@ -25,7 +26,7 @@ fig.update_xaxes(title="Дутуу утга, %")
 st.plotly_chart(_layout(fig, "Үзүүлэлт бүрийн дутуу утгын хувь", height=320), width="stretch")
 chart_note("Багана урт байх тусам тухайн үзүүлэлт олон тоглогчид дутуу.", "MBA тоглогчийн профайл ба улирлын статистик.",
            kind="Хэвтээ багана график (bar chart)", files=["missing"])
-st.subheader(f"Нэрээр холбосон тоглогчид ({len(relinked)})")
+section(f"Нэрээр холбосон тоглогчид ({len(relinked)})")
 st.dataframe(relinked.rename(columns={"left_name": "Нэр (нэг улирал)", "right_name": "Нэр (нөгөө улирал)",
                                       "score": "Төстэй байдал (1 = ижил)", "same_team": "Ижил баг",
                                       "n_candidates": "Сонголтын тоо"})

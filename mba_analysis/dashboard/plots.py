@@ -12,21 +12,42 @@ from src.uncertainty import funnel_limits
 
 A_COLOR, B_COLOR = PALETTE["blue"], PALETTE["vermillion"]
 LIGHTEST = "#D0D0D0"
-FONT = dict(family="Fira Sans, Arial, sans-serif", size=14, color="#0F172A")
+FONT = dict(family="Inter, 'Segoe UI', Arial, sans-serif", size=13, color="#334155")
+INK, MUTED, GRID, AXIS = "#0F172A", "#64748B", "#EDF1F6", "#C3CEDC"
 LABELS = {**CHART_LABELS, "EFF": "Үр ашгийн оноо (EFF)"}
 
 
 def _layout(fig: go.Figure, title: str, height: int = 420, **kw) -> go.Figure:
-    margin = kw.pop("margin", dict(l=10, r=44, t=60, b=10))
-    fig.update_layout(title=dict(text=title, x=0, font=dict(size=17, color="#0F172A")), font=FONT, height=height,
-                      margin=margin, plot_bgcolor="white", paper_bgcolor="white",
+    """Бүх графикийн нэгдсэн загвар: цагаан суурь, зөөлөн тор, тод гарчиг, нэг фонт, нэг hover загвар."""
+    margin = kw.pop("margin", dict(l=10, r=44, t=58, b=10))
+    fig.update_layout(title=dict(text=title, x=0.01, xanchor="left", y=0.97, yanchor="top",
+                                 font=dict(size=15, color=INK, family=FONT["family"], weight=600)),
+                      font=FONT, height=height, margin=margin, plot_bgcolor="white", paper_bgcolor="white",
                       # хэрэгслийн самбарыг баруун ирмэгт босоогоор: гарчиг, графикийн бичиг дээр гарахгүй
                       modebar=dict(orientation="v", bgcolor="rgba(255,255,255,0.85)", color="#94A3B8",
-                                   activecolor="#1E40AF"),
-                      hovermode="closest", hoverlabel=dict(font=dict(family=FONT["family"], size=14)),
-                      legend=dict(orientation="h", y=-0.22), **kw)
-    fig.update_xaxes(showgrid=True, gridcolor="#E2E8F0", zeroline=False, title_font=dict(size=14))
-    fig.update_yaxes(showgrid=True, gridcolor="#E2E8F0", zeroline=False, title_font=dict(size=14))
+                                   activecolor="#1B3A6B"),
+                      hovermode="closest",
+                      hoverlabel=dict(bgcolor="white", bordercolor=AXIS, font=dict(family=FONT["family"], size=13, color=INK)),
+                      legend=dict(orientation="h", y=-0.22, font=dict(size=12, color="#334155"), bgcolor="rgba(0,0,0,0)"),
+                      **kw)
+    fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False, showline=True, linecolor=AXIS, ticks="outside",
+                     tickcolor=AXIS, ticklen=4, title_font=dict(size=13, color=MUTED), tickfont=dict(size=12, color=MUTED))
+    fig.update_yaxes(showgrid=True, gridcolor=GRID, zeroline=False, showline=False,
+                     title_font=dict(size=13, color=MUTED), tickfont=dict(size=12, color=MUTED))
+    return fig
+
+
+def add_team_logos(fig: go.Figure, xs, ys, logos: list[str | None], size_frac: float = 0.075, row=None, col=None) -> go.Figure:
+    """Цэгийн байрлал дээр багийн логог (албан ёсны URL) зурна. Хэмжээ нь тэнхлэгийн хүрээний хувиар — сунахгүй."""
+    xs, ys = np.asarray(xs, float), np.asarray(ys, float)
+    if not len(xs):
+        return fig
+    sx = (np.nanmax(xs) - np.nanmin(xs) or 1) * size_frac
+    sy = (np.nanmax(ys) - np.nanmin(ys) or 1) * size_frac * 1.6
+    for x, y, url in zip(xs, ys, logos):
+        if url:
+            fig.add_layout_image(source=url, x=x, y=y, xref="x", yref="y", sizex=sx, sizey=sy, xanchor="center",
+                                 yanchor="middle", sizing="contain", layer="above")
     return fig
 
 
@@ -503,22 +524,30 @@ def px_assisted(df: pd.DataFrame, show_ci: bool) -> go.Figure:
     return _layout(fig, "Оноо хэрхэн бүтдэг вэ: дамжуулалтаас уу, бие даан уу", height=400)
 
 
-def px_off_def(df: pd.DataFrame, highlight: str | None = None) -> go.Figure:
+def px_off_def(df: pd.DataFrame, highlight: str | None = None, logos: dict | None = None) -> go.Figure:
+    """Тойрог бүр 1 баг: хүрээний өнгө = ялалтын хувь, дотор нь багийн лого (логогүй бол өнгөт тойрог)."""
     mx, my = df.ortg.mean(), df.drtg.mean()
+    logos = logos or {}
+    urls = [logos.get(t) for t in df.team]
     fig = go.Figure(go.Scatter(
-        x=df.ortg, y=df.drtg, mode="markers+text", text=df.team, textposition="top center", showlegend=False,
-        marker=dict(size=14 + 26 * df.win, color=df.win, colorscale="RdBu", cmin=0.1, cmax=0.9,
-                    line=dict(color=["black" if t == highlight else "#475569" for t in df.team],
-                              width=[3 if t == highlight else 1 for t in df.team]),
-                    colorbar=dict(title=dict(text="Ялалтын<br>хувь", side="top"), tickformat=".0%", thickness=12, len=0.7)),
+        x=df.ortg, y=df.drtg, mode="markers+text", text=df.team, textposition="bottom center", showlegend=False,
+        textfont=dict(size=11, color="#334155"),
+        marker=dict(size=44 if any(urls) else 14 + 26 * df.win, color=df.win, colorscale="RdBu", cmin=0.1, cmax=0.9,
+                    line=dict(color=["#0F172A" if t == highlight else "white" for t in df.team],
+                              width=[4 if t == highlight else 2 for t in df.team]),
+                    colorbar=dict(title=dict(text="Ялалт", side="top"), tickformat=".0%", thickness=10, len=0.6, x=1.0)),
         customdata=np.c_[df.win, df.pace, df.ortg - df.drtg],
         hovertemplate="<b>%{text}</b><br>100 довтолгоонд авсан %{x:.1f}, алдсан %{y:.1f} (зөрүү %{customdata[2]:+.1f})<br>"
                       "Ялалт %{customdata[0]:.0%} · тоглолтод %{customdata[1]:.0f} довтолгоо<extra></extra>"))
+    add_team_logos(fig, df.ortg, df.drtg, urls, size_frac=0.07)  # өнгөт тойргийн дотор лого: өнгө = ялалтын хувь
     fig.add_vline(x=mx, line_dash="dash", line_color=NEUTRAL)
     fig.add_hline(y=my, line_dash="dash", line_color=NEUTRAL)
-    fig.update_xaxes(title="Довтолгоо: 100 довтолгоонд авсан оноо (баруун тийш = сайн)")
-    fig.update_yaxes(title="Хамгаалалт: алдсан оноо (дээшээ = сайн)", autorange="reversed")
-    return _layout(fig, "Довтолгоо ба хамгаалалтаар багуудын байрлал", height=500)
+    pad_x = (df.ortg.max() - df.ortg.min()) * 0.12 or 1
+    pad_y = (df.drtg.max() - df.drtg.min()) * 0.15 or 1
+    fig.update_xaxes(title="Довтолгоо: 100 довтолгоонд авсан оноо (баруун тийш = сайн)",
+                     range=[df.ortg.min() - pad_x, df.ortg.max() + pad_x])
+    fig.update_yaxes(title="Хамгаалалт: алдсан оноо (дээшээ = сайн)", range=[df.drtg.max() + pad_y, df.drtg.min() - pad_y])
+    return _layout(fig, "Довтолгоо ба хамгаалалтаар багуудын байрлал", height=520)
 
 
 def px_usage(df: pd.DataFrame, highlight_team: str | None = None) -> go.Figure:

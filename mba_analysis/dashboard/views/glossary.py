@@ -3,7 +3,8 @@ import streamlit as st
 from src.glossary import TERMS
 from ui import page_header
 
-page_header("Нэр томьёо", "Dashboard ба тайланд гарах үг бүрийн энгийн тайлбар. Хайх талбарт үгээ бичнэ үү.")
+page_header("Нэр томьёо", "Dashboard ба тайланд гарах үг бүрийн энгийн тайлбар. Хайх талбарт үгээ бичнэ үү.",
+            eyebrow="Тусламж · Нэр томьёо")
 q = st.text_input("Хайх", placeholder="жишээ нь: оновч, хүрээ, Elo", key="glossary_q").strip().lower()
 rows = [t for t in TERMS if not q or any(q in x.lower() for x in t)]
 if not rows:

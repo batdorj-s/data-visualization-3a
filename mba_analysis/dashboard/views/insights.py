@@ -1,15 +1,16 @@
 import streamlit as st
 
-from data_access import current_filters, load
+from data_access import current_filters, load, team_logos
 from src.insights import stability_pairs
 from plots import (px_assisted, px_comebacks, px_distance, px_imports_on_court, px_lead_safety, px_off_def, px_stability,
                    px_stability_pairs, px_usage)
-from ui import chart_note, filter_summary, findings, page_header
+from ui import chart_note, filter_summary, findings, page_header, section
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Олдворууд",
-            "Датаас гарсан сагсан бөмбөгийн 8 олдвор. Таб бүр нэг сэдэв; график бүрийн дээр асуулт, доор нь хэрхэн уншихыг бичсэн.")
+            "Датаас гарсан сагсан бөмбөгийн 8 олдвор. Таб бүр нэг сэдэв; график бүрийн дээр асуулт, доор нь хэрхэн уншихыг бичсэн.",
+            eyebrow=f"Олдворууд · {season_txt}")
 filter_summary(f)
 
 imports = load("ins_imports")
@@ -38,13 +39,13 @@ tab_game, tab_shot, tab_team, tab_import = st.tabs(["Тоглолтын явц",
                                                     "Гадаад тоглогч"])
 
 with tab_game:
-    st.subheader("Тэргүүлж байгаа баг хэр найдвартай ялдаг вэ?")
+    section("Тэргүүлж байгаа баг хэр найдвартай ялдаг вэ?")
     st.plotly_chart(px_lead_safety(lead, f.show_ci), width="stretch")
     chart_note("Хэвтээ тэнхлэг = тухайн мөчид хэдэн оноогоор тэргүүлж байсан, босоо = тэр баг эцэст нь ялсан хувь. Бараан "
                "шугам = тоглолтын хожуу үе. Босоо зураас = 95% магадлалтай хүрээ: цөөн тоглолттой бүлэгт өргөн.",
                "MBA тоглолтын явцын бичлэг, 2025–26 ба 2026–27 улирлын 252 тоглолт.",
                kind="Шугаман график, цэгтэй (line chart)", files=["pbp", "games"])
-    st.subheader("Хоцорч байгаад ялах нь хэр их тохиолддог вэ?")
+    section("Хоцорч байгаад ялах нь хэр их тохиолддог вэ?")
     left, right = st.columns([3, 2], gap="large")
     with left:
         st.plotly_chart(px_comebacks(cb), width="stretch")
@@ -60,7 +61,7 @@ with tab_game:
                kind="Багана график (histogram) + хүснэгт", files=["pbp", "games"])
 
 with tab_shot:
-    st.subheader("Хэр холоос шидэх нь ашигтай вэ?")
+    section("Хэр холоос шидэх нь ашигтай вэ?")
     league_pps = float((dist.pps * dist.n).sum() / dist.n.sum())
     st.plotly_chart(px_distance(dist, league_pps, f.show_ci), width="stretch")
     chart_note("Дээр: тэр зайнаас шидэхэд дунджаар хэдэн оноо авсан (цэнхэр = 2 оноо, улаан-улбар = 3 оноо). Доор: хэдэн удаа "
@@ -68,7 +69,7 @@ with tab_shot:
                f"MBA тоглолтын хуудасны шидэлтийн байршил, байршил бүртгэгдсэн тоглолтуудын {int(dist.n.sum()):,} шидэлт "
                "(2025 оны 10-р сарын 29 тоглолтод байршил бүртгэгдээгүй тул хассан).",
                kind="Шугаман график (дээр) + багана график (доор)", files=["shots"])
-    st.subheader("Оноо хамтын тоглолтоос гардаг уу, бие даасан тоглолтоос уу?")
+    section("Оноо хамтын тоглолтоос гардаг уу, бие даасан тоглолтоос уу?")
     st.plotly_chart(px_assisted(assisted, f.show_ci), width="stretch")
     chart_note("Цэг = тухайн бүсээс оносон шидэлтийн хэдэн хувь нь багийн андын дамжуулалтаас гарсан. Баруун тийш = хамтын "
                "тоглолт, зүүн тийш = тоглогч өөрөө бүтээсэн.",
@@ -77,14 +78,15 @@ with tab_shot:
                kind="Цэгэн график, 95% хүрээтэй (dot plot)", files=["shots", "assists"])
 
 with tab_team:
-    st.subheader("Аль баг довтолгоогоор, аль нь хамгаалалтаар хүчтэй вэ?")
+    section("Аль баг довтолгоогоор, аль нь хамгаалалтаар хүчтэй вэ?")
     r = ratings[ratings.season == f.season]
-    st.plotly_chart(px_off_def(r, f.highlight_team), width="stretch")
-    chart_note("Тойрог бүр 1 баг: баруун тийш = сайн довтолгоо, дээшээ = сайн хамгаалалт; том, цэнхэр = өндөр ялалтын хувь. "
+    st.plotly_chart(px_off_def(r, f.highlight_team, team_logos()), width="stretch")
+    chart_note("Тойрог бүр 1 баг (дотор нь багийн лого): баруун тийш = сайн довтолгоо, дээшээ = сайн хамгаалалт; тойргийн өнгө цэнхэр = өндөр ялалтын хувь, улаан = бага. "
                "Тасархай шугам = лигийн дундаж. «Онцлох баг» сонговол зузаан хүрээтэй харагдана.",
-               f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(r)} баг; довтолгооны тоог хайрцаг онооноос тооцоолсон.",
-               kind="Тойргон цэгэн график (bubble chart)", files=["team_games"])
-    st.subheader("Их ачаалалтай тоглогч оновчтой байж чаддаг уу?")
+               f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, {len(r)} баг; довтолгооны тоог хайрцаг онооноос тооцоолсон; "
+               "лого — MBA-ийн албан ёсны сайт.",
+               kind="Тойргон цэгэн график, багийн логотой (bubble chart)", files=["team_games", "team_logos"])
+    section("Их ачаалалтай тоглогч оновчтой байж чаддаг уу?")
     u = usage[usage.season == f.season]
     if f.teams:
         u = u[u.team.isin(f.teams)]
@@ -101,7 +103,7 @@ with tab_team:
                    "(хамгийн үнэ цэнтэй тоглогчид). Цэг дээр хулганаа аваачвал нэрийг харуулна." + extra,
                    f"тоглолтын хайрцаг оноо, {season_txt} улирлын үндсэн шат, 200-аас олон минут тоглосон {len(u)} тоглогч.",
                    kind="Тойргон цэгэн график (bubble chart)", files=["player_games"])
-    st.subheader("Тоглогчийн юу нь улирлаас улиралд хадгалагддаг вэ?")
+    section("Тоглогчийн юу нь улирлаас улиралд хадгалагддаг вэ?")
     n_both = int(stab.n.max())
     st.markdown(f"2025–26 ба 2026–27 улиралд хоёуланд нь тоглосон **{n_both}** тоглогчийн үзүүлэлт бүрийг хоёр улирлаар "
                 "харьцуулав. Асуулт: **өмнөх улиралд өндөр байсан тоглогч энэ улиралд ч өндөр байна уу?** Хэрэв тийм бол "
@@ -131,7 +133,7 @@ with tab_team:
             "буцах нь элбэг. Тиймээс тоглогч сонгохдоо нэг улирлын оновчид бус, тоглолтын хэв маягт нь найдах нь зөв.")
 
 with tab_import:
-    st.subheader("Гадаад тоглогч тоглолтын аль үед талбай дээр байдаг вэ?")
+    section("Гадаад тоглогч тоглолтын аль үед талбай дээр байдаг вэ?")
     st.plotly_chart(px_imports_on_court(imports), width="stretch")
     m = imports.drop_duplicates(["season", "period"]).set_index(["season", "period"]).mean_k
     seasons = sorted(imports.season.unique())

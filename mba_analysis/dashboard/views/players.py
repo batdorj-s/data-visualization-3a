@@ -1,15 +1,17 @@
 import streamlit as st
 
-from data_access import apply, apply_selection, current_filters, empty_notice, load
+from data_access import apply, apply_selection, current_filters, empty_notice, load, team_logos
 from plots import LABELS, px_dot_ci, px_funnel, px_scatter
 from src.palette import IMPORT_LABELS
 from import_view import import_section
-from ui import chart_note, filter_summary, findings, page_header
+from ui import chart_note, filter_summary, findings, page_header, player_header, player_stats, section
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Тоглогчид",
-            "Тоглогчдыг хоёр үзүүлэлтээр харьцуулж, цэг дээр дарж тухайн тоглогчийн картыг баруун талд нь нээнэ.")
+            "Тоглогчдыг хоёр үзүүлэлтээр харьцуулж, цэг дээр дарж тухайн тоглогчийн картыг баруун талд нь нээнэ.",
+            eyebrow=f"Тоглогчид · {season_txt}")
+logos = team_logos()
 filter_summary(f)
 players = apply(load("players"), f)
 if empty_notice(players):
@@ -80,18 +82,16 @@ def player_card():
         ci = load("player_ci")
         ci = ci[(ci.player_id == pid) & (ci.season == f.season)].set_index("metric")
         style = row.cluster_name if isinstance(row.cluster_name, str) else "тодорхойгүй"
-        st.markdown(f"**{row.player_name}** · {row.team} · {row.position} · "
-                    f"{IMPORT_LABELS[bool(row.is_import)].lower()} тоглогч · хэв маяг: {style}")
-        c = st.columns(2)
-        for col, (m, label, fmt) in zip(c, [("ppg", "Оноо / тоглолт", "{:.1f}"), ("ts_pct", "Шидэлтийн оновч", "{:.0%}")]):
-            if m in ci.index:
-                r = ci.loc[m]
-                col.metric(label, fmt.format(r.est))
-                if f.show_ci:
-                    col.caption(f"Хүрээ: {fmt.format(r.lo)}–{fmt.format(r.hi)}")
-        c = st.columns(2)
-        c[0].metric("Самбар / тоглолт", f"{row.RPG:.1f}")
-        c[1].metric("Дамжуулалт / тоглолт", f"{row.APG:.1f}")
+        player_header(row.player_name, row.team, logos.get(row.team), row.position, bool(row.is_import), style)
+
+        def ci_item(m, label, fmt):
+            if m not in ci.index:
+                return None
+            r = ci.loc[m]
+            return (label, fmt.format(r.est), f"Хүрээ {fmt.format(r.lo)}–{fmt.format(r.hi)}" if f.show_ci else None)
+        items = [ci_item("ppg", "Оноо / тоглолт", "{:.1f}"), ci_item("ts_pct", "Шидэлтийн оновч", "{:.0%}"),
+                 ("Самбар / тоглолт", f"{row.RPG:.1f}", None), ("Дамжуулалт / тоглолт", f"{row.APG:.1f}", None)]
+        player_stats([i for i in items if i])
         level = st.segmented_control("Харах түвшин", ["Улирлын дундаж", "Тоглолт бүр"], default="Улирлын дундаж",
                                      key="card_level")
         if level == "Тоглолт бүр":
@@ -109,7 +109,7 @@ def player_card():
 
 @st.fragment
 def uncertainty():
-    st.subheader("Хэр найдвартай вэ?")
+    section("Хэр найдвартай вэ?")
     st.markdown("Цөөн тоглолт, цөөн шидэлттэй тоглогчийн үзүүлэлт санамсаргүйгээр өндөр эсвэл бага гарч болно. "
                 "Доорх хоёр график «үнэхээр сайн» ба «азаар сайн харагдаж байгаа»-г ялгахад тусална.")
     left, right = st.columns(2, gap="large")
