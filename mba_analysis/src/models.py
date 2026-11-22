@@ -11,8 +11,8 @@ from sklearn.preprocessing import StandardScaler
 SEED = 42
 ARCHETYPE_FEATURES = ["pts36", "reb36", "ast36", "stl36", "blk36", "tpa_rate", "ftr", "ts_pct"]
 ARCHETYPE_NAMES = {
-    "pts36": "Оноо авагч", "ts_pct": "Оноо авагч", "ast36": "Тоглолт зохион байгуулагч",
-    "reb36": "Хамгаалалтын төв", "blk36": "Хамгаалалтын төв", "tpa_rate": "Гурвын мэргэн",
+    "pts36": "Оноо авагч", "ts_pct": "Оноо авагч", "ast36": "Холбогч",
+    "reb36": "Хамгаалалтын төв", "blk36": "Хамгаалалтын төв", "tpa_rate": "Шидэгч",
     "stl36": "Идэвхтэй хамгаалагч", "ftr": "Сагс руу дайрагч",
 }
 BALANCED = "Тэнцвэртэй"

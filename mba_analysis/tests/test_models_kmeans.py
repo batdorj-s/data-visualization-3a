@@ -72,7 +72,7 @@ def test_name_clusters_rules():
         _centroid_z(tpa_rate=0.3),
     ])
     names = name_clusters(centroids_z)
-    assert names[0] == "Тоглолт зохион байгуулагч"
+    assert names[0] == "Холбогч"
     assert names[1] == "Оноо авагч"
     assert names[2] == "Хамгаалалтын төв"
     assert names[3] == "Тэнцвэртэй"
