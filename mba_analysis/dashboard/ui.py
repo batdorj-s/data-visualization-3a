@@ -53,7 +53,8 @@ CSS = f"""
 }}
 /* ---- суурь ---- */
 [data-testid="stDecoration"] {{ display: none; }}
-[data-testid="stMainBlockContainer"] {{ padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1440px; }}
+/* Streamlit-ийн дээд header (лого, sidebar нээх товч) 3.5rem өндөр бөгөөд контентын дээр давхарладаг тул түүний доороос эхэлнэ */
+[data-testid="stMainBlockContainer"] {{ padding-top: 4rem; padding-bottom: 3rem; max-width: 1440px; }}
 [data-testid="stMetricValue"], [data-testid="stDataFrame"], .mba-num {{ font-variant-numeric: tabular-nums; }}
 [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {{ line-height: 1.6; }}
 [data-testid="stCaptionContainer"] {{ line-height: 1.5; color: var(--mba-text-3); }}
@@ -112,7 +113,7 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 
 /* ---- дээд самбар: байршил + шүүлтүүр ---- */
 /* sticky-г Streamlit-ийн wrapper дээр тавина (дотор талын блок дээр тавибал wrapper-ээсээ гарч наалдахгүй) */
-[data-testid="stLayoutWrapper"]:has(> .st-key-mba_toolbar) {{ position: sticky; top: 0; z-index: 50;
+[data-testid="stLayoutWrapper"]:has(> .st-key-mba_toolbar) {{ position: sticky; top: 3.5rem; z-index: 50;
   background: color-mix(in srgb, var(--mba-bg) 88%, transparent); backdrop-filter: blur(8px); }}
 .st-key-mba_toolbar {{ padding: 10px 0; margin: 0 0 .6rem 0; border-bottom: 1px solid var(--mba-border); }}
 .st-key-mba_toolbar > div:first-child {{ margin-right: auto; }}
@@ -279,7 +280,7 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
   font-size: .8rem; text-align: center; }}
 
 @media (max-width: 640px) {{
-  [data-testid="stMainBlockContainer"] {{ padding-left: 1rem; padding-right: 1rem; padding-top: 1.2rem; }}
+  [data-testid="stMainBlockContainer"] {{ padding-left: 1rem; padding-right: 1rem; padding-top: 4rem; }}
   .mba-head h1 {{ font-size: 1.5rem; }}
   .mba-head__meta {{ align-items: flex-start; }}
   .mba-stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
