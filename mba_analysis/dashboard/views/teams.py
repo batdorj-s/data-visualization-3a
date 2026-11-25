@@ -4,14 +4,13 @@ import coach
 
 from data_access import current_filters, latest_elo, load, team_info, team_key_of, team_logos
 from plots import px_elo, px_four_factors, px_pareto
-from ui import (chart_note, coach as coach_box, compare_table, filter_summary, findings, page_header,
+from ui import (chart_note, coach as coach_box, compare_table, findings, page_header,
                 pareto_who, section, show_chart, team_header)
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Багууд", "Аль баг, яагаад ялж байна вэ? Багийн профайл, байр, ялалтын 4 хүчин зүйл, хүчний онооны явц ба "
             "хоёр багийн харьцуулалт.", eyebrow=f"Багууд · {season_txt}")
-filter_summary(f)
 logos = team_logos()
 info = team_info()
 tg_all = load("team_games")
@@ -42,7 +41,7 @@ default = f.highlight_team if f.highlight_team in teams else teams[0]
 def profile():
     section("Багийн профайл", "Баг сонгоход доорх онооны хуваарь ба хүчний онооны явц тухайн багийнх болж солигдоно.")
     team = st.selectbox("Баг сонгох", teams, index=teams.index(default), key=f"team_profile::{f.highlight_team}",
-                        help="Зүүн талын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
+                        help="Дээд самбарын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
     r = table.loc[team] if team in table.index else None
     city = info.home_city.get(team, "") if "home_city" in info else ""
     stats = []

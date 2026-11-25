@@ -3,9 +3,9 @@ import streamlit as st
 
 import coach
 
-from data_access import DATA, current_filters, import_share_ci, latest_elo, load, team_key_of, team_logos
+from data_access import DATA, SEASONS, current_filters, import_share_ci, latest_elo, load, team_key_of, team_logos
 from plots import px_fan, px_map, px_pareto
-from ui import (chart_note, coach as coach_box, filter_summary, findings, page_header, pareto_who,
+from ui import (chart_note, coach as coach_box, findings, page_header, pareto_who,
                 section, show_chart, standings_board, stat_cards)
 
 f = current_filters()
@@ -13,7 +13,6 @@ season_txt = f.season.replace("-20", "–") + (" (явагдаж буй)" if f.s
 page_header("Лигийн тойм",
             f"Монголын сагсан бөмбөгийн дээд лигийн {season_txt} улирлын тойм: хэн оноо авдаг, "
             "аль баг хүчтэй, үр дүн хэр найдвартай вэ?", eyebrow=f"Тойм · {season_txt}")
-filter_summary(f)
 
 logos = team_logos()
 games = load("games")
@@ -31,13 +30,31 @@ table = (reg.groupby("team").agg(W=("win", "sum"), G=("win", "size"), net=("net"
 
 ps = load("players")
 p = ps[(ps.season == f.season) & (ps.GP >= f.min_gp)]
+game_pts = (g.home_pts + g.away_pts).mean()
+
+# Өмнөх улиралтай харьцуулалт: тоглолтын тоо биш, харьцаа/дунджийг л харьцуулна (2026–27 дуусаагүй).
+# 2025–26-ийн өмнөх улирлын тоглолт бүрийн дата алга (2023–24 зөвхөн багийн байр) тул тэр үед тэмдэг зурахгүй.
+prev = SEASONS[SEASONS.index(f.season) - 1] if SEASONS.index(f.season) > 0 else None
+share_d = pts_d = None
+if prev:
+    prev_txt = prev.replace("-20", "–")
+    prev_share = import_share_ci(prev)[0]
+    gp = games[games.season == prev]
+    prev_pts = (gp.home_pts + gp.away_pts).mean()
+
+    def _dir(d: float, eps: float) -> str:
+        return "up" if d > eps else "down" if d < -eps else "flat"
+    dp = (share - prev_share) * 100
+    share_d = (f"{dp:+.1f} пункт", _dir(dp, 0.5), f"{prev_txt} улиралд {prev_share:.0%} байсан")
+    dpts = game_pts - prev_pts
+    pts_d = (f"{dpts:+.1f}", _dir(dpts, 0.5), f"{prev_txt} улиралд {prev_pts:.0f} байсан")
 stat_cards([
     ("Тоглолт", f"{len(g)}", "үндсэн шат ба плей-офф"),
     (f"Тоглогч ({f.min_gp}+ тоглолт)", f"{len(p)}", f"{int(p.is_import.astype(bool).sum())} гадаад · "
                                                     f"{int((~p.is_import.astype(bool)).sum())} дотоод"),
     ("Гадаадын оноо", f"{share:.0%}", f"95% хүрээ {lo:.0%}–{hi:.0%}" if f.show_ci else "лигийн нийт онооноос",
-     "Лигийн нийт онооны хэдэн хувийг гадаад тоглогч авсан"),
-    ("Тоглолтын оноо", f"{(g.home_pts + g.away_pts).mean():.0f}", "хоёр баг нийлээд, дунджаар"),
+     "Лигийн нийт онооны хэдэн хувийг гадаад тоглогч авсан", None, share_d),
+    ("Тоглолтын оноо", f"{game_pts:.0f}", "хоёр баг нийлээд, дунджаар", None, None, pts_d),
     ("Тэргүүлэгч", table.index[0] if len(table) else "—",
      f"{int(table.W.iloc[0])}–{int(table.L.iloc[0])}, {table.pct.iloc[0]:.0%} ялалт" if len(table) else None, None,
      (table.index[0], logos.get(table.index[0])) if len(table) else None),
@@ -73,7 +90,7 @@ def fan():
     default = f.highlight_team if f.highlight_team in teams else tg.groupby("team").winpct.last().idxmax()
     team = st.selectbox("Ялалтын явцыг харах баг", teams, index=teams.index(default),
                         key=f"overview_fan_team::{f.highlight_team}",
-                        help="Зүүн талын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
+                        help="Дээд самбарын «Онцлох баг»-ийг сонговол энд автоматаар солигдоно")
     show_chart(px_fan(tg, team_key_of(team), f.show_ci), width="stretch")
     chart_note("Улаан-улбар шугам = сонгосон багийн тухайн өдөр хүртэлх ялалтын хувь, саарал = бусад баг. "
                "Сүүдэр нь багийн жинхэнэ хүч байж болох хүрээ: цөөн тоглолтын дараа өргөн, улирлын эцэст нарийсна.",

@@ -81,7 +81,7 @@ def test_scatter_selection_updates_card():
 
 def test_reset_filters_restores_defaults():
     at = run("views/players.py", min_gp=20, positions=["C"], import_status="Гадаад")
-    next(b for b in at.button if b.label == "Шүүлтүүрийг цэвэрлэх").click()
+    at.button(key="reset_filters").click()
     at.run()
     assert at.session_state["min_gp"] == 5 and at.session_state["positions"] == []
     assert at.session_state["import_status"] == "Бүгд"
