@@ -7,14 +7,13 @@ from data_access import current_filters, load, team_logos
 from plots import px_assist_network, px_game_flow, px_inplay_accuracy, px_shot_map, px_zone_bars
 from src.inplay import REG_SEC, finalize, win_prob
 from src.pbp import ZONES
-from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, scoreboard, section, show_chart
+from ui import chart_note, coach as coach_box, findings, page_header, scoreboard, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
 page_header("Шидэлт ба тоглолтын явц",
             "Хаанаас шидэх нь хамгийн үр ашигтай вэ? Хэн хэнд дамжуулдаг вэ? Тоглолт минут тутам хэрхэн өрнөсөн бэ?",
             eyebrow=f"Шидэлт ба тоглолтын явц · {season_txt}")
-filter_summary(f)
 
 ALL = "Бүгд"
 MIN_SHOTS = 20  # тоглогчийн жагсаалтад орох доод шидэлтийн тоо

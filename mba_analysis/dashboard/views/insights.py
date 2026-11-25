@@ -5,7 +5,7 @@ from data_access import current_filters, load, team_logos
 from src.insights import stability_pairs
 from plots import (px_assisted, px_comebacks, px_distance, px_imports_on_court, px_lead_safety, px_off_def, px_stability,
                    px_stability_pairs, px_usage)
-from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, section, show_chart
+from ui import chart_note, coach as coach_box, findings, page_header, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -13,7 +13,6 @@ page_header("Олдворууд",
             "Датаас гарсан сагсан бөмбөгийн 8 олдвор. Таб бүр нэг сэдвийг хамарна: график бүрийн дээр асуулт, доор нь унших заавар "
             "ба дасгалжуулагчийн дүгнэлт бий.",
             eyebrow=f"Олдворууд · {season_txt}")
-filter_summary(f)
 
 imports = load("ins_imports")
 lead = load("ins_lead")

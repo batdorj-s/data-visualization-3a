@@ -25,7 +25,7 @@ TOKENS = {
     "primary": "#1B3A6B", "primary-hover": "#142C52", "primary-soft": "#E8EEF7",
     "secondary": "#475569", "accent": "#F08A3C", "accent-ink": "#B9480C", "accent-soft": "#FDEBDD",
     # гадаргуу
-    "bg": "#F5F7FA", "surface": "#FFFFFF", "surface-2": "#F1F4F8", "sidebar": "#0F2240",
+    "bg": "#F5F7FA", "surface": "#FFFFFF", "surface-2": "#F1F4F8", "sidebar": "#F8FAFC",
     # текст
     "text": "#0F172A", "text-2": "#475569", "text-3": "#5B6B7F", "text-inverse": "#E6ECF5",
     # хүрээ
@@ -101,15 +101,25 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 /* ---- segmented control ---- */
 [data-testid="stButtonGroup"] button {{ font-size: .875rem; }}
 
-/* ---- sidebar ---- */
-[data-testid="stSidebar"] {{ border-right: 1px solid #0B1A33; }}
+/* ---- sidebar (shadcn: цайвар, зөвхөн навигаци) ---- */
+[data-testid="stSidebar"] {{ border-right: 1px solid var(--mba-border); }}
 [data-testid="stSidebarNav"] a {{ border-radius: var(--mba-radius-md); }}
-[data-testid="stSidebarNav"] a[aria-current="page"] {{ box-shadow: inset 3px 0 0 var(--mba-accent); }}
-[data-testid="stSidebarNavSeparator"] {{ border-color: #2A4675; }}
-[data-testid="stSidebar"] [data-testid="stCaptionContainer"], [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{ color: #9FB3D1; }}
-[data-testid="stSidebar"] hr {{ border-color: #2A4675; }}
-.mba-side-title {{ font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: #9FB3D1; margin: .4rem 0 .2rem 0; }}
+[data-testid="stSidebarNav"] a:hover {{ background: var(--mba-surface-2); }}
+[data-testid="stSidebarNav"] a[aria-current="page"] {{ background: var(--mba-primary-soft); }}
+[data-testid="stSidebarNav"] a[aria-current="page"] span {{ color: var(--mba-primary); font-weight: 600; }}
+[data-testid="stSidebarNavSeparator"] {{ border-color: var(--mba-border); }}
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"], [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{ color: var(--mba-text-3); }}
+
+/* ---- дээд самбар: байршил + шүүлтүүр ---- */
+/* sticky-г Streamlit-ийн wrapper дээр тавина (дотор талын блок дээр тавибал wrapper-ээсээ гарч наалдахгүй) */
+[data-testid="stLayoutWrapper"]:has(> .st-key-mba_toolbar) {{ position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--mba-bg) 88%, transparent); backdrop-filter: blur(8px); }}
+.st-key-mba_toolbar {{ padding: 10px 0; margin: 0 0 .6rem 0; border-bottom: 1px solid var(--mba-border); }}
+.st-key-mba_toolbar > div:first-child {{ margin-right: auto; }}
+.mba-crumb {{ display: flex; gap: 8px; align-items: center; font-size: .875rem; color: var(--mba-text-3); white-space: nowrap; }}
+.mba-crumb b {{ color: var(--mba-text); font-weight: 600; }}
+.mba-crumb--solo {{ padding: 10px 0; margin-bottom: .6rem; border-bottom: 1px solid var(--mba-border); }}
+.mba-chips__label {{ font-size: .8rem; color: var(--mba-text-3); align-self: center; margin-right: 2px; }}
 
 /* ---- хуудасны толгой ---- */
 .mba-head {{ display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap;
@@ -133,7 +143,8 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 .mba-badge--domestic {{ background: #E6F1F8; color: #075985; }}
 .mba-badge--live::before {{ content: ""; width: 6px; height: 6px; border-radius: 50%; background: #4ADE80; }}
 .mba-badge b {{ font-weight: 600; }}
-.mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: .2rem 0 .6rem 0; }}
+.mba-chips {{ display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }}
+.st-key-mba_chips {{ margin: -.2rem 0 .6rem 0; }}
 
 /* ---- хэсгийн гарчиг ---- */
 .mba-section {{ margin: 1.8rem 0 .7rem 0; }}
@@ -158,6 +169,10 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible {{
 @container (min-width: 220px) {{ .mba-kpi__value {{ font-size: 1.875rem; }} }}
 .mba-kpi__foot {{ font-size: .8rem; color: var(--mba-text-3); line-height: 1.4; }}
 .mba-kpi__row {{ display: flex; align-items: center; gap: 10px; min-width: 0; }}
+.mba-kpi__row--trend {{ flex-wrap: wrap; row-gap: 4px; }}
+.mba-kpi__row--trend .mba-kpi__value {{ font-size: inherit; }}
+.mba-kpi__trend {{ flex: none; font-variant-numeric: tabular-nums; white-space: nowrap; }}
+.mba-kpi__foot--note {{ color: var(--mba-text-2); font-weight: 500; }}
 .mba-kpi__row .mba-kpi__value {{ font-size: 1.25rem; }}
 
 /* ---- багийн лого ---- */
@@ -319,16 +334,13 @@ def _md_bold(text: str) -> str:
 
 # ---------------------------------------------------------------- толгой, хэсэг
 def page_header(title: str, lead: str, eyebrow: str = "MBA Analytics") -> None:
-    """Хуудасны толгой: зүүн талд гарчиг ба зорилго, баруун талд идэвхтэй улирал ба дата татсан огноо."""
-    from data_access import current_filters, snapshot  # data_access нь ui-г зөвхөн функц дотроос импортолдог
+    """Хуудасны толгой: гарчиг ба зорилго, баруун талд дата шинэчилсэн огноо.
+    Байршил ба улирал дээд самбарт (breadcrumb, улирлын сонголт) харагддаг тул eyebrow-г давхардуулж зурахгүй."""
+    from data_access import snapshot  # data_access нь ui-г зөвхөн функц дотроос импортолдог
 
-    season = current_filters().season
-    live = season == "2026-2027"
-    pill = f'<span class="mba-badge mba-badge--default{" mba-badge--live" if live else ""}">{esc(season.replace("-20", "–"))}' \
-           f'{" · явагдаж буй" if live else ""}</span>'
-    st.html(f'<header class="mba-head"><div class="mba-head__main"><div class="mba-eyebrow">{esc(eyebrow)}</div>'
+    st.html(f'<header class="mba-head"><div class="mba-head__main">'
             f'<h1>{esc(title)}</h1><p class="mba-lead">{esc(lead)}</p></div>'
-            f'<div class="mba-head__meta">{pill}<span class="mba-fresh">Дата шинэчилсэн: {esc(snapshot())}</span></div>'
+            f'<div class="mba-head__meta"><span class="mba-fresh">Дата шинэчилсэн: {esc(snapshot())}</span></div>'
             "</header>")
 
 
@@ -347,17 +359,31 @@ def findings(items: list[str], title: str = "Гол дүгнэлт") -> None:
 
 
 def stat_cards(items: Sequence[tuple], accent_first: bool = False) -> None:
-    """shadcn dashboard-ийн KPI карт: тайлбар, том утга, доод мөр.
-    items: (шошго, утга, тайлбар|None, tooltip|None, (баг, лого)|None). accent_first: хуучин API (одоо ашиглахгүй)."""
+    """shadcn dashboard-ийн KPI карт (SectionCards): тайлбар + чиг хандлагын тэмдэг, том утга, доод мөр.
+    items: (шошго, утга, тайлбар|None, tooltip|None, (баг, лого)|None, (өөрчлөлт, чиглэл, тайлбар)|None).
+    чиглэл: "up" | "down" | "flat". Өнгөөр сайн/муу гэж дүгнэхгүй (гадаадын онооны өсөлт сайн ч биш, муу ч биш),
+    зөвхөн сум ба тоогоор харуулна. accent_first: хуучин API (одоо ашиглахгүй)."""
+    arrows = {"up": "↑", "down": "↓", "flat": "→"}
     cards = []
     for it in items:
-        label, value, sub, tip, logo = (list(it) + [None, None, None])[:5]
+        label, value, sub, tip, logo, delta = (list(it) + [None] * 4)[:6]
         title = f' title="{esc(tip)}"' if tip else ""
         val = f'<div class="mba-kpi__value">{esc(str(value))}</div>'
         if logo is not None:  # logo = (багийн нэр, URL) → утгын өмнө лого
             val = f'<div class="mba-kpi__row">{team_logo(logo[0], logo[1], 34)}{val}</div>'
-        cards.append(f'<div class="mba-card mba-kpi"{title}><div class="mba-kpi__desc">{esc(label)}</div>{val}'
-                     + (f'<div class="mba-kpi__foot">{esc(sub)}</div>' if sub else "") + "</div>")
+        trend = ""
+        if delta is not None:
+            text, direction, note = (list(delta) + [None])[:3]
+            trend = (f'<span class="mba-badge mba-badge--outline mba-kpi__trend" title="{esc(note or "")}">'
+                     f'<span aria-hidden="true">{arrows.get(direction, "")}</span> {esc(text)}</span>')
+        if trend:  # утгын баруун талд — карт нарийн үед шошгыг шахахгүй
+            val = f'<div class="mba-kpi__row mba-kpi__row--trend">{val}{trend}</div>'
+        head = f'<div class="mba-kpi__desc">{esc(label)}</div>'
+        cards.append(f'<div class="mba-card mba-kpi"{title}>{head}{val}'
+                     + (f'<div class="mba-kpi__foot">{esc(sub)}</div>' if sub else "")
+                     + (f'<div class="mba-kpi__foot mba-kpi__foot--note">{esc(delta[2])}</div>'
+                        if delta is not None and len(delta) > 2 and delta[2] else "")
+                     + "</div>")
     st.html(f'<div class="mba-stats">{"".join(cards)}</div>')
 
 
@@ -479,16 +505,28 @@ def error_state(title: str, text: str = "") -> None:
 
 
 def filter_summary(f) -> None:
-    chips = [("Улирал", f.season.replace("-20", "–"), True)]
-    chips.append(("Баг", ", ".join(f.teams) if f.teams else "бүгд", bool(f.teams)))
-    chips.append(("Байрлал", ", ".join(f.positions) if f.positions else "бүгд", bool(f.positions)))
-    chips.append(("Тоглогч", f.import_status.lower(), f.import_status != "Бүгд"))
-    chips.append(("Доод хязгаар", f"{f.min_gp}+ тоглолт", f.min_gp != 5))
+    """Идэвхтэй (анхдагчаас өөр) шүүлтүүрийг чипээр харуулна; анхдагч төлөвт юу ч зурахгүй."""
+    chips = []
+    if f.teams:
+        chips.append(("Баг", ", ".join(f.teams)))
+    if f.positions:
+        chips.append(("Байрлал", ", ".join(f.positions)))
+    if f.import_status != "Бүгд":
+        chips.append(("Тоглогч", f.import_status.lower()))
+    if f.min_gp != 5:
+        chips.append(("Доод хязгаар", f"{f.min_gp}+ тоглолт"))
+    if not f.show_ci:
+        chips.append(("Магадлалтай хүрээ", "нуусан"))
     if f.highlight_team:
-        chips.append(("Онцолсон", f.highlight_team, True))
-    st.html('<div class="mba-chips" aria-label="Идэвхтэй шүүлтүүр">' + "".join(
-        f'<span class="mba-badge {"mba-badge--soft" if act else "mba-badge--outline"}">{esc(k)}: <b>{esc(v)}</b></span>'
-        for k, v, act in chips) + "</div>")
+        chips.append(("Онцолсон", f.highlight_team))
+    if chips:
+        from data_access import reset_filters  # data_access нь ui-г зөвхөн функц дотроос импортолдог
+        with st.container(horizontal=True, vertical_alignment="center", gap="small", key="mba_chips"):
+            st.html('<div class="mba-chips" aria-label="Идэвхтэй шүүлтүүр"><span class="mba-chips__label">Идэвхтэй шүүлтүүр:</span>'
+                    + "".join(f'<span class="mba-badge mba-badge--soft">{esc(k)}: <b>{esc(v)}</b></span>' for k, v in chips)
+                    + "</div>", width="content")
+            st.button("Бүгдийг цэвэрлэх", on_click=reset_filters, type="tertiary", key="reset_filters",
+                      icon=":material/close:", help="Бүх шүүлтүүрийг анхдагч төлөвт буцаана")
 
 
 def pareto_who(df, teams: dict | None = None, label: str = "лигийн") -> None:

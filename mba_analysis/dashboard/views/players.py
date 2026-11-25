@@ -7,7 +7,7 @@ from data_access import apply, apply_selection, current_filters, empty_notice, l
 from plots import LABELS, px_dot_ci, px_funnel, px_plus_minus, px_scatter
 from src.palette import IMPORT_LABELS
 from import_view import import_section
-from ui import chart_note, coach as coach_box, filter_summary, findings, page_header, player_header, player_stats, section, show_chart
+from ui import chart_note, coach as coach_box, findings, page_header, player_header, player_stats, section, show_chart
 
 f = current_filters()
 season_txt = f.season.replace("-20", "–")
@@ -15,7 +15,6 @@ page_header("Тоглогчид",
             "Тоглогчдыг сонгосон хоёр үзүүлэлтээр харьцуулна. Цэг дээр дарахад тухайн тоглогчийн карт баруун талд нээгдэнэ.",
             eyebrow=f"Тоглогчид · {season_txt}")
 logos = team_logos()
-filter_summary(f)
 players = apply(load("players"), f)
 if empty_notice(players):
     st.stop()

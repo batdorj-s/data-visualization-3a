@@ -1,5 +1,5 @@
 # MBA Analytics — дизайны систем (бүх токен dashboard/ui.py-ийн TOKENS-тэй ижил утгатай).
-# Брэнд: гүн цэнхэр (navy) = итгэл, шинжилгээ; сагсны талбайн улбар шар = зөвхөн брэнд тэмдэг, идэвхтэй навигацид.
+# Брэнд: гүн цэнхэр (navy) = итгэл, шинжилгээ, идэвхтэй навигаци; сагсны талбайн улбар шар = зөвхөн брэнд тэмдэг.
 # Графикийн өнгө (Okabe–Ito: цэнхэр = дотоод, улаан-улбар = гадаад) UI-ийн өнгөнөөс тусдаа — утга нь хольж болохгүй.
 # Цайвар саарал суурь + цагаан карт; бүх текст WCAG AA (4.5:1+). Кирилл үсэгтэй Inter фонт, тоо нь тэгш өргөнтэй.
 # Streamlit нь ажиллуулж буй хавтасны .streamlit/-ийг уншдаг тул repo-ийн үндэс ба mba_analysis/ хоёуланд ижил хуулбар байна.
@@ -25,11 +25,11 @@ chartCategoricalColors = ["#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7",
 dataframeHeaderBackgroundColor = "#F1F4F8"
 
 [theme.sidebar]
-backgroundColor = "#0F2240"
-secondaryBackgroundColor = "#17305A"
-textColor = "#E6ECF5"
-borderColor = "#2A4675"
-primaryColor = "#F08A3C"
+backgroundColor = "#F8FAFC"
+secondaryBackgroundColor = "#EEF2F7"
+textColor = "#0F172A"
+borderColor = "#DCE3EC"
+primaryColor = "#1B3A6B"
 
 [client]
 toolbarMode = "minimal"

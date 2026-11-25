@@ -9,8 +9,8 @@ DATA = Path(__file__).parent / "data"
 SEASONS = ["2025-2026", "2026-2027"]
 POSITIONS = ["PG", "SG", "SF", "PF", "C"]
 IMPORT_OPTIONS = ["Бүгд", "Гадаад", "Дотоод"]
-EMPTY_MSG = ("Сонгосон шүүлтүүрт тохирох өгөгдөл алга. Зүүн талын «Шүүлтүүрийг цэвэрлэх» товчийг дарж "
-             "эсвэл тоглолтын доод хязгаарыг бууруулна уу.")
+EMPTY_MSG = ("Сонгосон шүүлтүүрт тохирох өгөгдөл алга. Дээд самбарын «Бүгдийг цэвэрлэх» товчийг дарж "
+             "эсвэл «Нарийвчлал» цэснээс тоглолтын доод хязгаарыг бууруулна уу.")
 DEFAULTS = {"season": "2025-2026", "teams": [], "positions": [], "import_status": "Бүгд", "min_gp": 5,
             "show_ci": True}
 
@@ -95,33 +95,64 @@ def team_info() -> pd.DataFrame:
     return load("team_meta").set_index("canonical_name")
 
 
-def filters_sidebar() -> Filters:
-    sb = st.sidebar
-    sb.html('<div class="mba-side-title">Шүүлтүүр</div>')
-    sb.caption("Бүх хуудсанд нэг дор үйлчилнэ.")
-    season = sb.selectbox("Улирал", SEASONS, key="season",
-                          format_func=lambda s: s.replace("-20", "–") + (" (явагдаж буй)" if s == "2026-2027" else ""))
-    teams = team_names(season)
-    for key in ("teams", "highlight_team"):
-        cur = st.session_state.get(key)
-        if key == "teams" and cur:
-            st.session_state[key] = [t for t in cur if t in teams]
-        if key == "highlight_team" and cur not in teams:
-            st.session_state.pop(key, None)
-    sel_teams = sb.multiselect("Баг", teams, key="teams", placeholder="Бүх баг")
-    positions = sb.multiselect("Байрлал", POSITIONS, key="positions", placeholder="Бүх байрлал")
-    imp = sb.radio("Тоглогчийн төрөл", IMPORT_OPTIONS, key="import_status", horizontal=True,
-                   help="Гадаад = лигийн гадаад тоглогчийн квотоор тоглож буй тоглогч")
-    min_gp = sb.slider("Хамгийн багадаа хэдэн тоглолт тоглосон", 1, 30, key="min_gp",
-                       value=st.session_state.get("min_gp", 5),
-                       help="Цөөн тоглолттой тоглогчийн дундаж санамсаргүй их хэлбэлздэг тул анхдагчаар 5+")
-    show_ci = sb.toggle("Магадлалтай хүрээг харуулах", key="show_ci", value=st.session_state.get("show_ci", True),
-                        help="Дата цөөн үед бодит утга хаана байж болохыг сүүдэр/шугамаар харуулна (95% магадлал)")
-    sb.button("Шүүлтүүрийг цэвэрлэх", on_click=reset_filters, icon=":material/restart_alt:", width="stretch")
-    sb.divider()
-    highlight = sb.selectbox("Онцлох баг", teams, key="highlight_team", index=None, placeholder="Сонгоогүй",
-                             help="Сонгосон баг бүх хуудасны график дээр тодорч харагдана")
-    sb.caption(f"Дата: MBA лигийн албан ёсны статистик, {snapshot()}-нд татсан")
+FILTER_KEYS = (*DEFAULTS, "highlight_team")
+
+
+def keep_filter_state() -> None:
+    """Шүүлтүүрийн widget-гүй хуудсанд (Тусламж) очиход Streamlit тэдгээрийн утгыг устгадаг тул дахин бичиж хадгална."""
+    for k in FILTER_KEYS:
+        if k in st.session_state:
+            st.session_state[k] = st.session_state[k]
+
+
+def filters_state() -> Filters:
+    """Toolbar зурахгүй хуудсанд session_state-ээс шүүлтүүрийг уншина."""
+    g = st.session_state.get
+    return Filters(g("season", DEFAULTS["season"]), list(g("teams", [])), list(g("positions", [])),
+                   g("import_status", "Бүгд"), g("min_gp", 5), g("show_ci", True), g("highlight_team"))
+
+
+def _count(label: str, n: int) -> str:
+    return f"{label} · {n}" if n else label
+
+
+def filters_toolbar(crumb: tuple[str, str]) -> Filters:
+    """SaaS загварын дээд самбар: зүүн талд байршил (хэсэг / хуудас), баруун талд шүүлтүүрийн товчлуурууд (popover).
+    Бүх шүүлтүүр бүх хуудсанд нэг дор үйлчилнэ; идэвхтэй шүүлтүүр товчлуур дээрээ тоогоор, доор нь чипээр харагдана."""
+    if "season" not in st.session_state:
+        st.session_state["season"] = DEFAULTS["season"]
+    bar = st.container(horizontal=True, vertical_alignment="center", gap="small", key="mba_toolbar")
+    with bar:
+        st.html(f'<nav class="mba-crumb" aria-label="Байршил"><span>{crumb[0]}</span><span aria-hidden="true">/</span>'
+                f'<b>{crumb[1]}</b></nav>', width="content")
+        season = st.segmented_control("Улирал", SEASONS, key="season", required=True, label_visibility="collapsed",
+                                      format_func=lambda s: s.replace("-20", "–") + (" ●" if s == "2026-2027" else ""),
+                                      help="● = одоо явагдаж буй улирал (дуусаагүй)")
+        teams = team_names(season)
+        cur = st.session_state.get("teams")
+        if cur:
+            st.session_state["teams"] = [t for t in cur if t in teams]
+        if st.session_state.get("highlight_team") not in teams:
+            st.session_state.pop("highlight_team", None)
+        with st.popover(_count("Баг", len(st.session_state.get("teams") or [])), icon=":material/groups:", key="pop_teams"):
+            sel_teams = st.multiselect("Баг", teams, key="teams", placeholder="Бүх баг")
+        with st.popover(_count("Байрлал", len(st.session_state.get("positions") or [])), icon=":material/sports_basketball:",
+                        key="pop_pos"):
+            positions = st.pills("Байрлал", POSITIONS, selection_mode="multi", key="positions") or []
+        imp_now = st.session_state.get("import_status", "Бүгд")
+        with st.popover("Тоглогч" if imp_now == "Бүгд" else f"Тоглогч · {imp_now.lower()}", icon=":material/public:",
+                        key="pop_imp"):
+            imp = st.radio("Тоглогчийн төрөл", IMPORT_OPTIONS, key="import_status",
+                           help="Гадаад = лигийн гадаад тоглогчийн квотоор тоглож буй тоглогч")
+        with st.popover("Нарийвчлал", icon=":material/tune:", key="pop_more"):
+            min_gp = st.slider("Хамгийн багадаа хэдэн тоглолт тоглосон", 1, 30, key="min_gp",
+                               value=st.session_state.get("min_gp", 5),
+                               help="Цөөн тоглолттой тоглогчийн дундаж санамсаргүй их хэлбэлздэг тул анхдагчаар 5+")
+            show_ci = st.toggle("Магадлалтай хүрээг харуулах", key="show_ci", value=st.session_state.get("show_ci", True),
+                                help="Дата цөөн үед бодит утга хаана байж болохыг сүүдэр/шугамаар харуулна (95% магадлал)")
+        with st.popover(st.session_state.get("highlight_team") or "Онцлох баг", icon=":material/star:", key="pop_hl"):
+            highlight = st.selectbox("Онцлох баг", teams, key="highlight_team", index=None, placeholder="Сонгоогүй",
+                                     help="Сонгосон баг бүх хуудасны график дээр тодорч харагдана")
     return Filters(season, sel_teams, positions, imp, min_gp, show_ci, highlight)
 
 
